@@ -13,6 +13,45 @@ const asList = (value) => (Array.isArray(value) ? value : []);
 const linkFor = (path) => path;
 const dataPath = (path) => `/${path}`;
 
+const UI = {
+  latestBrief: "最新每日摘要",
+  readFullBrief: "閱讀完整摘要",
+  hotTopics: "焦點主題",
+  newsItems: "新聞項目",
+  categories: "分類",
+  sources: "來源",
+  dailyOverview: "今日總覽",
+  dailyOverviewNote: "由 daily_summary_zh 生成的快速閱讀入口。",
+  focusRanking: "今日焦點新聞榜",
+  focusRankingNote: "根據 hot_topics 的 rank 和 heat_score 排序。",
+  relatedNews: "相關新聞",
+  categoryNews: "分類新聞",
+  categoryNewsNote: "分類透過 categories[].item_ids 連接到詳細新聞。",
+  originalSources: "原文來源",
+  originalSourcesNote: "由 sources 顯示來源連結和可讀狀態。",
+  hotTags: "熱門標籤",
+  formalTags: "正式標籤",
+  marketImpact: "市場影響",
+  trackingValue: "追蹤價值",
+  readSource: "閱讀原文",
+  search: "搜尋",
+  clear: "清除",
+  all: "全部",
+  searchPlaceholder: "搜尋標題、摘要、來源或標籤",
+  globalSearchPlaceholder: "搜尋 Nvidia、Fed、AI cloud...",
+  noMatchingItems: "沒有符合條件的新聞。",
+  archive: "歸檔",
+  archiveNote: "由 data/index.json 列出每日摘要。",
+  viewDailyBrief: "查看當日摘要",
+  topics: "主題",
+  topicsNote: "由 items[].themes 生成正式標籤。",
+  topicNote: "由已載入摘要資料篩選出的主題新聞。",
+  noRelatedItems: "沒有相關新聞。",
+  searchNote: "搜尋所有已載入文章的標題、摘要、來源、分類和正式標籤。",
+  searchTry: "試試 Nvidia、AI cloud、Fed policy",
+  noSearchResults: "沒有符合條件的文章。可試試 Nvidia、AI cloud、Fed policy 或 semiconductors。"
+};
+
 function heatLabel(score = 0, explicit) {
   if (explicit) return explicit;
   if (score >= 75) return "High";
@@ -41,7 +80,7 @@ async function boot() {
     bindNavigation();
     render();
   } catch (error) {
-    app.innerHTML = `<section class="error"><p class="eyebrow">Data loading failed</p><h1>Sample JSON could not be loaded.</h1><p>${escapeHtml(error.message)}</p></section>`;
+    app.innerHTML = `<section class="error"><p class="eyebrow">資料載入失敗</p><h1>無法載入新聞摘要 JSON。</h1><p>${escapeHtml(error.message)}</p></section>`;
   }
 }
 
@@ -61,6 +100,7 @@ function bindNavigation() {
 
   const form = document.querySelector("#global-search-form");
   const input = document.querySelector("#global-search-input");
+  if (input) input.placeholder = UI.globalSearchPlaceholder;
   form?.addEventListener("submit", (event) => {
     event.preventDefault();
     navigateToSearch(input.value.trim());
@@ -81,14 +121,8 @@ function route() {
   return { name: "home" };
 }
 
-function getSearchQuery() {
-  return new URLSearchParams(location.search).get("q") || "";
-}
-
-function navigateToSearch(query) {
-  history.pushState({}, "", `/search?q=${encodeURIComponent(query || "")}`);
-  render();
-}
+function getSearchQuery() { return new URLSearchParams(location.search).get("q") || ""; }
+function navigateToSearch(query) { history.pushState({}, "", `/search?q=${encodeURIComponent(query || "")}`); render(); }
 
 function render() {
   const current = route();
@@ -104,7 +138,7 @@ function render() {
 function renderBrief(date, isHome = false) {
   const brief = state.brief;
   if (date !== brief.date) {
-    app.innerHTML = `<section class="error"><p class="eyebrow">Brief not available</p><h1>${escapeHtml(date)}</h1><p>V1 currently includes sample data for ${escapeHtml(brief.date)} only.</p></section>`;
+    app.innerHTML = `<section class="error"><p class="eyebrow">找不到摘要</p><h1>${escapeHtml(date)}</h1><p>目前 V1 只載入 ${escapeHtml(brief.date)} 的 sample data。</p></section>`;
     return;
   }
 
@@ -114,11 +148,11 @@ function renderBrief(date, isHome = false) {
 
 function hero(brief, isHome) {
   const indexEntry = state.index.briefs?.find((item) => item.date === brief.date) || {};
-  return `<section class="hero"><div><p class="eyebrow">${escapeHtml(brief.date)} · Latest daily brief</p><h1>${escapeHtml(brief.title || "Daily finance and technology brief")}</h1><p class="deck">${escapeHtml(brief.deck || indexEntry.summary || "")}</p>${isHome ? `<p><a class="action" href="${linkFor(`/briefs/${brief.date}`)}" data-link>Read full brief</a></p>` : ""}</div><aside class="hero-meta" aria-label="Brief metrics"><div class="metric-grid"><div class="metric"><b>${asList(brief.hot_topics).length}</b><span>Hot topics</span></div><div class="metric"><b>${asList(brief.items).length}</b><span>News items</span></div><div class="metric"><b>${asList(brief.categories).length}</b><span>Categories</span></div><div class="metric"><b>${asList(brief.sources).length}</b><span>Sources</span></div></div><div class="focus-list">${asList(brief.market_focus).map((item) => `<span class="pill">${escapeHtml(item)}</span>`).join("")}</div></aside></section>`;
+  return `<section class="hero"><div><p class="eyebrow">${escapeHtml(brief.date)} · ${UI.latestBrief}</p><h1>${escapeHtml(brief.title || "每日財經與科技摘要")}</h1><p class="deck">${escapeHtml(brief.deck || indexEntry.summary || "")}</p>${isHome ? `<p><a class="action" href="${linkFor(`/briefs/${brief.date}`)}" data-link>${UI.readFullBrief}</a></p>` : ""}</div><aside class="hero-meta" aria-label="Brief metrics"><div class="metric-grid"><div class="metric"><b>${asList(brief.hot_topics).length}</b><span>${UI.hotTopics}</span></div><div class="metric"><b>${asList(brief.items).length}</b><span>${UI.newsItems}</span></div><div class="metric"><b>${asList(brief.categories).length}</b><span>${UI.categories}</span></div><div class="metric"><b>${asList(brief.sources).length}</b><span>${UI.sources}</span></div></div><div class="focus-list">${asList(brief.market_focus).map((item) => `<span class="pill">${escapeHtml(item)}</span>`).join("")}</div></aside></section>`;
 }
 
 function summarySection(brief) {
-  return `<section class="section"><div class="section-head"><h2>Daily overview</h2><p class="section-note">Quick reading entry generated from <code>daily_summary_zh</code>.</p></div><p class="summary-text">${escapeHtml(brief.daily_summary_zh || "")}</p></section>`;
+  return `<section class="section"><div class="section-head"><h2>${UI.dailyOverview}</h2><p class="section-note">${UI.dailyOverviewNote}</p></div><p class="summary-text">${escapeHtml(brief.daily_summary_zh || "")}</p></section>`;
 }
 
 function hotTopicsSection(brief) {
@@ -128,14 +162,14 @@ function hotTopicsSection(brief) {
     .map((topic) => {
       const label = heatLabel(topic.heat_score, topic.heat_label);
       const related = asList(topic.item_ids).map((id) => itemById.get(id)).filter(Boolean);
-      return `<article class="topic-card"><div class="item-top"><span class="rank">#${escapeHtml(topic.rank || "")}</span><span class="badge ${heatClass(label)}">${escapeHtml(label)} · ${escapeHtml(topic.heat_score || 0)}</span></div><h3>${escapeHtml(topic.topic)}</h3><p>${escapeHtml(topic.one_line_reason || "")}</p><div class="focus-list">${asList(topic.main_sources).map((source) => `<span class="pill">${escapeHtml(source)}</span>`).join("")}</div>${related.length ? `<div class="related-items"><strong>Related news</strong>${related.map((item) => `<a class="related-link" href="#item-${escapeHtml(item.id)}" data-item-jump="${escapeHtml(item.id)}"><strong>${escapeHtml(item.title_zh || item.title_original)}</strong><span>${escapeHtml(item.source)}</span></a>`).join("")}</div>` : ""}</article>`;
+      return `<article class="topic-card"><div class="item-top"><span class="rank">#${escapeHtml(topic.rank || "")}</span><span class="badge ${heatClass(label)}">${escapeHtml(label)} · ${escapeHtml(topic.heat_score || 0)}</span></div><h3>${escapeHtml(topic.topic)}</h3><p>${escapeHtml(topic.one_line_reason || "")}</p><div class="focus-list">${asList(topic.main_sources).map((source) => `<span class="pill">${escapeHtml(source)}</span>`).join("")}</div>${related.length ? `<div class="related-items"><strong>${UI.relatedNews}</strong>${related.map((item) => `<a class="related-link" href="#item-${escapeHtml(item.id)}" data-item-jump="${escapeHtml(item.id)}"><strong>${escapeHtml(item.title_zh || item.title_original)}</strong><span>${escapeHtml(item.source)}</span></a>`).join("")}</div>` : ""}</article>`;
     })
     .join("");
-  return `<section class="section"><div class="section-head"><h2>Today's focus ranking</h2><p class="section-note">Built from <code>hot_topics</code>, sorted by rank and heat score.</p></div><div class="topic-grid">${cards}</div></section>`;
+  return `<section class="section"><div class="section-head"><h2>${UI.focusRanking}</h2><p class="section-note">${UI.focusRankingNote}</p></div><div class="topic-grid">${cards}</div></section>`;
 }
 
 function categoriesSection(brief) {
-  return `<section class="section"><div class="section-head"><h2>Category news</h2><p class="section-note">Categories connect to detailed articles through <code>categories[].item_ids</code>.</p></div><div class="search-row"><input id="news-search" type="search" placeholder="Search title, summary, source or tag" /><button class="filter-button" id="clear-search" type="button">Clear</button></div><div class="category-tabs"><button class="filter-button active" data-category="all" type="button">All</button>${asList(brief.categories).map((category) => `<button class="filter-button" data-category="${escapeHtml(category.slug)}" type="button">${escapeHtml(category.name)}</button>`).join("")}</div><div id="category-panel" class="category-panel"></div></section>`;
+  return `<section class="section"><div class="section-head"><h2>${UI.categoryNews}</h2><p class="section-note">${UI.categoryNewsNote}</p></div><div class="search-row"><input id="news-search" type="search" placeholder="${UI.searchPlaceholder}" /><button class="filter-button" id="clear-search" type="button">${UI.clear}</button></div><div class="category-tabs"><button class="filter-button active" data-category="all" type="button">${UI.all}</button>${asList(brief.categories).map((category) => `<button class="filter-button" data-category="${escapeHtml(category.slug)}" type="button">${escapeHtml(category.name)}</button>`).join("")}</div><div id="category-panel" class="category-panel"></div></section>`;
 }
 
 function bindCategoryControls(brief) {
@@ -143,11 +177,7 @@ function bindCategoryControls(brief) {
   const buttons = [...document.querySelectorAll("[data-category]")];
   const search = document.querySelector("#news-search");
   const clear = document.querySelector("#clear-search");
-  const update = () => {
-    buttons.forEach((button) => button.classList.toggle("active", button.dataset.category === state.categorySlug));
-    panel.innerHTML = renderItems(brief, state.categorySlug, state.query);
-    bindItemJumpControls();
-  };
+  const update = () => { buttons.forEach((button) => button.classList.toggle("active", button.dataset.category === state.categorySlug)); panel.innerHTML = renderItems(brief, state.categorySlug, state.query); bindItemJumpControls(); };
   buttons.forEach((button) => button.addEventListener("click", () => { state.categorySlug = button.dataset.category; update(); }));
   search?.addEventListener("input", () => { state.query = search.value.trim().toLowerCase(); update(); });
   clear?.addEventListener("click", () => { state.query = ""; search.value = ""; update(); });
@@ -159,48 +189,33 @@ function renderItems(brief, categorySlug, query) {
   const category = asList(brief.categories).find((item) => item.slug === categorySlug);
   const baseItems = category ? asList(category.item_ids).map((id) => byId.get(id)).filter(Boolean) : asList(brief.items);
   const filtered = query ? baseItems.filter((item) => [item.title_zh, item.title_original, item.source, item.category, item.summary_zh, ...asList(item.themes)].join(" ").toLowerCase().includes(query)) : baseItems;
-  if (!filtered.length) return `<p class="section-note">No matching news items.</p>`;
+  if (!filtered.length) return `<p class="section-note">${UI.noMatchingItems}</p>`;
   return `<div class="item-list">${filtered.map(renderItem).join("")}</div>`;
 }
 
 function renderItem(item) {
   const label = heatLabel(item.heat_score);
-  return `<article class="item-card" id="item-${escapeHtml(item.id)}"><div class="item-top"><div class="item-meta"><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span><span>${escapeHtml(item.time_horizon || "")}</span></div><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(item.title_zh || item.title_original)}</h3><p>${escapeHtml(item.summary_zh || "")}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div>${asList(item.key_facts).length ? `<ul class="facts">${asList(item.key_facts).map((fact) => `<li>${escapeHtml(fact)}</li>`).join("")}</ul>` : ""}<div class="two-col"><div class="detail-box"><strong>Market impact</strong>${escapeHtml(item.market_impact || "")}</div><div class="detail-box"><strong>Tracking value</strong>${escapeHtml(item.tracking_value || "")}</div></div><p><a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">Read source</a></p></article>`;
+  return `<article class="item-card" id="item-${escapeHtml(item.id)}"><div class="item-top"><div class="item-meta"><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span><span>${escapeHtml(item.time_horizon || "")}</span></div><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(item.title_zh || item.title_original)}</h3><p>${escapeHtml(item.summary_zh || "")}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div>${asList(item.key_facts).length ? `<ul class="facts">${asList(item.key_facts).map((fact) => `<li>${escapeHtml(fact)}</li>`).join("")}</ul>` : ""}<div class="two-col"><div class="detail-box"><strong>${UI.marketImpact}</strong>${escapeHtml(item.market_impact || "")}</div><div class="detail-box"><strong>${UI.trackingValue}</strong>${escapeHtml(item.tracking_value || "")}</div></div><p><a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p></article>`;
 }
 
 function bindItemJumpControls() {
-  document.querySelectorAll("[data-item-jump]").forEach((link) => {
-    link.addEventListener("click", (event) => {
-      const id = link.dataset.itemJump;
-      const target = document.querySelector(`#item-${CSS.escape(id)}`);
-      if (!target) return;
-      event.preventDefault();
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-      document.querySelectorAll(".item-card.highlighted").forEach((node) => node.classList.remove("highlighted"));
-      target.classList.add("highlighted");
-      window.setTimeout(() => target.classList.remove("highlighted"), 2200);
-    });
-  });
+  document.querySelectorAll("[data-item-jump]").forEach((link) => { link.addEventListener("click", (event) => { const id = link.dataset.itemJump; const target = document.querySelector(`#item-${CSS.escape(id)}`); if (!target) return; event.preventDefault(); target.scrollIntoView({ behavior: "smooth", block: "start" }); document.querySelectorAll(".item-card.highlighted").forEach((node) => node.classList.remove("highlighted")); target.classList.add("highlighted"); window.setTimeout(() => target.classList.remove("highlighted"), 2200); }); });
 }
 
 function sourcesSection(brief) {
-  return `<section class="section"><div class="section-head"><h2>Original sources</h2><p class="section-note">Source links and access status from <code>sources</code>.</p></div><div class="source-grid">${asList(brief.sources).map((source) => `<a class="source-card" href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer"><strong>${escapeHtml(source.name)}</strong><p>${escapeHtml(source.access || "Unknown access")}</p></a>`).join("")}</div></section>`;
+  return `<section class="section"><div class="section-head"><h2>${UI.originalSources}</h2><p class="section-note">${UI.originalSourcesNote}</p></div><div class="source-grid">${asList(brief.sources).map((source) => `<a class="source-card" href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer"><strong>${escapeHtml(source.name)}</strong><p>${escapeHtml(source.access || "Unknown access")}</p></a>`).join("")}</div></section>`;
 }
 
 function renderArchive() {
-  const rows = asList(state.index.briefs).map((brief) => {
-    const fullBrief = getBriefByDate(brief.date);
-    const itemLinks = asList(fullBrief?.items).slice().sort((a, b) => (b.heat_score || 0) - (a.heat_score || 0)).slice(0, 5).map((item) => `<a class="archive-link" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer"><strong>${escapeHtml(item.title_zh || item.title_original)}</strong><span>${escapeHtml(item.source)}</span></a>`).join("");
-    return `<article class="archive-row"><p class="eyebrow">${escapeHtml(brief.date)}</p><h3><a href="${linkFor(`/briefs/${brief.date}`)}" data-link>${escapeHtml(brief.title)}</a></h3><p>${escapeHtml(brief.summary || "")}</p><div class="focus-list">${asList(brief.top_themes).map((theme) => `<span class="pill">${escapeHtml(theme)}</span>`).join("")}</div>${itemLinks ? `<div class="archive-links">${itemLinks}</div>` : ""}</article>`;
-  }).join("");
-  app.innerHTML = `<section class="section"><div class="section-head"><h1>Archive</h1><p class="section-note">Daily briefs listed from <code>data/index.json</code>.</p></div><div class="archive-list">${rows}</div></section>`;
+  const rows = asList(state.index.briefs).map((brief) => { const fullBrief = getBriefByDate(brief.date); const itemLinks = asList(fullBrief?.items).slice().sort((a, b) => (b.heat_score || 0) - (a.heat_score || 0)).slice(0, 5).map((item) => `<a class="archive-link" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer"><strong>${escapeHtml(item.title_zh || item.title_original)}</strong><span>${escapeHtml(item.source)}</span></a>`).join(""); return `<article class="archive-row"><p class="eyebrow">${escapeHtml(brief.date)}</p><h3><a href="${linkFor(`/briefs/${brief.date}`)}" data-link>${escapeHtml(brief.title)}</a></h3><p>${escapeHtml(brief.summary || "")}</p><div class="focus-list">${asList(brief.top_themes).map((theme) => `<span class="pill">${escapeHtml(theme)}</span>`).join("")}</div>${itemLinks ? `<div class="archive-links">${itemLinks}</div>` : ""}</article>`; }).join("");
+  app.innerHTML = `<section class="section"><div class="section-head"><h1>${UI.archive}</h1><p class="section-note">${UI.archiveNote}</p></div><div class="archive-list">${rows}</div></section>`;
 }
 
 function renderSearch(query) {
   const input = document.querySelector("#global-search-input");
   if (input) input.value = query || state.globalQuery || "";
   const results = searchItems(query || state.globalQuery);
-  app.innerHTML = `<section class="section"><div class="section-head"><h1>Search</h1><p class="section-note">Search all loaded articles by title, summary, source, category and formal tags.</p></div><div class="search-row"><input id="search-page-input" type="search" value="${escapeHtml(query || state.globalQuery || "")}" placeholder="Try Nvidia, AI cloud, Fed policy" /><button class="filter-button" id="search-page-button" type="button">Search</button></div>${results.length ? `<div class="item-list">${results.map((result) => renderSearchResult(result)).join("")}</div>` : `<p class="section-note">No matching articles. Try Nvidia, AI cloud, Fed policy or semiconductors.</p>`}</section>`;
+  app.innerHTML = `<section class="section"><div class="section-head"><h1>${UI.search}</h1><p class="section-note">${UI.searchNote}</p></div><div class="search-row"><input id="search-page-input" type="search" value="${escapeHtml(query || state.globalQuery || "")}" placeholder="${UI.searchTry}" /><button class="filter-button" id="search-page-button" type="button">${UI.search}</button></div>${results.length ? `<div class="item-list">${results.map((result) => renderSearchResult(result)).join("")}</div>` : `<p class="section-note">${UI.noSearchResults}</p>`}</section>`;
   const pageInput = document.querySelector("#search-page-input");
   const run = () => navigateToSearch(pageInput.value.trim());
   document.querySelector("#search-page-button")?.addEventListener("click", run);
@@ -209,27 +224,22 @@ function renderSearch(query) {
 
 function renderSearchResult(result) {
   const item = result.item;
-  return `<article class="item-card"><div class="item-top"><div class="item-meta"><span>${escapeHtml(result.date)}</span><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(heatLabel(item.heat_score))}">${heatLabel(item.heat_score)} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(item.title_zh || item.title_original)}</h3><p>${escapeHtml(item.summary_zh || "")}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div><p><a class="action" href="${linkFor(`/briefs/${result.date}`)}" data-link>View daily brief</a> <a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">Read source</a></p></article>`;
+  return `<article class="item-card"><div class="item-top"><div class="item-meta"><span>${escapeHtml(result.date)}</span><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(heatLabel(item.heat_score))}">${heatLabel(item.heat_score)} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(item.title_zh || item.title_original)}</h3><p>${escapeHtml(item.summary_zh || "")}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div><p><a class="action" href="${linkFor(`/briefs/${result.date}`)}" data-link>${UI.viewDailyBrief}</a> <a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p></article>`;
 }
 
 function renderTopics() {
   const themes = collectThemes();
-  app.innerHTML = `<section class="section"><div class="section-head"><h1>Topics</h1><p class="section-note">Formal tags generated from <code>items[].themes</code>.</p></div><div class="topic-list">${themes.map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div></section>`;
+  app.innerHTML = `<section class="section"><div class="section-head"><h1>${UI.topics}</h1><p class="section-note">${UI.topicsNote}</p></div><div class="topic-list">${themes.map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div></section>`;
 }
 
 function renderTopic(slug) {
   const matches = asList(state.brief.items).filter((item) => asList(item.themes).some((theme) => slugify(theme) === slug));
   const title = asList(matches[0]?.themes).find((theme) => slugify(theme) === slug) || slug;
-  app.innerHTML = `<section class="section"><div class="section-head"><h1>${escapeHtml(title)}</h1><p class="section-note">Topic-filtered articles from loaded brief data.</p></div>${matches.length ? `<div class="item-list">${matches.map(renderItem).join("")}</div>` : `<p>No related news items.</p>`}</section>`;
+  app.innerHTML = `<section class="section"><div class="section-head"><h1>${escapeHtml(title)}</h1><p class="section-note">${UI.topicNote}</p></div>${matches.length ? `<div class="item-list">${matches.map(renderItem).join("")}</div>` : `<p>${UI.noRelatedItems}</p>`}</section>`;
 }
 
-function getAllBriefs() {
-  return state.brief ? [state.brief] : [];
-}
-
-function getBriefByDate(date) {
-  return getAllBriefs().find((brief) => brief.date === date);
-}
+function getAllBriefs() { return state.brief ? [state.brief] : []; }
+function getBriefByDate(date) { return getAllBriefs().find((brief) => brief.date === date); }
 
 function searchItems(query) {
   const normalized = String(query || "").trim().toLowerCase();
@@ -239,7 +249,7 @@ function searchItems(query) {
 
 function tagsSidebar() {
   const tags = formalTags();
-  return `<aside class="sidebar" aria-label="Formal tags"><div><p class="eyebrow">Formal tags</p><h2>Hot tags</h2></div><div class="sidebar-list">${tags.slice(0, 14).map((tag) => `<a class="tag-link" href="${linkFor(`/topics/${slugify(tag.name)}`)}" data-link><strong>${escapeHtml(tag.name)}</strong><small>${tag.count}</small></a>`).join("")}</div></aside>`;
+  return `<aside class="sidebar" aria-label="${UI.formalTags}"><div><p class="eyebrow">${UI.formalTags}</p><h2>${UI.hotTags}</h2></div><div class="sidebar-list">${tags.slice(0, 14).map((tag) => `<a class="tag-link" href="${linkFor(`/topics/${slugify(tag.name)}`)}" data-link><strong>${escapeHtml(tag.name)}</strong><small>${tag.count}</small></a>`).join("")}</div></aside>`;
 }
 
 function formalTags() {
