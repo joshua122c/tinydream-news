@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tiny Dream News</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" data-link>
+        <span class="brand-mark">TD</span>
+        <span>
+          <strong>Tiny Dream News</strong>
+          <small>Global finance and technology brief</small>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="/archive" data-link>Archive</a>
+        <a href="/topics" data-link>Topics</a>
+      </nav>
+      <form class="global-search" id="global-search-form" role="search">
+        <input id="global-search-input" type="search" placeholder="Search Nvidia, Fed, AI cloud..." />
+        <button type="submit">Search</button>
+      </form>
+    </header>
+
+    <main id="app" class="app-shell" aria-live="polite">
+      <section class="loading"><p>Loading daily brief...</p></section>
+    </main>
+
+    <footer class="site-footer">
+      <span>news.tinydreamlab.com V1</span>
+      <span>Structured brief data from website-ready JSON</span>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
