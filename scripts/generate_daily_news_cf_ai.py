@@ -175,18 +175,42 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
     return filtered[:100], sources
 
 
+def sanitize_json_text(text: str) -> str:
+    text = re.sub(r"\\u(?![0-9a-fA-F]{4})", r"\\\\u", text)
+    text = re.sub(r"\\(?![\"\\/bfnrtu])", r"\\\\", text)
+    return text
+
+
+def load_json_with_repair(text: str) -> dict:
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as exc:
+        repaired = sanitize_json_text(text)
+        if repaired != text:
+            try:
+                print("Warning: repaired invalid JSON escape sequences from AI output.")
+                return json.loads(repaired)
+            except json.JSONDecodeError:
+                pass
+        start = max(0, exc.pos - 300)
+        end = min(len(text), exc.pos + 300)
+        preview = text[start:end].encode("unicode_escape", errors="replace").decode("ascii")
+        print(f"Cloudflare AI JSON parse failed near char {exc.pos}: {preview}", file=sys.stderr)
+        raise
+
+
 def extract_json(text: str) -> dict:
     text = text.strip()
     if text.startswith("```"):
         text = re.sub(r"^```(?:json)?\s*", "", text)
         text = re.sub(r"\s*```$", "", text)
     try:
-        return json.loads(text)
+        return load_json_with_repair(text)
     except json.JSONDecodeError:
         match = re.search(r"\{.*\}", text, flags=re.S)
         if not match:
             raise
-        return json.loads(match.group(0))
+        return load_json_with_repair(match.group(0))
 
 
 def call_cloudflare_ai(candidates: list[dict], sources: list[dict]) -> dict:
