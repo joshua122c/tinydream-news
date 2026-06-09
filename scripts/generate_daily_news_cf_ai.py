@@ -13,7 +13,6 @@ from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 from pathlib import Path
 
-
 HK_TZ = timezone(timedelta(hours=8))
 TODAY = datetime.now(HK_TZ).strftime("%Y-%m-%d")
 GENERATED_AT = datetime.now(HK_TZ).isoformat(timespec="seconds")
@@ -23,7 +22,6 @@ DATA_DIR = REPO_ROOT / "data"
 BRIEFS_DIR = DATA_DIR / "briefs"
 INDEX_PATH = DATA_DIR / "index.json"
 BRIEF_PATH = BRIEFS_DIR / f"{TODAY}.json"
-
 USER_AGENT = "Mozilla/5.0 (compatible; TinyDreamNewsRadar/1.0; +https://news.tinydreamlab.com/)"
 
 SOURCE_URLS = [
@@ -38,53 +36,9 @@ SOURCE_URLS = [
     ("LatePost", "https://www.latepost.com/"),
 ]
 
-REQUIRED_BRIEF_FIELDS = [
-    "date",
-    "title",
-    "deck",
-    "daily_summary_zh",
-    "market_focus",
-    "hot_topics",
-    "categories",
-    "items",
-    "sources",
-    "generated_at",
-]
-
-REQUIRED_HOT_TOPIC_FIELDS = [
-    "rank",
-    "topic",
-    "heat_score",
-    "heat_label",
-    "source_count",
-    "main_sources",
-    "item_ids",
-    "one_line_reason",
-    "reporter_angle",
-]
-
-REQUIRED_ITEM_FIELDS = [
-    "id",
-    "date",
-    "title_original",
-    "title_zh",
-    "source",
-    "url",
-    "published_at",
-    "category",
-    "themes",
-    "summary_zh",
-    "key_facts",
-    "market_impact",
-    "reporter_angle",
-    "importance_score",
-    "heat_score",
-    "source_count",
-    "sources_reporting_same_topic",
-    "position_signal",
-    "time_horizon",
-    "tracking_value",
-]
+REQUIRED_BRIEF_FIELDS = ["date", "title", "deck", "daily_summary_zh", "market_focus", "hot_topics", "categories", "items", "sources", "generated_at"]
+REQUIRED_HOT_TOPIC_FIELDS = ["rank", "topic", "heat_score", "heat_label", "source_count", "main_sources", "item_ids", "one_line_reason", "reporter_angle"]
+REQUIRED_ITEM_FIELDS = ["id", "date", "title_original", "title_zh", "source", "url", "published_at", "category", "themes", "summary_zh", "key_facts", "market_impact", "reporter_angle", "importance_score", "heat_score", "source_count", "sources_reporting_same_topic", "position_signal", "time_horizon", "tracking_value"]
 
 
 def fail(message: str) -> None:
@@ -111,20 +65,18 @@ def fetch_url(url: str) -> tuple[int, str]:
 
 
 def clean_text(value: str) -> str:
-    value = re.sub(r"<[^>]+>", " ", value)
+    value = re.sub(r"<[^>]+>", " ", value or "")
     value = html.unescape(value)
-    value = re.sub(r"\s+", " ", value).strip()
-    return value
+    return re.sub(r"\s+", " ", value).strip()
 
 
 def absolute_url(base_url: str, href: str) -> str:
-    return urllib.parse.urljoin(base_url, html.unescape(href.strip()))
+    return urllib.parse.urljoin(base_url, html.unescape((href or "").strip()))
 
 
 def extract_candidates(source_name: str, url: str, body: str) -> list[dict]:
     candidates = []
     seen = set()
-
     for title in re.findall(r"<title[^>]*>(.*?)</title>", body, flags=re.I | re.S):
         text = clean_text(title)
         if 12 <= len(text) <= 180 and text not in seen:
@@ -147,7 +99,6 @@ def extract_candidates(source_name: str, url: str, body: str) -> list[dict]:
         candidates.append({"source": source_name, "title": text, "url": link})
         if len(candidates) >= 30:
             break
-
     return candidates
 
 
@@ -161,18 +112,19 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
         if status == 200:
             all_candidates.extend(extract_candidates(source_name, url, body))
 
-    keyword_pattern = re.compile(
-        r"(fed|fomc|inflation|cpi|pce|jobs|payroll|treasury|yield|dollar|oil|gold|"
-        r"nvidia|amd|broadcom|marvell|tsmc|semiconductor|chip|ai|artificial intelligence|"
-        r"agent|datacenter|data center|cloud|apple|tesla|microsoft|google|meta|amazon|"
-        r"\u7f8e\u806f\u5132|\u806f\u5132|\u901a\u8139|\u975e\u8fb2|\u7f8e\u50b5|\u7f8e\u5143|\u9ec3\u91d1|\u539f\u6cb9|\u4eba\u5de5\u667a\u80fd|\u534a\u5c0e\u9ad4|\u82af\u7247|\u6676\u7247|\u7b97\u529b|"
-        r"\u83ef\u70ba|\u9a30\u8a0a|\u963f\u91cc|\u7f8e\u5718|\u5c0f\u7c73|\u767e\u5ea6|\u6bd4\u4e9e\u8fea)",
-        re.I,
-    )
-    filtered = [item for item in all_candidates if keyword_pattern.search(item["title"])]
+    keywords = re.compile(r"fed|fomc|inflation|cpi|pce|jobs|treasury|yield|dollar|oil|gold|nvidia|amd|tsmc|semiconductor|chip|ai|artificial intelligence|cloud|apple|tesla|microsoft|google|meta|amazon|\u806f\u5132|\u901a\u8139|\u975e\u8fb2|\u9ec3\u91d1|\u539f\u6cb9|\u4eba\u5de5\u667a\u80fd|\u534a\u5c0e\u9ad4|\u82af\u7247|\u6676\u7247", re.I)
+    filtered = [item for item in all_candidates if keywords.search(item["title"])]
     if len(filtered) < 20:
         filtered = all_candidates[:80]
     return filtered[:100], sources
+
+
+def strip_code_fence(text: str) -> str:
+    text = (text or "").strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*", "", text)
+        text = re.sub(r"\s*```$", "", text)
+    return text.strip()
 
 
 def sanitize_json_text(text: str) -> str:
@@ -181,36 +133,19 @@ def sanitize_json_text(text: str) -> str:
     return text
 
 
-def load_json_with_repair(text: str) -> dict:
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError as exc:
-        repaired = sanitize_json_text(text)
-        if repaired != text:
-            try:
-                print("Warning: repaired invalid JSON escape sequences from AI output.")
-                return json.loads(repaired)
-            except json.JSONDecodeError:
-                pass
-        start = max(0, exc.pos - 300)
-        end = min(len(text), exc.pos + 300)
-        preview = text[start:end].encode("unicode_escape", errors="replace").decode("ascii")
-        print(f"Cloudflare AI JSON parse failed near char {exc.pos}: {preview}", file=sys.stderr)
-        raise
-
-
 def extract_json(text: str) -> dict:
-    text = text.strip()
-    if text.startswith("```"):
-        text = re.sub(r"^```(?:json)?\s*", "", text)
-        text = re.sub(r"\s*```$", "", text)
-    try:
-        return load_json_with_repair(text)
-    except json.JSONDecodeError:
-        match = re.search(r"\{.*\}", text, flags=re.S)
-        if not match:
-            raise
-        return load_json_with_repair(match.group(0))
+    text = strip_code_fence(text)
+    candidates = [text]
+    match = re.search(r"\{.*\}", text, flags=re.S)
+    if match and match.group(0) != text:
+        candidates.append(match.group(0))
+    for candidate in candidates:
+        for attempt in [candidate, sanitize_json_text(candidate)]:
+            try:
+                return json.loads(attempt)
+            except json.JSONDecodeError:
+                continue
+    raise json.JSONDecodeError("Cloudflare AI did not return parseable JSON", text, 0)
 
 
 def call_cloudflare_ai(candidates: list[dict], sources: list[dict]) -> dict:
@@ -218,118 +153,36 @@ def call_cloudflare_ai(candidates: list[dict], sources: list[dict]) -> dict:
     api_token = env_required("CLOUDFLARE_API_TOKEN")
     model = os.environ.get("CF_AI_MODEL", "@cf/meta/llama-3.1-8b-instruct").strip()
 
-    candidates_json = json.dumps(candidates, ensure_ascii=False, indent=2)
-    sources_json = json.dumps(sources, ensure_ascii=False, indent=2)
-
-    prompt = f"""
-\u4eca\u5929\u65e5\u671f\u662f {TODAY}\uff0c\u6642\u5340\u662f Asia/Hong_Kong\u3002
-
-\u4f60\u662f\u4e00\u540d\u8ca1\u7d93/\u79d1\u6280\u65b0\u805e\u7de8\u8f2f\u3002\u4ee5\u4e0b\u662f\u5f9e\u591a\u500b\u4f86\u6e90\u6293\u53d6\u5230\u7684\u5019\u9078\u65b0\u805e\u6a19\u984c\u548c\u9023\u7d50\u3002
-\u8acb\u4e0d\u8981\u4ee5\u4efb\u4f55\u55ae\u4e00\u4f86\u6e90\u70ba\u4e3b\uff0c\u8acb\u6839\u64da\u5019\u9078\u65b0\u805e\u505a topic clustering\uff0c\u627e\u51fa\u570b\u969b\u8ca1\u7d93\u3001\u91d1\u878d\u5e02\u5834\u3001AI\u3001\u534a\u5c0e\u9ad4\u3001\u79d1\u6280\u7522\u696d\u3001\u4e2d\u570b\u79d1\u6280/\u653f\u7b56\u7684\u4eca\u65e5\u7126\u9ede\u3002
-
-\u4f86\u6e90\u72c0\u614b\uff1a
-{sources_json}
-
-\u5019\u9078\u65b0\u805e\uff1a
-{candidates_json}
-
-\u8acb\u53ea\u8f38\u51fa\u5408\u6cd5 JSON\uff0c\u4e0d\u8981\u8f38\u51fa markdown\uff0c\u4e0d\u8981\u52a0\u89e3\u91cb\u6587\u5b57\u3002
-
-JSON schema:
-{{
-  "date": "{TODAY}",
-  "title": "\u7e41\u9ad4\u4e2d\u6587\u6a19\u984c",
-  "deck": "\u7e41\u9ad4\u4e2d\u6587\u5c0e\u8a9e",
-  "daily_summary_zh": "\u7e41\u9ad4\u4e2d\u6587\u6bcf\u65e5\u7e3d\u7d50",
-  "market_focus": ["\u7126\u9ede1", "\u7126\u9ede2", "\u7126\u9ede3"],
-  "hot_topics": [
-    {{
-      "rank": 1,
-      "topic": "\u7126\u9ede\u4e3b\u984c",
-      "heat_score": 80,
-      "heat_label": "High",
-      "source_count": 3,
-      "main_sources": ["Reuters", "CNBC"],
-      "item_ids": ["{TODAY}-source-topic-001"],
-      "one_line_reason": "\u4e0a\u699c\u539f\u56e0",
-      "reporter_angle": "\u8a18\u8005\u53ef\u8ddf\u9032\u89d2\u5ea6"
-    }}
-  ],
-  "categories": [
-    {{
-      "name": "AI\u7b97\u529b\u8207\u534a\u5c0e\u9ad4",
-      "slug": "ai-compute-semiconductors",
-      "item_ids": ["{TODAY}-source-topic-001"]
-    }}
-  ],
-  "items": [
-    {{
-      "id": "{TODAY}-source-topic-001",
-      "date": "{TODAY}",
-      "title_original": "Original headline",
-      "title_zh": "\u7e41\u9ad4\u4e2d\u6587\u6a19\u984c",
-      "source": "Reuters",
-      "url": "https://example.com/article",
-      "published_at": "{GENERATED_AT}",
-      "category": "\u570b\u969b\u5b8f\u89c0\u8207\u592e\u884c",
-      "themes": ["Fed policy", "AI infrastructure"],
-      "summary_zh": "\u7e41\u9ad4\u4e2d\u6587\u6458\u8981\u3002\u82e5\u53ea\u8b80\u5230\u6a19\u984c\uff0c\u8acb\u660e\u78ba\u8aaa\u9019\u662f\u6839\u64da\u6a19\u984c\u548c\u4f86\u6e90\u4e0a\u4e0b\u6587\u7684\u6458\u8981\u3002",
-      "key_facts": ["\u4e8b\u5be61", "\u4e8b\u5be62"],
-      "market_impact": "\u5e02\u5834\u5f71\u97ff",
-      "reporter_angle": "\u8a18\u8005\u53ef\u8ddf\u9032\u89d2\u5ea6",
-      "importance_score": 8,
-      "heat_score": 75,
-      "source_count": 3,
-      "sources_reporting_same_topic": ["Reuters", "CNBC"],
-      "position_signal": "headline cluster",
-      "time_horizon": "short_term",
-      "tracking_value": "\u8ffd\u8e64\u50f9\u503c"
-    }}
-  ],
-  "sources": [
-    {{
-      "name": "Reuters Markets",
-      "url": "https://www.reuters.com/markets/",
-      "access": "Full"
-    }}
-  ],
-  "generated_at": "{GENERATED_AT}",
-  "email_body_zh": "1000\u81f31600\u5b57\u7e41\u9ad4\u4e2d\u6587 email \u6b63\u6587\uff0c\u5305\u542b\u4eca\u65e5\u4e00\u53e5\u8a71\u7d50\u8ad6\u3001\u7126\u9ede\u65b0\u805e\u699c\u3001\u8ca1\u7d93\u8207\u79d1\u6280\u91cd\u9ede\u3001\u8a18\u8005\u53ef\u8ddf\u9032\u89d2\u5ea6\u548c\u539f\u6587\u9023\u7d50\u3002"
-}}
-
-\u8981\u6c42\uff1a
-- hot_topics \u5fc5\u9808\u6709 3 \u81f3 5 \u500b\u3002
-- items \u81f3\u5c11 6 \u689d\uff0c\u6700\u591a 12 \u689d\u3002
-- \u6bcf\u500b hot_topics[].item_ids \u4e0d\u53ef\u70ba\u7a7a\u3002
-- \u6bcf\u500b hot_topics[].item_ids \u5fc5\u9808\u5b58\u5728\u65bc items[].id\u3002
-- categories[].item_ids \u5fc5\u9808\u5b58\u5728\u65bc items[].id\u3002
-- \u4e0d\u53ef\u6709 duplicate item id\u3002
-- \u4f7f\u7528\u7e41\u9ad4\u4e2d\u6587\u3002
-- heat_score 0-100\uff0c75-100 High\uff0c50-74 Medium\uff0c\u4f4e\u65bc50 Low\u3002
-- importance_score 1-10\u3002
-- \u4e0d\u63d0\u4f9b\u500b\u4eba\u5316\u6295\u8cc7\u5efa\u8b70\u3002
-"""
+    prompt = {
+        "task": "Create a Traditional Chinese website-ready daily international finance and technology news brief. Output strict JSON only. Use real Traditional Chinese characters, not Unicode escape placeholders like \\uXXXX.",
+        "date": TODAY,
+        "schema_rules": [
+            "Return only one JSON object, no markdown.",
+            "hot_topics must have 3 to 5 entries and every item_ids value must exist in items[].id.",
+            "items must have at least 6 entries and every item must include the required website fields.",
+            "categories[].item_ids must exist in items[].id.",
+            "Do not give personalized investment advice.",
+        ],
+        "required_item_fields": REQUIRED_ITEM_FIELDS,
+        "required_hot_topic_fields": REQUIRED_HOT_TOPIC_FIELDS,
+        "sources": sources,
+        "candidate_headlines": candidates[:80],
+    }
 
     payload = {
         "messages": [
-            {
-                "role": "system",
-                "content": "You output strict JSON only. No markdown.",
-            },
-            {"role": "user", "content": prompt},
+            {"role": "system", "content": "You output strict JSON only. No markdown. Use Traditional Chinese characters directly."},
+            {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
         ],
         "max_tokens": 6000,
-        "temperature": 0.2,
+        "temperature": 0.1,
     }
 
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{model}"
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {api_token}",
-            "Content-Type": "application/json",
-        },
+        headers={"Authorization": f"Bearer {api_token}", "Content-Type": "application/json"},
         method="POST",
     )
     try:
@@ -345,8 +198,6 @@ JSON schema:
 
     result = data.get("result", {})
     text = result.get("response") or result.get("text") or result.get("content")
-    if not text and isinstance(result.get("tool_calls"), list):
-        text = json.dumps(result, ensure_ascii=False)
     if not text:
         fail(f"Cloudflare Workers AI response missing text: {raw[:1000]}")
     return extract_json(text)
@@ -355,10 +206,8 @@ JSON schema:
 def normalize_brief(brief: dict, sources: list[dict]) -> dict:
     brief["date"] = TODAY
     brief["generated_at"] = brief.get("generated_at") or GENERATED_AT
-    if not brief.get("sources"):
-        brief["sources"] = sources
-    if "email_body_zh" not in brief:
-        brief["email_body_zh"] = brief.get("daily_summary_zh", "")
+    brief.setdefault("sources", sources)
+    brief.setdefault("email_body_zh", brief.get("daily_summary_zh", ""))
     return brief
 
 
@@ -430,12 +279,86 @@ def update_index(brief: dict) -> dict:
         index = json.loads(INDEX_PATH.read_text(encoding="utf-8"))
     else:
         index = {"latest_date": TODAY, "briefs": []}
-
     entry = build_index_entry(brief)
     briefs = [b for b in index.get("briefs", []) if b.get("date") != TODAY]
     briefs.append(entry)
     briefs.sort(key=lambda row: row.get("date", ""), reverse=True)
     return {"latest_date": TODAY, "briefs": briefs}
+
+
+def build_fallback_brief(candidates: list[dict], sources: list[dict], error: str) -> dict:
+    usable = [item for item in candidates if item.get("title") and item.get("url")]
+    if not usable:
+        usable = [{"source": source["name"], "title": source["name"], "url": source["url"]} for source in sources]
+    while len(usable) < 6:
+        usable.append(usable[len(usable) % max(1, len(usable))])
+
+    category_defs = [
+        ("\u570b\u969b\u8ca1\u7d93\u8207\u5e02\u5834", "global-finance-markets"),
+        ("AI\u8207\u79d1\u6280\u7522\u696d", "ai-technology-industry"),
+        ("\u4e2d\u570b\u79d1\u6280\u8207\u653f\u7b56", "china-tech-policy"),
+    ]
+    items = []
+    for idx, candidate in enumerate(usable[:6], start=1):
+        category_name, _ = category_defs[(idx - 1) % len(category_defs)]
+        source_name = candidate.get("source") or "Public source"
+        title = clean_text(candidate.get("title") or source_name)
+        items.append({
+            "id": f"{TODAY}-fallback-{idx:03d}",
+            "date": TODAY,
+            "title_original": title,
+            "title_zh": title,
+            "source": source_name,
+            "url": candidate.get("url") or "https://news.tinydreamlab.com/",
+            "published_at": GENERATED_AT,
+            "category": category_name,
+            "themes": [category_name],
+            "summary_zh": "\u9019\u689d\u65b0\u805e\u7531\u81ea\u52d5\u4fdd\u5e95\u6a21\u5f0f\u6839\u64da\u516c\u958b\u6a19\u984c\u548c\u9023\u7d50\u7522\u751f\u3002\u539f\u59cb AI JSON \u56de\u8986\u683c\u5f0f\u672a\u80fd\u901a\u904e\u9a57\u8b49\uff0c\u56e0\u6b64\u672c\u7cfb\u7d71\u5148\u4fdd\u7559\u53ef\u8ffd\u8e64\u7684\u65b0\u805e\u5165\u53e3\u3002",
+            "key_facts": ["\u4f86\u6e90\u9801\u9762\u51fa\u73fe\u76f8\u95dc\u6a19\u984c\u6216\u9023\u7d50\u3002", "\u9700\u4eba\u624b\u6216\u4e0b\u4e00\u8f2a\u81ea\u52d5\u6458\u8981\u9032\u4e00\u6b65\u88dc\u5145\u5167\u5bb9\u3002"],
+            "market_impact": "\u9700\u5f8c\u7e8c\u8ddf\u9032\u3002",
+            "reporter_angle": "\u53ef\u5f9e\u539f\u6587\u9023\u7d50\u6838\u5be6\u4e8b\u5be6\u548c\u5e02\u5834\u5f71\u97ff\u3002",
+            "importance_score": max(5, 9 - idx),
+            "heat_score": max(50, 82 - idx * 4),
+            "source_count": 1,
+            "sources_reporting_same_topic": [source_name],
+            "position_signal": "fallback headline candidate",
+            "time_horizon": "short_term",
+            "tracking_value": "\u9700\u8ffd\u8e64\u539f\u6587\u66f4\u65b0\u8207\u76f8\u95dc\u5831\u9053\u3002",
+        })
+
+    hot_topics = []
+    for rank, item in enumerate(items[:3], start=1):
+        hot_topics.append({
+            "rank": rank,
+            "topic": item["title_zh"][:60],
+            "heat_score": item["heat_score"],
+            "heat_label": "High" if item["heat_score"] >= 75 else "Medium",
+            "source_count": 1,
+            "main_sources": [item["source"]],
+            "item_ids": [item["id"]],
+            "one_line_reason": "\u81ea\u52d5\u4fdd\u5e95\u6a21\u5f0f\u9078\u51fa\u7684\u9ad8\u512a\u5148\u7d1a\u65b0\u805e\u5165\u53e3\u3002",
+            "reporter_angle": item["reporter_angle"],
+        })
+
+    categories = []
+    for category_name, slug in category_defs:
+        refs = [item["id"] for item in items if item["category"] == category_name]
+        if refs:
+            categories.append({"name": category_name, "slug": slug, "item_ids": refs})
+
+    return {
+        "date": TODAY,
+        "title": "\u6bcf\u65e5\u570b\u969b\u8ca1\u7d93\u8207\u79d1\u6280\u65b0\u805e\u6458\u8981",
+        "deck": "\u4eca\u65e5\u6458\u8981\u7531\u81ea\u52d5\u4fdd\u5e95\u6a21\u5f0f\u7522\u751f\uff0c\u4fdd\u7559\u65b0\u805e\u6a19\u984c\u3001\u4f86\u6e90\u548c\u539f\u6587\u9023\u7d50\u3002",
+        "daily_summary_zh": "\u672c\u6b21 Cloudflare Workers AI \u56de\u8986\u672a\u80fd\u901a\u904e JSON \u9a57\u8b49\u3002\u7cfb\u7d71\u5df2\u555f\u7528\u4fdd\u5e95\u6a21\u5f0f\uff0c\u6839\u64da\u5df2\u6293\u53d6\u7684\u516c\u958b\u65b0\u805e\u6a19\u984c\u548c\u9023\u7d50\u7522\u751f\u53ef\u4f9b\u7db2\u7ad9\u986f\u793a\u7684\u7d50\u69cb\u5316\u6458\u8981\u3002",
+        "market_focus": ["\u570b\u969b\u8ca1\u7d93\u8207\u5e02\u5834", "AI\u8207\u79d1\u6280\u7522\u696d", "\u539f\u6587\u9023\u7d50\u8ffd\u8e64"],
+        "hot_topics": hot_topics,
+        "categories": categories,
+        "items": items,
+        "sources": sources,
+        "generated_at": GENERATED_AT,
+        "email_body_zh": "\u4eca\u65e5\u81ea\u52d5\u65b0\u805e\u6458\u8981\u555f\u7528\u4fdd\u5e95\u6a21\u5f0f\u3002\n\n\u539f\u56e0\uff1aCloudflare Workers AI \u56de\u8986\u7684 JSON \u683c\u5f0f\u672a\u80fd\u901a\u904e\u7cfb\u7d71\u9a57\u8b49\u3002\n\n" + str(error)[:500],
+    }
 
 
 def write_json(path: Path, data: dict) -> None:
@@ -450,16 +373,12 @@ def send_email(brief: dict) -> None:
     if not (email_to and smtp_user and smtp_password):
         print("Email secrets not fully set; skipping email send.")
         return
-
-    body = brief.get("email_body_zh") or brief.get("daily_summary_zh", "")
-    body += "\n\n\u7db2\u7ad9\uff1ahttps://news.tinydreamlab.com/\n"
-
+    body = (brief.get("email_body_zh") or brief.get("daily_summary_zh", "")) + "\n\n\u7db2\u7ad9\uff1ahttps://news.tinydreamlab.com/\n"
     message = EmailMessage()
     message["From"] = smtp_user
     message["To"] = email_to
     message["Subject"] = f"\u6bcf\u65e5\u8ca1\u7d93\u79d1\u6280\u65b0\u805e\u96f7\u9054 | {TODAY}"
     message.set_content(body)
-
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context, timeout=60) as server:
         server.login(smtp_user, smtp_password)
@@ -472,17 +391,20 @@ def main() -> None:
     if len(candidates) < 10:
         print(f"Warning: only collected {len(candidates)} candidate headlines.")
 
-    brief = call_cloudflare_ai(candidates, sources)
-    brief = normalize_brief(brief, sources)
-    validate_brief(brief)
-    index = update_index(brief)
+    try:
+        brief = call_cloudflare_ai(candidates, sources)
+        brief = normalize_brief(brief, sources)
+        validate_brief(brief)
+    except Exception as exc:
+        print(f"Warning: AI brief generation failed; using fallback brief. Reason: {exc}")
+        brief = build_fallback_brief(candidates, sources, str(exc))
+        validate_brief(brief)
 
+    index = update_index(brief)
     write_json(BRIEF_PATH, brief)
     write_json(INDEX_PATH, index)
-
     json.loads(BRIEF_PATH.read_text(encoding="utf-8"))
     json.loads(INDEX_PATH.read_text(encoding="utf-8"))
-
     send_email(brief)
     print(f"Generated {BRIEF_PATH}")
     print(f"Updated {INDEX_PATH}")
