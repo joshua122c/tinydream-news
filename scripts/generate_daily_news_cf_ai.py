@@ -23,16 +23,29 @@ INDEX_PATH = DATA_DIR / "index.json"
 BRIEF_PATH = BRIEFS_DIR / f"{TODAY}.json"
 USER_AGENT = "Mozilla/5.0 (compatible; TinyDreamNewsRadar/1.0; +https://news.tinydreamlab.com/)"
 
-SOURCE_URLS = [
-    ("Wallstreetcn", "https://wallstreetcn.com/"),
-    ("Reuters Markets", "https://www.reuters.com/markets/"),
-    ("Reuters Technology", "https://www.reuters.com/technology/"),
-    ("CNBC Markets", "https://www.cnbc.com/markets/"),
-    ("CNBC Technology", "https://www.cnbc.com/technology/"),
-    ("TechCrunch AI", "https://techcrunch.com/category/artificial-intelligence/"),
-    ("TechCrunch Startups", "https://techcrunch.com/category/startups/"),
-    ("Caixin", "https://www.caixin.com/"),
-    ("LatePost", "https://www.latepost.com/"),
+SOURCE_CONFIGS = [
+    {"name": "Reuters Markets", "url": "https://www.reuters.com/markets/", "kind": "page", "tier": 1, "max_items": 10, "region": "global"},
+    {"name": "Reuters Technology", "url": "https://www.reuters.com/technology/", "kind": "page", "tier": 1, "max_items": 8, "region": "global"},
+    {"name": "CNBC Top News", "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html", "kind": "rss", "tier": 1, "max_items": 10, "region": "global"},
+    {"name": "CNBC Markets", "url": "https://www.cnbc.com/markets/", "kind": "page", "tier": 1, "max_items": 8, "region": "global"},
+    {"name": "CNBC Technology", "url": "https://www.cnbc.com/technology/", "kind": "page", "tier": 1, "max_items": 8, "region": "global"},
+    {"name": "WSJ Markets", "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml", "kind": "rss", "tier": 1, "max_items": 8, "region": "global"},
+    {"name": "WSJ Technology", "url": "https://feeds.a.dj.com/rss/RSSWSJD.xml", "kind": "rss", "tier": 1, "max_items": 6, "region": "global"},
+    {"name": "MarketWatch Top Stories", "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories", "kind": "rss", "tier": 2, "max_items": 6, "region": "global"},
+    {"name": "TechCrunch AI", "url": "https://techcrunch.com/category/artificial-intelligence/", "kind": "page", "tier": 2, "max_items": 6, "region": "global"},
+    {"name": "TechCrunch Startups", "url": "https://techcrunch.com/category/startups/", "kind": "page", "tier": 2, "max_items": 5, "region": "global"},
+    {"name": "Wallstreetcn", "url": "https://wallstreetcn.com/", "kind": "page", "tier": 3, "max_items": 4, "region": "china"},
+    {"name": "Caixin", "url": "https://www.caixin.com/", "kind": "page", "tier": 3, "max_items": 3, "region": "china"},
+    {"name": "LatePost", "url": "https://www.latepost.com/", "kind": "page", "tier": 3, "max_items": 3, "region": "china"},
+]
+
+CATEGORY_TAXONOMY = [
+    ("全球市場與宏觀", "global-markets-macro"),
+    ("企業、財報與交易", "companies-earnings-deals"),
+    ("科技、AI與平台", "technology-ai-platforms"),
+    ("半導體與供應鏈", "semiconductors-supply-chain"),
+    ("中國與亞洲觀察", "china-asia-watch"),
+    ("能源、外匯與商品", "energy-fx-commodities"),
 ]
 
 REQUIRED_BRIEF_FIELDS = ["date", "title", "deck", "daily_summary_zh", "market_focus", "hot_topics", "categories", "items", "sources", "generated_at"]
@@ -140,7 +153,6 @@ def extract_candidates(source_name: str, url: str, body: str) -> list[dict]:
         if 12 <= len(text) <= 180 and text not in seen:
             seen.add(text)
             candidates.append({"source": source_name, "title": text, "url": url})
-
     anchor_pattern = re.compile(r"<a\s+[^>]*href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>", re.I | re.S)
     for href, label in anchor_pattern.findall(body):
         text = clean_text(label)
@@ -160,19 +172,76 @@ def extract_candidates(source_name: str, url: str, body: str) -> list[dict]:
     return candidates
 
 
+def extract_rss_candidates(source_name: str, url: str, body: str) -> list[dict]:
+    candidates = []
+    for item in re.findall(r"<item\b[^>]*>(.*?)</item>", body, flags=re.I | re.S):
+        title_match = re.search(r"<title[^>]*>(.*?)</title>", item, re.I | re.S)
+        link_match = re.search(r"<link[^>]*>(.*?)</link>", item, re.I | re.S)
+        date_match = re.search(r"<pubDate[^>]*>(.*?)</pubDate>", item, re.I | re.S)
+        if not title_match:
+            continue
+        title = clean_text(title_match.group(1))
+        link = clean_text(link_match.group(1)) if link_match else url
+        if not (12 <= len(title) <= 180):
+            continue
+        candidates.append({"source": source_name, "title": title, "url": absolute_url(url, link), "published_at_hint": clean_text(date_match.group(1)) if date_match else ""})
+        if len(candidates) >= 30:
+            break
+    return candidates
+
+
+def infer_topic_hint(title: str) -> str:
+    text = title.lower()
+    if re.search(r"nvidia|amd|tsmc|semiconductor|chip|晶片|半導體", text):
+        return "半導體與供應鏈"
+    if re.search(r"\bai\b|artificial intelligence|openai|cloud|data center|datacenter|人工智能|雲|數據中心", text):
+        return "科技、AI與平台"
+    if re.search(r"fed|fomc|inflation|cpi|pce|yield|treasury|jobs|rates|聯儲|通脹|利率|非農", text):
+        return "全球市場與宏觀"
+    if re.search(r"earnings|deal|merger|ipo|stock|shares|財報|併購|上市|股份", text):
+        return "企業、財報與交易"
+    if re.search(r"oil|gas|gold|dollar|yen|euro|commodity|原油|黃金|美元|日圓|商品", text):
+        return "能源、外匯與商品"
+    if re.search(r"china|hong kong|japan|asia|中國|香港|日本|亞洲", text):
+        return "中國與亞洲觀察"
+    return "全球市場與宏觀"
+
+
+def headline_score(candidate: dict) -> int:
+    title = candidate.get("title", "")
+    source_tier = int(candidate.get("source_tier", 3))
+    score = 100 - source_tier * 12
+    text = title.lower()
+    priority_terms = ["fed", "inflation", "jobs", "treasury", "yield", "nvidia", "ai", "semiconductor", "chip", "tsmc", "apple", "microsoft", "google", "meta", "amazon", "tesla", "oil", "gold", "dollar", "聯儲", "通脹", "利率", "非農", "人工智能", "半導體", "晶片", "原油", "黃金", "美元", "中國"]
+    score += sum(8 for term in priority_terms if term in text)
+    if 24 <= len(title) <= 120:
+        score += 6
+    return score
+
+
 def collect_news_candidates() -> tuple[list[dict], list[dict]]:
     all_candidates = []
     sources = []
-    for source_name, url in SOURCE_URLS:
+    for config in SOURCE_CONFIGS:
+        source_name = config["name"]
+        url = config["url"]
         status, body = fetch_url(url)
-        sources.append({"name": source_name, "url": url, "access": "Full" if status == 200 else "Blocked"})
-        if status == 200:
-            all_candidates.extend(extract_candidates(source_name, url, body))
+        sources.append({"name": source_name, "url": url, "access": "Full" if status == 200 else "Blocked", "tier": config.get("tier", 3), "region": config.get("region", "global")})
+        if status != 200:
+            continue
+        extracted = extract_rss_candidates(source_name, url, body) if config.get("kind") == "rss" else extract_candidates(source_name, url, body)
+        for candidate in extracted[: config.get("max_items", 8)]:
+            candidate["source_tier"] = config.get("tier", 3)
+            candidate["region"] = config.get("region", "global")
+            candidate["topic_hint"] = infer_topic_hint(candidate.get("title", ""))
+            candidate["score"] = headline_score(candidate)
+            all_candidates.append(candidate)
     keywords = re.compile(r"fed|fomc|inflation|cpi|pce|jobs|treasury|yield|dollar|oil|gold|nvidia|amd|tsmc|semiconductor|chip|ai|artificial intelligence|cloud|apple|tesla|microsoft|google|meta|amazon|聯儲|通脹|非農|黃金|原油|人工智能|半導體|晶片|中國", re.I)
     filtered = [item for item in all_candidates if keywords.search(item["title"])]
     if len(filtered) < 20:
-        filtered = all_candidates[:80]
-    return filtered[:100], sources
+        filtered = all_candidates
+    filtered.sort(key=lambda item: item.get("score", 0), reverse=True)
+    return filtered[:120], sources
 
 
 def strip_code_fence(text: str) -> str:
@@ -209,12 +278,7 @@ def extract_json(text: str) -> dict:
 def ai_request(account_id: str, api_token: str, model: str, messages: list[dict], max_tokens: int = 7000) -> str:
     payload = {"messages": messages, "max_tokens": max_tokens, "temperature": 0.0}
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{model}"
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={"Authorization": f"Bearer {api_token}", "Content-Type": "application/json"},
-        method="POST",
-    )
+    req = urllib.request.Request(url, data=json.dumps(payload, ensure_ascii=False).encode("utf-8"), headers={"Authorization": f"Bearer {api_token}", "Content-Type": "application/json"}, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=180) as response:
             raw = response.read().decode("utf-8")
@@ -236,10 +300,10 @@ def build_prompt(candidates: list[dict], sources: list[dict]) -> str:
         "title": "每日國際財經與科技新聞摘要",
         "deck": "繁體中文導語",
         "daily_summary_zh": "繁體中文每日總結",
-        "market_focus": ["國際財經", "AI與科技產業", "半導體"],
+        "market_focus": ["全球市場與宏觀", "科技、AI與平台", "半導體與供應鏈"],
         "hot_topics": [{"rank": 1, "topic": "繁體中文焦點標題", "heat_score": 80, "heat_label": "High", "source_count": 2, "main_sources": ["Reuters", "CNBC"], "item_ids": [f"{TODAY}-topic-001"], "one_line_reason": "繁體中文上榜原因", "reporter_angle": "繁體中文追蹤角度"}],
-        "categories": [{"name": "AI與科技產業", "slug": "ai-technology-industry", "item_ids": [f"{TODAY}-topic-001"]}],
-        "items": [{"id": f"{TODAY}-topic-001", "date": TODAY, "title_original": "Original headline", "title_zh": "繁體中文標題", "source": "Reuters", "url": "https://example.com/article", "published_at": GENERATED_AT, "category": "AI與科技產業", "themes": ["AI基建", "半導體"], "summary_zh": "繁體中文摘要。", "key_facts": ["繁體中文重點一", "繁體中文重點二"], "market_impact": "繁體中文市場影響", "reporter_angle": "繁體中文追蹤角度", "importance_score": 8, "heat_score": 75, "source_count": 2, "sources_reporting_same_topic": ["Reuters", "CNBC"], "position_signal": "headline cluster", "time_horizon": "short_term", "tracking_value": "繁體中文追蹤價值"}],
+        "categories": [{"name": "科技、AI與平台", "slug": "technology-ai-platforms", "item_ids": [f"{TODAY}-topic-001"]}],
+        "items": [{"id": f"{TODAY}-topic-001", "date": TODAY, "title_original": "Original headline", "title_zh": "繁體中文標題", "source": "Reuters", "url": "https://example.com/article", "published_at": GENERATED_AT, "category": "科技、AI與平台", "themes": ["AI基建", "半導體"], "summary_zh": "繁體中文摘要。", "key_facts": ["繁體中文重點一", "繁體中文重點二"], "market_impact": "繁體中文市場影響", "reporter_angle": "繁體中文追蹤角度", "importance_score": 8, "heat_score": 75, "source_count": 2, "sources_reporting_same_topic": ["Reuters", "CNBC"], "position_signal": "headline cluster", "time_horizon": "short_term", "tracking_value": "繁體中文追蹤價值"}],
         "sources": sources,
         "generated_at": GENERATED_AT,
         "email_body_zh": "繁體中文 email 摘要",
@@ -248,12 +312,21 @@ def build_prompt(candidates: list[dict], sources: list[dict]) -> str:
         "task": "Create a website-ready daily international finance and technology news brief.",
         "date": TODAY,
         "language": "Traditional Chinese only for all reader-facing Chinese fields.",
+        "editorial_policy": [
+            "Prioritize global finance and technology stories from tier 1 sources such as Reuters, CNBC and WSJ.",
+            "Use Wallstreetcn, Caixin and LatePost as China/Asia context sources, not as the dominant source of the whole brief.",
+            "Cluster similar headlines across sources into one topic when possible.",
+            "Rank by market relevance, cross-source confirmation, policy or earnings impact, and technology industry significance.",
+            "Always preserve original article URLs in items[].url.",
+        ],
+        "category_taxonomy": [{"name": name, "slug": slug} for name, slug in CATEGORY_TAXONOMY],
         "output_rules": [
             "Return one valid JSON object only. No markdown. No comments.",
             "Use real Traditional Chinese characters directly. Do not output Unicode escape sequences.",
             "Do not mention JSON validation, fallback mode, automation, prompt, model, or internal errors in reader-facing fields.",
             "hot_topics must contain 3 to 5 entries.",
-            "items must contain 6 to 12 entries.",
+            "items must contain 8 to 12 entries when enough candidate headlines are available; never fewer than 6.",
+            "Use only category names and slugs from category_taxonomy.",
             "Every hot_topics[].item_ids and categories[].item_ids value must exist in items[].id.",
             "Do not give personalized investment advice.",
         ],
@@ -261,7 +334,7 @@ def build_prompt(candidates: list[dict], sources: list[dict]) -> str:
         "required_hot_topic_fields": REQUIRED_HOT_TOPIC_FIELDS,
         "schema_example": schema,
         "sources": sources,
-        "candidate_headlines": candidates[:80],
+        "candidate_headlines": candidates[:120],
     }
     return json.dumps(task, ensure_ascii=False, indent=2)
 
@@ -365,7 +438,7 @@ def build_fallback_brief(candidates: list[dict], sources: list[dict], error: str
         usable = [{"source": source["name"], "title": source["name"], "url": source["url"]} for source in sources]
     while len(usable) < 6:
         usable.append(usable[len(usable) % max(1, len(usable))])
-    category_defs = [("國際財經與市場", "global-finance-markets"), ("AI與科技產業", "ai-technology-industry"), ("中國科技與政策", "china-tech-policy")]
+    category_defs = CATEGORY_TAXONOMY
     items = []
     for idx, candidate in enumerate(usable[:6], start=1):
         category_name, _ = category_defs[(idx - 1) % len(category_defs)]
@@ -374,7 +447,7 @@ def build_fallback_brief(candidates: list[dict], sources: list[dict], error: str
         items.append({
             "id": f"{TODAY}-headline-{idx:03d}", "date": TODAY, "title_original": title, "title_zh": title,
             "source": source_name, "url": candidate.get("url") or "https://news.tinydreamlab.com/", "published_at": GENERATED_AT,
-            "category": category_name, "themes": [category_name],
+            "category": category_name, "themes": [category_name, candidate.get("topic_hint", category_name)],
             "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
             "key_facts": ["來源頁面出現相關標題或連結。", "可從原文連結繼續核實細節和市場影響。"],
             "market_impact": "值得後續追蹤其對市場情緒、相關股份或產業鏈的影響。",
@@ -397,7 +470,7 @@ def build_fallback_brief(candidates: list[dict], sources: list[dict], error: str
         "title": "每日國際財經與科技新聞摘要",
         "deck": "今日摘要已更新，整理公開新聞標題、來源和原文連結。",
         "daily_summary_zh": "今日新聞摘要已根據已抓取的公開新聞標題、來源和原文連結整理，供快速瀏覽和後續追蹤。",
-        "market_focus": ["國際財經與市場", "AI與科技產業", "原文連結追蹤"],
+        "market_focus": ["全球市場與宏觀", "科技、AI與平台", "半導體與供應鏈"],
         "hot_topics": hot_topics, "categories": categories, "items": items, "sources": sources, "generated_at": GENERATED_AT,
         "email_body_zh": "今日新聞摘要已更新。網站已整理公開新聞標題、來源和原文連結，方便快速瀏覽和後續追蹤。\n\n網站：https://news.tinydreamlab.com/",
     })
