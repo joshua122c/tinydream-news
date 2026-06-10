@@ -1,0 +1,379 @@
+{
+  "date": "2026-06-11",
+  "title": "每日國際財經與科技新聞摘要",
+  "deck": "今日摘要已更新，整理公開新聞標題、來源和原文連結。",
+  "daily_summary_zh": "今日新聞摘要已根據已抓取的公開新聞標題、來源和原文連結整理，供快速瀏覽和後續追蹤。",
+  "market_focus": [
+    "全球市場與宏觀",
+    "科技、AI與平台",
+    "半導體與供應鏈"
+  ],
+  "hot_topics": [
+    {
+      "rank": 1,
+      "topic": "Trump says 'I love the inflation' after consumer price index",
+      "heat_score": 78,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC Top News"
+      ],
+      "item_ids": [
+        "2026-06-11-headline-001"
+      ],
+      "one_line_reason": "根據來源和題材熱度選出的高優先級新聞入口。",
+      "reporter_angle": "可從原文連結核實事實，並追蹤後續是否有更多來源報道同一主題。"
+    },
+    {
+      "rank": 2,
+      "topic": "Here's the inflation breakdown for May 2026 — in one chart",
+      "heat_score": 74,
+      "heat_label": "Medium",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC Top News"
+      ],
+      "item_ids": [
+        "2026-06-11-headline-002"
+      ],
+      "one_line_reason": "根據來源和題材熱度選出的高優先級新聞入口。",
+      "reporter_angle": "可從原文連結核實事實，並追蹤後續是否有更多來源報道同一主題。"
+    },
+    {
+      "rank": 3,
+      "topic": "Amazon trucking expansion sparks freight stock sell-off",
+      "heat_score": 70,
+      "heat_label": "Medium",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC Top News"
+      ],
+      "item_ids": [
+        "2026-06-11-headline-003"
+      ],
+      "one_line_reason": "根據來源和題材熱度選出的高優先級新聞入口。",
+      "reporter_angle": "可從原文連結核實事實，並追蹤後續是否有更多來源報道同一主題。"
+    }
+  ],
+  "categories": [
+    {
+      "name": "全球市場與宏觀",
+      "slug": "global-markets-macro",
+      "item_ids": [
+        "2026-06-11-headline-001"
+      ]
+    },
+    {
+      "name": "企業、財報與交易",
+      "slug": "companies-earnings-deals",
+      "item_ids": [
+        "2026-06-11-headline-002"
+      ]
+    },
+    {
+      "name": "科技、AI與平台",
+      "slug": "technology-ai-platforms",
+      "item_ids": [
+        "2026-06-11-headline-003"
+      ]
+    },
+    {
+      "name": "半導體與供應鏈",
+      "slug": "semiconductors-supply-chain",
+      "item_ids": [
+        "2026-06-11-headline-004"
+      ]
+    },
+    {
+      "name": "中國與亞洲觀察",
+      "slug": "china-asia-watch",
+      "item_ids": [
+        "2026-06-11-headline-005"
+      ]
+    },
+    {
+      "name": "能源、外匯與商品",
+      "slug": "energy-fx-commodities",
+      "item_ids": [
+        "2026-06-11-headline-006"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "2026-06-11-headline-001",
+      "date": "2026-06-11",
+      "title_original": "Trump says 'I love the inflation' after consumer price index hits 3-year high",
+      "title_zh": "Trump says 'I love the inflation' after consumer price index hits 3-year high",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/06/10/trump-inflation-cpi-iran-oil.html",
+      "published_at": "2026-06-11T00:43:47+08:00",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "全球市場與宏觀"
+      ],
+      "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
+      "key_facts": [
+        "來源頁面出現相關標題或連結。",
+        "可從原文連結繼續核實細節和市場影響。"
+      ],
+      "market_impact": "值得後續追蹤其對市場情緒、相關股份或產業鏈的影響。",
+      "reporter_angle": "可從原文連結核實事實，並追蹤後續是否有更多來源報道同一主題。",
+      "importance_score": 8,
+      "heat_score": 78,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC Top News"
+      ],
+      "position_signal": "headline candidate",
+      "time_horizon": "short_term",
+      "tracking_value": "需要追蹤原文更新與相關報道。"
+    },
+    {
+      "id": "2026-06-11-headline-002",
+      "date": "2026-06-11",
+      "title_original": "Here's the inflation breakdown for May 2026 — in one chart",
+      "title_zh": "Here's the inflation breakdown for May 2026 — in one chart",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/06/10/heres-the-inflation-breakdown-for-may-2026-in-one-chart.html",
+      "published_at": "2026-06-11T00:43:47+08:00",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易",
+        "全球市場與宏觀"
+      ],
+      "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
+      "key_facts": [
+        "來源頁面出現相關標題或連結。",
+        "可從原文連結繼續核實細節和市場影響。"
+      ],
+      "market_impact": "值得後續追蹤其對市場情緒、相關股份或產業鏈的影響。",
+      "reporter_angle": "可從原文連結核實事實，並追蹤後續是否有更多來源報道同一主題。",
+      "importance_score": 7,
+      "heat_score": 74,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC Top News"
+      ],
+      "position_signal": "headline candidate",
+      "time_horizon": "short_term",
+      "tracking_value": "需要追蹤原文更新與相關報道。"
+    },
+    {
+      "id": "2026-06-11-headline-003",
+      "date": "2026-06-11",
+      "title_original": "Amazon trucking expansion sparks freight stock sell-off",
+      "title_zh": "Amazon trucking expansion sparks freight stock sell-off",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/06/10/amazon-trucking-expansion-freight-stock-selloff.html",
+      "published_at": "2026-06-11T00:43:47+08:00",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "企業、財報與交易"
+      ],
+      "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
+      "key_facts": [
+        "來源頁面出現相關標題或連結。",
+        "可從原文連結繼續核實細節和市場影響。"
+      ],
+      "market_impact": "值得後續追蹤其對市場情緒、相關股份或產業鏈的影響。",
+      "reporter_angle": "可從原文連結核實事實，並追蹤後續是否有更多來源報道同一主題。",
+      "importance_score": 6,
+      "heat_score": 70,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC Top News"
+      ],
+      "position_signal": "headline candidate",
+      "time_horizon": "short_term",
+      "tracking_value": "需要追蹤原文更新與相關報道。"
+    },
+    {
+      "id": "2026-06-11-headline-004",
+      "date": "2026-06-11",
+      "title_original": "Cramer still likes recently spun FedEx Freight despite the emergence of new rival",
+      "title_zh": "Cramer still likes recently spun FedEx Freight despite the emergence of new rival",
+      "source": "CNBC Technology",
+      "url": "https://www.cnbc.com/2026/06/10/cramer-still-likes-fedex-freight-despite-emergence-of-new-rival.html",
+      "published_at": "2026-06-11T00:43:47+08:00",
+      "category": "半導體與供應鏈",
+      "themes": [
+        "半導體與供應鏈",
+        "全球市場與宏觀"
+      ],
+      "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
+      "key_facts": [
+        "來源頁面出現相關標題或連結。",
+        "可從原文連結繼續核實細節和市場影響。"
+      ],
+      "market_impact": "值得後續追蹤其對市場情緒、相關股份或產業鏈的影響。",
+      "reporter_angle": "可從原文連結核實事實，並追蹤後續是否有更多來源報道同一主題。",
+      "importance_score": 5,
+      "heat_score": 66,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC Technology"
+      ],
+      "position_signal": "headline candidate",
+      "time_horizon": "short_term",
+      "tracking_value": "需要追蹤原文更新與相關報道。"
+    },
+    {
+      "id": "2026-06-11-headline-005",
+      "date": "2026-06-11",
+      "title_original": "Stocks Sink in Broad AI Rout Sparked by China's DeepSeek",
+      "title_zh": "Stocks Sink in Broad AI Rout Sparked by China's DeepSeek",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/nikkei-may-rise-as-weak-yen-raises-earnings-hopes-776a8056?mod=rss_markets_main",
+      "published_at": "2026-06-11T00:43:47+08:00",
+      "category": "中國與亞洲觀察",
+      "themes": [
+        "中國與亞洲觀察",
+        "科技、AI與平台"
+      ],
+      "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
+      "key_facts": [
+        "來源頁面出現相關標題或連結。",
+        "可從原文連結繼續核實細節和市場影響。"
+      ],
+      "market_impact": "值得後續追蹤其對市場情緒、相關股份或產業鏈的影響。",
+      "reporter_angle": "可從原文連結核實事實，並追蹤後續是否有更多來源報道同一主題。",
+      "importance_score": 5,
+      "heat_score": 62,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Markets"
+      ],
+      "position_signal": "headline candidate",
+      "time_horizon": "short_term",
+      "tracking_value": "需要追蹤原文更新與相關報道。"
+    },
+    {
+      "id": "2026-06-11-headline-006",
+      "date": "2026-06-11",
+      "title_original": "Comex Gold, Silver Settle Lower",
+      "title_zh": "Comex Gold, Silver Settle Lower",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/gold-edges-lower-feds-rate-decision-in-focus-09dbfceb?mod=rss_markets_main",
+      "published_at": "2026-06-11T00:43:47+08:00",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "能源、外匯與商品"
+      ],
+      "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
+      "key_facts": [
+        "來源頁面出現相關標題或連結。",
+        "可從原文連結繼續核實細節和市場影響。"
+      ],
+      "market_impact": "值得後續追蹤其對市場情緒、相關股份或產業鏈的影響。",
+      "reporter_angle": "可從原文連結核實事實，並追蹤後續是否有更多來源報道同一主題。",
+      "importance_score": 5,
+      "heat_score": 58,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Markets"
+      ],
+      "position_signal": "headline candidate",
+      "time_horizon": "short_term",
+      "tracking_value": "需要追蹤原文更新與相關報道。"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Reuters Markets",
+      "url": "https://www.reuters.com/markets/",
+      "access": "Blocked",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "Reuters Technology",
+      "url": "https://www.reuters.com/technology/",
+      "access": "Blocked",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "CNBC Top News",
+      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+      "access": "Full",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "CNBC Markets",
+      "url": "https://www.cnbc.com/markets/",
+      "access": "Full",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "CNBC Technology",
+      "url": "https://www.cnbc.com/technology/",
+      "access": "Full",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "WSJ Markets",
+      "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "access": "Full",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "WSJ Technology",
+      "url": "https://feeds.a.dj.com/rss/RSSWSJD.xml",
+      "access": "Full",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "MarketWatch Top Stories",
+      "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
+      "access": "Full",
+      "tier": 2,
+      "region": "global"
+    },
+    {
+      "name": "TechCrunch AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/",
+      "access": "Full",
+      "tier": 2,
+      "region": "global"
+    },
+    {
+      "name": "TechCrunch Startups",
+      "url": "https://techcrunch.com/category/startups/",
+      "access": "Full",
+      "tier": 2,
+      "region": "global"
+    },
+    {
+      "name": "Wallstreetcn",
+      "url": "https://wallstreetcn.com/",
+      "access": "Full",
+      "tier": 3,
+      "region": "china"
+    },
+    {
+      "name": "Caixin",
+      "url": "https://www.caixin.com/",
+      "access": "Full",
+      "tier": 3,
+      "region": "china"
+    },
+    {
+      "name": "LatePost",
+      "url": "https://www.latepost.com/",
+      "access": "Full",
+      "tier": 3,
+      "region": "china"
+    }
+  ],
+  "generated_at": "2026-06-11T00:43:47+08:00",
+  "email_body_zh": "今日新聞摘要已更新。網站已整理公開新聞標題、來源和原文連結，方便快速瀏覽和後續追蹤。\n\n網站：https://news.tinydreamlab.com/"
+}
