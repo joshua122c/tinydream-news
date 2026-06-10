@@ -275,7 +275,7 @@ def extract_json(text: str) -> dict:
     raise json.JSONDecodeError("Cloudflare AI did not return parseable JSON", text, 0)
 
 
-def ai_request(account_id: str, api_token: str, model: str, messages: list[dict], max_tokens: int = 7000) -> str:
+def ai_request(account_id: str, api_token: str, model: str, messages: list[dict], max_tokens: int = 3600) -> str:
     payload = {"messages": messages, "max_tokens": max_tokens, "temperature": 0.0}
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{model}"
     req = urllib.request.Request(url, data=json.dumps(payload, ensure_ascii=False).encode("utf-8"), headers={"Authorization": f"Bearer {api_token}", "Content-Type": "application/json"}, method="POST")
@@ -294,24 +294,38 @@ def ai_request(account_id: str, api_token: str, model: str, messages: list[dict]
     return text
 
 
-def build_prompt(candidates: list[dict], sources: list[dict]) -> str:
-    schema = {
-        "date": TODAY,
-        "title": "每日國際財經與科技新聞摘要",
-        "deck": "繁體中文導語",
-        "daily_summary_zh": "繁體中文每日總結",
-        "market_focus": ["全球市場與宏觀", "科技、AI與平台", "半導體與供應鏈"],
-        "hot_topics": [{"rank": 1, "topic": "繁體中文焦點標題", "heat_score": 80, "heat_label": "High", "source_count": 2, "main_sources": ["Reuters", "CNBC"], "item_ids": [f"{TODAY}-topic-001"], "one_line_reason": "繁體中文上榜原因", "reporter_angle": "繁體中文追蹤角度"}],
-        "categories": [{"name": "科技、AI與平台", "slug": "technology-ai-platforms", "item_ids": [f"{TODAY}-topic-001"]}],
-        "items": [{"id": f"{TODAY}-topic-001", "date": TODAY, "title_original": "Original headline", "title_zh": "繁體中文標題", "source": "Reuters", "url": "https://example.com/article", "published_at": GENERATED_AT, "category": "科技、AI與平台", "themes": ["AI基建", "半導體"], "summary_zh": "繁體中文摘要。", "key_facts": ["繁體中文重點一", "繁體中文重點二"], "market_impact": "繁體中文市場影響", "reporter_angle": "繁體中文追蹤角度", "importance_score": 8, "heat_score": 75, "source_count": 2, "sources_reporting_same_topic": ["Reuters", "CNBC"], "position_signal": "headline cluster", "time_horizon": "short_term", "tracking_value": "繁體中文追蹤價值"}],
-        "sources": sources,
-        "generated_at": GENERATED_AT,
-        "email_body_zh": "繁體中文 email 摘要",
+def compact_candidate(candidate: dict, index: int) -> dict:
+    return {
+        "n": index,
+        "source": candidate.get("source", ""),
+        "title": candidate.get("title", "")[:130],
+        "url": candidate.get("url", ""),
+        "topic_hint": candidate.get("topic_hint", ""),
+        "score": candidate.get("score", 0),
+        "tier": candidate.get("source_tier", 3),
     }
+
+
+def compact_source(source: dict) -> dict:
+    return {
+        "name": source.get("name", ""),
+        "url": source.get("url", ""),
+        "access": source.get("access", ""),
+        "tier": source.get("tier", 3),
+    }
+
+
+def build_prompt(candidates: list[dict], sources: list[dict]) -> str:
+    compact_candidates = [compact_candidate(candidate, idx) for idx, candidate in enumerate(candidates[:24], start=1)]
+    compact_sources = [compact_source(source) for source in sources]
     task = {
         "task": "Create a website-ready daily international finance and technology news brief.",
         "date": TODAY,
         "language": "Traditional Chinese only for all reader-facing Chinese fields.",
+        "required_top_level_fields": REQUIRED_BRIEF_FIELDS + ["email_body_zh"],
+        "required_item_fields": REQUIRED_ITEM_FIELDS,
+        "required_hot_topic_fields": REQUIRED_HOT_TOPIC_FIELDS,
+        "category_taxonomy": [{"name": name, "slug": slug} for name, slug in CATEGORY_TAXONOMY],
         "editorial_policy": [
             "Prioritize global finance and technology stories from tier 1 sources such as Reuters, CNBC and WSJ.",
             "Use Wallstreetcn, Caixin and LatePost as China/Asia context sources, not as the dominant source of the whole brief.",
@@ -319,24 +333,21 @@ def build_prompt(candidates: list[dict], sources: list[dict]) -> str:
             "Rank by market relevance, cross-source confirmation, policy or earnings impact, and technology industry significance.",
             "Always preserve original article URLs in items[].url.",
         ],
-        "category_taxonomy": [{"name": name, "slug": slug} for name, slug in CATEGORY_TAXONOMY],
         "output_rules": [
             "Return one valid JSON object only. No markdown. No comments.",
             "Use real Traditional Chinese characters directly. Do not output Unicode escape sequences.",
             "Do not mention JSON validation, fallback mode, automation, prompt, model, or internal errors in reader-facing fields.",
             "hot_topics must contain 3 to 5 entries.",
-            "items must contain 8 to 12 entries when enough candidate headlines are available; never fewer than 6.",
+            "items must contain 6 to 8 entries.",
             "Use only category names and slugs from category_taxonomy.",
             "Every hot_topics[].item_ids and categories[].item_ids value must exist in items[].id.",
+            f"Item ids must use this format: {TODAY}-topic-001.",
             "Do not give personalized investment advice.",
         ],
-        "required_item_fields": REQUIRED_ITEM_FIELDS,
-        "required_hot_topic_fields": REQUIRED_HOT_TOPIC_FIELDS,
-        "schema_example": schema,
-        "sources": sources,
-        "candidate_headlines": candidates[:120],
+        "sources": compact_sources,
+        "candidate_headlines": compact_candidates,
     }
-    return json.dumps(task, ensure_ascii=False, indent=2)
+    return json.dumps(task, ensure_ascii=False, separators=(",", ":"))
 
 
 def call_cloudflare_ai(candidates: list[dict], sources: list[dict]) -> dict:
@@ -349,7 +360,7 @@ def call_cloudflare_ai(candidates: list[dict], sources: list[dict]) -> dict:
         return extract_json(text)
     except json.JSONDecodeError:
         repair_prompt = "Repair the following response into one valid JSON object that matches the requested schema. Output JSON only. Use Traditional Chinese for reader-facing fields. Remove markdown and invalid escape sequences.\n\n" + text[:24000]
-        repaired = ai_request(account_id, api_token, model, [{"role": "system", "content": system}, {"role": "user", "content": repair_prompt}], max_tokens=7000)
+        repaired = ai_request(account_id, api_token, model, [{"role": "system", "content": system}, {"role": "user", "content": repair_prompt}], max_tokens=3600)
         return extract_json(repaired)
 
 
