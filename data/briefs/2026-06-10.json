@@ -11,7 +11,7 @@
   "hot_topics": [
     {
       "rank": 1,
-      "topic": "硅基“反噬”--这是自ChatGPT问世以来第一次！ 隔夜纳指成为美股跌幅最大的指数，整个美股看，只有科技和能源板块下跌",
+      "topic": "AI推高通胀！国家统计局：5月算力需求增长等带动有色金属、电气机械和计算机相关行业价格上涨",
       "heat_score": 78,
       "heat_label": "High",
       "source_count": 1,
@@ -26,7 +26,7 @@
     },
     {
       "rank": 2,
-      "topic": "超微电脑盘后大跌12%！启动70亿美元股权融资以支持AI业务 杨宸 06:08",
+      "topic": "中国5月CPI同比 1.2%，前值 1.2%。中国5月PPI同比 3.9%，前值 2.8%。 石惠 09:30",
       "heat_score": 74,
       "heat_label": "Medium",
       "source_count": 1,
@@ -41,7 +41,7 @@
     },
     {
       "rank": 3,
-      "topic": "快讯 布伦特原油期货跌穿90美元/桶整数位心理关口，创4月17日以来新低，日内当前跌幅4.5%。 00:04",
+      "topic": "快讯 美国完成就阿帕奇直升机被击落事件对伊朗实施的打击 WTI原油期货日内涨幅收窄至0.7%。美国中央司令部称，于6月9",
       "heat_score": 70,
       "heat_label": "Medium",
       "source_count": 1,
@@ -85,11 +85,11 @@
     {
       "id": "2026-06-10-fallback-001",
       "date": "2026-06-10",
-      "title_original": "硅基“反噬”--这是自ChatGPT问世以来第一次！ 隔夜纳指成为美股跌幅最大的指数，整个美股看，只有科技和能源板块下跌（图1）； 过去五天，标普500指数（图2红线）与高盛标普除人工智能指数篮子（图2绿线）之间的巨大差距，最明显地体现了这种分歧。这种分歧之大是2022年底ChatGPT问世以来第一次（图3） 市场直击 07:43",
-      "title_zh": "硅基“反噬”--这是自ChatGPT问世以来第一次！ 隔夜纳指成为美股跌幅最大的指数，整个美股看，只有科技和能源板块下跌（图1）； 过去五天，标普500指数（图2红线）与高盛标普除人工智能指数篮子（图2绿线）之间的巨大差距，最明显地体现了这种分歧。这种分歧之大是2022年底ChatGPT问世以来第一次（图3） 市场直击 07:43",
+      "title_original": "AI推高通胀！国家统计局：5月算力需求增长等带动有色金属、电气机械和计算机相关行业价格上涨",
+      "title_zh": "AI推高通胀！国家统计局：5月算力需求增长等带动有色金属、电气机械和计算机相关行业价格上涨",
       "source": "Wallstreetcn",
-      "url": "https://wallstreetcn.com/charts/41959207",
-      "published_at": "2026-06-10T08:43:02+08:00",
+      "url": "https://wallstreetcn.com/articles/3774282",
+      "published_at": "2026-06-10T10:05:11+08:00",
       "category": "國際財經與市場",
       "themes": [
         "國際財經與市場"
@@ -114,11 +114,11 @@
     {
       "id": "2026-06-10-fallback-002",
       "date": "2026-06-10",
-      "title_original": "超微电脑盘后大跌12%！启动70亿美元股权融资以支持AI业务 杨宸 06:08",
-      "title_zh": "超微电脑盘后大跌12%！启动70亿美元股权融资以支持AI业务 杨宸 06:08",
+      "title_original": "中国5月CPI同比 1.2%，前值 1.2%。中国5月PPI同比 3.9%，前值 2.8%。 石惠 09:30",
+      "title_zh": "中国5月CPI同比 1.2%，前值 1.2%。中国5月PPI同比 3.9%，前值 2.8%。 石惠 09:30",
       "source": "Wallstreetcn",
-      "url": "https://wallstreetcn.com/articles/3774264",
-      "published_at": "2026-06-10T08:43:02+08:00",
+      "url": "https://wallstreetcn.com/articles/3774282",
+      "published_at": "2026-06-10T10:05:11+08:00",
       "category": "AI與科技產業",
       "themes": [
         "AI與科技產業"
@@ -143,11 +143,11 @@
     {
       "id": "2026-06-10-fallback-003",
       "date": "2026-06-10",
-      "title_original": "快讯 布伦特原油期货跌穿90美元/桶整数位心理关口，创4月17日以来新低，日内当前跌幅4.5%。 00:04",
-      "title_zh": "快讯 布伦特原油期货跌穿90美元/桶整数位心理关口，创4月17日以来新低，日内当前跌幅4.5%。 00:04",
+      "title_original": "快讯 美国完成就阿帕奇直升机被击落事件对伊朗实施的打击 WTI原油期货日内涨幅收窄至0.7%。美国中央司令部称，于6月9日完成了对伊朗的自卫性打击，以回应前一天美国陆军阿帕奇直升机被击落的事件。美国中央司令部部队袭击了霍尔木兹海峡附近的伊朗防空、地面控制站和监视雷达站。 08:58",
+      "title_zh": "快讯 美国完成就阿帕奇直升机被击落事件对伊朗实施的打击 WTI原油期货日内涨幅收窄至0.7%。美国中央司令部称，于6月9日完成了对伊朗的自卫性打击，以回应前一天美国陆军阿帕奇直升机被击落的事件。美国中央司令部部队袭击了霍尔木兹海峡附近的伊朗防空、地面控制站和监视雷达站。 08:58",
       "source": "Wallstreetcn",
-      "url": "https://wallstreetcn.com/livenews/3116948",
-      "published_at": "2026-06-10T08:43:02+08:00",
+      "url": "https://wallstreetcn.com/livenews/3117113",
+      "published_at": "2026-06-10T10:05:11+08:00",
       "category": "中國科技與政策",
       "themes": [
         "中國科技與政策"
@@ -172,11 +172,11 @@
     {
       "id": "2026-06-10-fallback-004",
       "date": "2026-06-10",
-      "title_original": "Treasury yields edge lower as traders await more economic data",
-      "title_zh": "Treasury yields edge lower as traders await more economic data",
-      "source": "CNBC Markets",
-      "url": "https://www.cnbc.com/2026/06/09/treasury-yields-hold-steady-as-traders-await-more-economic-data.html",
-      "published_at": "2026-06-10T08:43:02+08:00",
+      "title_original": "5月CPI：是否继续让加息预期火上浇油？ 弋文涛 08:17",
+      "title_zh": "5月CPI：是否继续让加息预期火上浇油？ 弋文涛 08:17",
+      "source": "Wallstreetcn",
+      "url": "https://wallstreetcn.com/member/articles/3774222",
+      "published_at": "2026-06-10T10:05:11+08:00",
       "category": "國際財經與市場",
       "themes": [
         "國際財經與市場"
@@ -192,7 +192,7 @@
       "heat_score": 66,
       "source_count": 1,
       "sources_reporting_same_topic": [
-        "CNBC Markets"
+        "Wallstreetcn"
       ],
       "position_signal": "fallback headline candidate",
       "time_horizon": "short_term",
@@ -201,11 +201,11 @@
     {
       "id": "2026-06-10-fallback-005",
       "date": "2026-06-10",
-      "title_original": "Markets will be sensitive to things like credit spreads or rates: Renaissance Macro's Jeff deGraaf",
-      "title_zh": "Markets will be sensitive to things like credit spreads or rates: Renaissance Macro's Jeff deGraaf",
-      "source": "CNBC Markets",
-      "url": "https://www.cnbc.com/video/2026/06/08/markets-will-be-sensitive-to-things-like-credit-spreads-or-rates-renaissance-macros-jeff-degraaf.html",
-      "published_at": "2026-06-10T08:43:02+08:00",
+      "title_original": "硅基“反噬”--这是自ChatGPT问世以来第一次！ 隔夜纳指成为美股跌幅最大的指数，整个美股看，只有科技和能源板块下跌（图1）； 过去五天，标普500指数（图2红线）与高盛标普除人工智能指数篮子（图2绿线）之间的巨大差距，最明显地体现了这种分歧。这种分歧之大是2022年底ChatGPT问世以来第一次（图3） 市场直击 07:43",
+      "title_zh": "硅基“反噬”--这是自ChatGPT问世以来第一次！ 隔夜纳指成为美股跌幅最大的指数，整个美股看，只有科技和能源板块下跌（图1）； 过去五天，标普500指数（图2红线）与高盛标普除人工智能指数篮子（图2绿线）之间的巨大差距，最明显地体现了这种分歧。这种分歧之大是2022年底ChatGPT问世以来第一次（图3） 市场直击 07:43",
+      "source": "Wallstreetcn",
+      "url": "https://wallstreetcn.com/charts/41959207",
+      "published_at": "2026-06-10T10:05:11+08:00",
       "category": "AI與科技產業",
       "themes": [
         "AI與科技產業"
@@ -221,7 +221,7 @@
       "heat_score": 62,
       "source_count": 1,
       "sources_reporting_same_topic": [
-        "CNBC Markets"
+        "Wallstreetcn"
       ],
       "position_signal": "fallback headline candidate",
       "time_horizon": "short_term",
@@ -230,11 +230,11 @@
     {
       "id": "2026-06-10-fallback-006",
       "date": "2026-06-10",
-      "title_original": "Treasury yields edge higher as traders weigh rate outlook, fresh Iran tensions",
-      "title_zh": "Treasury yields edge higher as traders weigh rate outlook, fresh Iran tensions",
-      "source": "CNBC Markets",
-      "url": "https://www.cnbc.com/2026/06/08/treasury-yields-rise-as-traders-weigh-inflationary-pressures.html",
-      "published_at": "2026-06-10T08:43:02+08:00",
+      "title_original": "超微电脑盘后大跌12%！启动70亿美元股权融资以支持AI业务 杨宸 06:08",
+      "title_zh": "超微电脑盘后大跌12%！启动70亿美元股权融资以支持AI业务 杨宸 06:08",
+      "source": "Wallstreetcn",
+      "url": "https://wallstreetcn.com/articles/3774264",
+      "published_at": "2026-06-10T10:05:11+08:00",
       "category": "中國科技與政策",
       "themes": [
         "中國科技與政策"
@@ -250,7 +250,7 @@
       "heat_score": 58,
       "source_count": 1,
       "sources_reporting_same_topic": [
-        "CNBC Markets"
+        "Wallstreetcn"
       ],
       "position_signal": "fallback headline candidate",
       "time_horizon": "short_term",
@@ -304,6 +304,6 @@
       "access": "Full"
     }
   ],
-  "generated_at": "2026-06-10T08:43:02+08:00",
+  "generated_at": "2026-06-10T10:05:11+08:00",
   "email_body_zh": "今日自動新聞摘要啟用保底模式。\n\n原因：Cloudflare Workers AI 回覆的 JSON 格式未能通過系統驗證。\n\nCloudflare AI did not return parseable JSON: line 1 column 1 (char 0)"
 }
