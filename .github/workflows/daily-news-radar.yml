@@ -1,16 +1,13 @@
-name: Daily Finance Tech News Radar
+name: Daily Finance Tech News Radar - Manual Backup
 
 on:
   workflow_dispatch:
-  schedule:
-    # 08:00 Hong Kong time = 00:00 UTC.
-    - cron: "0 0 * * *"
 
 permissions:
   contents: write
 
 concurrency:
-  group: daily-news-radar
+  group: daily-news-radar-manual-backup
   cancel-in-progress: false
 
 jobs:
