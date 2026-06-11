@@ -440,6 +440,25 @@ def build_professional_item(candidate: dict, idx: int, category_defs: list[tuple
     }
 
 
+def hot_topic_reason(item: dict) -> str:
+    category = item.get("category", "")
+    title = item.get("title_zh", "")
+    source = item.get("source", "主要來源")
+    if "全球市場" in category:
+        return f"{source} 的報道反映投資者正重新評估利率、通脹和資金流向，可能影響股債匯商品的短線定價。"
+    if "能源" in category or "外匯" in category or "商品" in category:
+        return f"{title[:28]} 牽涉能源或商品價格變化，對通脹預期、企業成本和市場避險情緒都有追蹤價值。"
+    if "科技" in category or "AI" in category:
+        return f"這條新聞觸及人工智能投資與科技平台競爭，值得觀察是否改變市場對科技股增長和資本開支的判斷。"
+    if "半導體" in category:
+        return f"半導體和供應鏈消息往往會牽動 AI 基建、硬件需求和相關股份估值，是今日科技線索的重要一環。"
+    if "企業" in category:
+        return f"企業融資、業績或交易消息會直接影響個股估值和行業情緒，適合作為今日公司新聞的優先入口。"
+    if "中國" in category or "亞洲" in category:
+        return f"中國與亞洲相關消息可能影響區內市場、科技政策和全球供應鏈預期，適合放入今日觀察清單。"
+    return f"{source} 報道的這條新聞具備市場敏感度，適合先讀摘要再打開原文核實細節。"
+
+
 def build_prompt(candidates: list[dict], sources: list[dict]) -> str:
     compact_candidates = [compact_candidate(candidate, idx) for idx, candidate in enumerate(candidates[:36], start=1)]
     compact_sources = [compact_source(source) for source in sources]
@@ -624,7 +643,7 @@ def build_fallback_brief(candidates: list[dict], sources: list[dict], error: str
             "source_count": 1,
             "main_sources": [item["source"]],
             "item_ids": [item["id"]],
-            "one_line_reason": "此題材同時觸及宏觀預期、科技產業或主要市場價格，適合作為今日優先閱讀焦點。",
+            "one_line_reason": hot_topic_reason(item),
             "reporter_angle": item["reporter_angle"],
         })
     categories = []
