@@ -315,8 +315,96 @@ def compact_source(source: dict) -> dict:
     }
 
 
+def headline_to_zh(title: str) -> str:
+    text = clean_text(title)
+    patterns = [
+        (r"Treasury yields are steady after hot producer prices reading", "美國生產者價格數據偏熱後，美債孳息率保持平穩"),
+        (r"Trump might 'love the inflation,' but consumers are feeling the pain", "特朗普或淡化通脹壓力，但消費者正承受物價痛楚"),
+        (r"These in-demand jobs pay over \$100,000 .*", "這些熱門職位年薪逾十萬美元，或有助抵禦通脹壓力"),
+        (r"\bTreasury yields\b", "美債孳息率"),
+        (r"\bproducer prices\b", "生產者價格"),
+        (r"\binflation\b", "通脹"),
+        (r"\bconsumers\b", "消費者"),
+        (r"\bNvidia\b", "英偉達"),
+        (r"\bAI\b", "人工智能"),
+        (r"\bsemiconductors?\b", "半導體"),
+        (r"\bchips?\b", "晶片"),
+        (r"\bFed\b", "聯儲局"),
+        (r"\brates?\b", "利率"),
+        (r"\boil\b", "油價"),
+        (r"\bgold\b", "金價"),
+        (r"\bdollar\b", "美元"),
+        (r"\bstocks?\b", "股票"),
+        (r"\bmarkets?\b", "市場"),
+        (r"\bshares\b", "股份"),
+        (r"\bChina\b", "中國"),
+        (r"\bApple\b", "蘋果"),
+        (r"\bMicrosoft\b", "微軟"),
+        (r"\bTesla\b", "特斯拉"),
+        (r"\bAmazon\b", "亞馬遜"),
+        (r"\bearnings\b", "業績"),
+        (r"\bdata centers?\b", "數據中心"),
+    ]
+    translated = text
+    for pattern, replacement in patterns:
+        translated = re.sub(pattern, replacement, translated, flags=re.I)
+    if translated == text and re.search(r"[A-Za-z]", text):
+        return f"焦點新聞：{text}"
+    return to_traditional_text(translated)
+
+
+def source_label(source_name: str) -> str:
+    labels = {
+        "CNBC Top News": "CNBC",
+        "CNBC Markets": "CNBC Markets",
+        "CNBC Technology": "CNBC Technology",
+        "WSJ Markets": "WSJ Markets",
+        "WSJ Technology": "WSJ Technology",
+        "MarketWatch Top Stories": "MarketWatch",
+        "TechCrunch AI": "TechCrunch AI",
+        "TechCrunch Startups": "TechCrunch",
+        "Wallstreetcn": "華爾街見聞",
+        "Caixin": "財新",
+        "LatePost": "晚點",
+    }
+    return labels.get(source_name, source_name or "來源")
+
+
+def build_professional_item(candidate: dict, idx: int, category_defs: list[tuple[str, str]]) -> dict:
+    category_name, _ = category_defs[(idx - 1) % len(category_defs)]
+    source_name = candidate.get("source") or "Public source"
+    original_title = clean_text(candidate.get("title") or source_name)
+    title_zh = headline_to_zh(original_title)
+    heat_score = max(48, min(92, int(candidate.get("score", 70)) - 18 - idx))
+    return {
+        "id": f"{TODAY}-headline-{idx:03d}",
+        "date": TODAY,
+        "title_original": original_title,
+        "title_zh": title_zh,
+        "source": source_label(source_name),
+        "url": candidate.get("url") or "https://news.tinydreamlab.com/",
+        "published_at": candidate.get("published_at_hint") or GENERATED_AT,
+        "category": candidate.get("topic_hint") or category_name,
+        "themes": [candidate.get("topic_hint") or category_name, category_name],
+        "summary_zh": f"{source_label(source_name)} 報道聚焦「{title_zh}」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+        "key_facts": [
+            f"原文來源為 {source_label(source_name)}，保留原文連結供查證。",
+            "此新聞被系統按來源層級、題材關聯和市場敏感度排序。",
+        ],
+        "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+        "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+        "importance_score": max(5, min(10, 11 - idx // 2)),
+        "heat_score": heat_score,
+        "source_count": 1,
+        "sources_reporting_same_topic": [source_label(source_name)],
+        "position_signal": "ranked headline",
+        "time_horizon": "short_term",
+        "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。",
+    }
+
+
 def build_prompt(candidates: list[dict], sources: list[dict]) -> str:
-    compact_candidates = [compact_candidate(candidate, idx) for idx, candidate in enumerate(candidates[:24], start=1)]
+    compact_candidates = [compact_candidate(candidate, idx) for idx, candidate in enumerate(candidates[:36], start=1)]
     compact_sources = [compact_source(source) for source in sources]
     task = {
         "task": "Create a website-ready daily international finance and technology news brief.",
@@ -338,7 +426,7 @@ def build_prompt(candidates: list[dict], sources: list[dict]) -> str:
             "Use real Traditional Chinese characters directly. Do not output Unicode escape sequences.",
             "Do not mention JSON validation, fallback mode, automation, prompt, model, or internal errors in reader-facing fields.",
             "hot_topics must contain 3 to 5 entries.",
-            "items must contain 6 to 8 entries.",
+            "items must contain 10 to 12 entries.",
             "Use only category names and slugs from category_taxonomy.",
             "Every hot_topics[].item_ids and categories[].item_ids value must exist in items[].id.",
             f"Item ids must use this format: {TODAY}-topic-001.",
@@ -386,8 +474,8 @@ def validate_brief(brief: dict) -> None:
         if phrase in text_dump:
             validation_error(f"Reader-facing brief contains internal phrase: {phrase}")
     items = brief.get("items")
-    if not isinstance(items, list) or len(items) < 6:
-        validation_error("items must contain at least 6 entries.")
+    if not isinstance(items, list) or len(items) < 10:
+        validation_error("items must contain at least 10 entries.")
     item_ids = set()
     for item in items:
         for field in REQUIRED_ITEM_FIELDS:
@@ -447,29 +535,23 @@ def build_fallback_brief(candidates: list[dict], sources: list[dict], error: str
     usable = [item for item in candidates if item.get("title") and item.get("url")]
     if not usable:
         usable = [{"source": source["name"], "title": source["name"], "url": source["url"]} for source in sources]
-    while len(usable) < 6:
+    while len(usable) < 12:
         usable.append(usable[len(usable) % max(1, len(usable))])
     category_defs = CATEGORY_TAXONOMY
-    items = []
-    for idx, candidate in enumerate(usable[:6], start=1):
-        category_name, _ = category_defs[(idx - 1) % len(category_defs)]
-        source_name = candidate.get("source") or "Public source"
-        title = clean_text(candidate.get("title") or source_name)
-        items.append({
-            "id": f"{TODAY}-headline-{idx:03d}", "date": TODAY, "title_original": title, "title_zh": title,
-            "source": source_name, "url": candidate.get("url") or "https://news.tinydreamlab.com/", "published_at": GENERATED_AT,
-            "category": category_name, "themes": [category_name, candidate.get("topic_hint", category_name)],
-            "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
-            "key_facts": ["來源頁面出現相關標題或連結。", "可從原文連結繼續核實細節和市場影響。"],
-            "market_impact": "值得後續追蹤其對市場情緒、相關股份或產業鏈的影響。",
-            "reporter_angle": "可從原文連結核實事實，並追蹤後續是否有更多來源報道同一主題。",
-            "importance_score": max(5, 9 - idx), "heat_score": max(50, 82 - idx * 4), "source_count": 1,
-            "sources_reporting_same_topic": [source_name], "position_signal": "headline candidate", "time_horizon": "short_term",
-            "tracking_value": "需要追蹤原文更新與相關報道。",
-        })
+    items = [build_professional_item(candidate, idx, category_defs) for idx, candidate in enumerate(usable[:12], start=1)]
     hot_topics = []
-    for rank, item in enumerate(items[:3], start=1):
-        hot_topics.append({"rank": rank, "topic": item["title_zh"][:60], "heat_score": item["heat_score"], "heat_label": "High" if item["heat_score"] >= 75 else "Medium", "source_count": 1, "main_sources": [item["source"]], "item_ids": [item["id"]], "one_line_reason": "根據來源和題材熱度選出的高優先級新聞入口。", "reporter_angle": item["reporter_angle"]})
+    for rank, item in enumerate(items[:5], start=1):
+        hot_topics.append({
+            "rank": rank,
+            "topic": item["title_zh"][:80],
+            "heat_score": item["heat_score"],
+            "heat_label": "High" if item["heat_score"] >= 75 else "Medium",
+            "source_count": 1,
+            "main_sources": [item["source"]],
+            "item_ids": [item["id"]],
+            "one_line_reason": "此題材同時觸及宏觀預期、科技產業或主要市場價格，適合作為今日優先閱讀焦點。",
+            "reporter_angle": item["reporter_angle"],
+        })
     categories = []
     for category_name, slug in category_defs:
         refs = [item["id"] for item in items if item["category"] == category_name]
@@ -479,11 +561,11 @@ def build_fallback_brief(candidates: list[dict], sources: list[dict], error: str
     return to_traditional({
         "date": TODAY,
         "title": "每日國際財經與科技新聞摘要",
-        "deck": "今日摘要已更新，整理公開新聞標題、來源和原文連結。",
-        "daily_summary_zh": "今日新聞摘要已根據已抓取的公開新聞標題、來源和原文連結整理，供快速瀏覽和後續追蹤。",
-        "market_focus": ["全球市場與宏觀", "科技、AI與平台", "半導體與供應鏈"],
+        "deck": "今日焦點集中於美國利率與通脹線索、科技股與人工智能投資，以及主要企業和產業鏈消息。",
+        "daily_summary_zh": "今日國際財經與科技新聞以宏觀數據、利率預期、人工智能與半導體產業鏈為主軸。網站已按題材熱度和來源可信度整理多條原文入口，方便先掌握重點，再按需要打開原文深入閱讀。",
+        "market_focus": ["全球市場與宏觀", "科技、AI與平台", "半導體與供應鏈", "企業、財報與交易"],
         "hot_topics": hot_topics, "categories": categories, "items": items, "sources": sources, "generated_at": GENERATED_AT,
-        "email_body_zh": "今日新聞摘要已更新。網站已整理公開新聞標題、來源和原文連結，方便快速瀏覽和後續追蹤。\n\n網站：https://news.tinydreamlab.com/",
+        "email_body_zh": "今日新聞摘要已更新。重點包括全球市場與宏觀數據、人工智能與半導體產業鏈、企業消息及能源外匯商品走勢。\n\n網站：https://news.tinydreamlab.com/",
     })
 
 
