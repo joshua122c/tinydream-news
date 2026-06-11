@@ -27,12 +27,12 @@
     },
     {
       "rank": 2,
-      "topic": "這些熱門職位年薪逾十萬美元，或有助抵禦通脹壓力",
-      "heat_score": 86,
+      "topic": "金價 slumps to 6-month low even as 通脹 fears rise. Here's why bullion is out of fav",
+      "heat_score": 90,
       "heat_label": "High",
       "source_count": 1,
       "main_sources": [
-        "MarketWatch"
+        "CNBC"
       ],
       "item_ids": [
         "2026-06-11-headline-002"
@@ -42,12 +42,12 @@
     },
     {
       "rank": 3,
-      "topic": "Trump threatens to seize Kharg Island and other Iran 油價 infrastructure",
-      "heat_score": 81,
+      "topic": "這些熱門職位年薪逾十萬美元，或有助抵禦通脹壓力",
+      "heat_score": 85,
       "heat_label": "High",
       "source_count": 1,
       "main_sources": [
-        "CNBC"
+        "MarketWatch"
       ],
       "item_ids": [
         "2026-06-11-headline-003"
@@ -57,7 +57,7 @@
     },
     {
       "rank": 4,
-      "topic": "Oracle 股份 tumble 11% on increased capital raise, cash concerns",
+      "topic": "Trump threatens to seize Kharg Island and other Iran 油價 infrastructure",
       "heat_score": 80,
       "heat_label": "High",
       "source_count": 1,
@@ -72,7 +72,7 @@
     },
     {
       "rank": 5,
-      "topic": "DoorDash lets customers use photos, prompts to order food and book reservations ",
+      "topic": "Oracle 股份 tumble 11% on increased capital raise, cash concerns",
       "heat_score": 79,
       "heat_label": "High",
       "source_count": 1,
@@ -93,24 +93,24 @@
       "item_ids": [
         "2026-06-11-headline-001",
         "2026-06-11-headline-002",
-        "2026-06-11-headline-006"
+        "2026-06-11-headline-003",
+        "2026-06-11-headline-007"
       ]
     },
     {
       "name": "企業、財報與交易",
       "slug": "companies-earnings-deals",
       "item_ids": [
-        "2026-06-11-headline-004"
+        "2026-06-11-headline-005",
+        "2026-06-11-headline-008"
       ]
     },
     {
       "name": "科技、AI與平台",
       "slug": "technology-ai-platforms",
       "item_ids": [
-        "2026-06-11-headline-005",
-        "2026-06-11-headline-007",
-        "2026-06-11-headline-008",
-        "2026-06-11-headline-010",
+        "2026-06-11-headline-006",
+        "2026-06-11-headline-009",
         "2026-06-11-headline-011",
         "2026-06-11-headline-012"
       ]
@@ -119,8 +119,8 @@
       "name": "能源、外匯與商品",
       "slug": "energy-fx-commodities",
       "item_ids": [
-        "2026-06-11-headline-003",
-        "2026-06-11-headline-009"
+        "2026-06-11-headline-004",
+        "2026-06-11-headline-010"
       ]
     }
   ],
@@ -132,7 +132,7 @@
       "title_zh": "美國生產者價格數據偏熱後，美債孳息率保持平穩, crude 油價 gains",
       "source": "CNBC Markets",
       "url": "https://www.cnbc.com/2026/06/11/treasury-yields-flat-as-investors-monitor-inflation-data-us-strikes-in-iran.html",
-      "published_at": "2026-06-11T23:39:35+08:00",
+      "published_at": "2026-06-11T23:44:31+08:00",
       "category": "全球市場與宏觀",
       "themes": [
         "全球市場與宏觀",
@@ -158,47 +158,17 @@
     {
       "id": "2026-06-11-headline-002",
       "date": "2026-06-11",
-      "title_original": "These in-demand jobs pay over $100,000 — and offer raises that keep ahead of inflation",
-      "title_zh": "這些熱門職位年薪逾十萬美元，或有助抵禦通脹壓力",
-      "source": "MarketWatch",
-      "url": "https://www.marketwatch.com/story/these-in-demand-jobs-pay-over-100-000-and-offer-raises-that-keep-ahead-of-inflation-29c2ad1a?mod=mw_rss_topstories",
-      "published_at": "Thu, 11 Jun 2026 14:33:00 GMT",
+      "title_original": "Gold slumps to 6-month low even as inflation fears rise. Here's why bullion is out of favor",
+      "title_zh": "金價 slumps to 6-month low even as 通脹 fears rise. Here's why bullion is out of favor",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/11/gold-slumps-to-6-month-low-even-as-inflation-fears-rise-heres-why-bullion-is-out-of-favor.html",
+      "published_at": "Thu, 11 Jun 2026 15:32:34 GMT",
       "category": "全球市場與宏觀",
       "themes": [
         "全球市場與宏觀",
         "企業、財報與交易"
       ],
-      "summary_zh": "MarketWatch 報道聚焦「這些熱門職位年薪逾十萬美元，或有助抵禦通脹壓力」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
-      "key_facts": [
-        "原文來源為 MarketWatch，保留原文連結供查證。",
-        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
-      ],
-      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
-      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
-      "importance_score": 10,
-      "heat_score": 86,
-      "source_count": 1,
-      "sources_reporting_same_topic": [
-        "MarketWatch"
-      ],
-      "position_signal": "ranked headline",
-      "time_horizon": "short_term",
-      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
-    },
-    {
-      "id": "2026-06-11-headline-003",
-      "date": "2026-06-11",
-      "title_original": "Trump threatens to seize Kharg Island and other Iran oil infrastructure",
-      "title_zh": "Trump threatens to seize Kharg Island and other Iran 油價 infrastructure",
-      "source": "CNBC",
-      "url": "https://www.cnbc.com/2026/06/11/trump-says-us-will-seize-kharg-island-and-other-oil-infrastructure-points.html",
-      "published_at": "Thu, 11 Jun 2026 15:36:26 GMT",
-      "category": "能源、外匯與商品",
-      "themes": [
-        "能源、外匯與商品",
-        "科技、AI與平台"
-      ],
-      "summary_zh": "CNBC 報道聚焦「Trump threatens to seize Kharg Island and other Iran 油價 infrastructure」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "summary_zh": "CNBC 報道聚焦「金價 slumps to 6-month low even as 通脹 fears rise. Here's why bullion is out of favor」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
       "key_facts": [
         "原文來源為 CNBC，保留原文連結供查證。",
         "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
@@ -206,7 +176,7 @@
       "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
       "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
       "importance_score": 10,
-      "heat_score": 81,
+      "heat_score": 90,
       "source_count": 1,
       "sources_reporting_same_topic": [
         "CNBC"
@@ -216,19 +186,49 @@
       "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
     },
     {
+      "id": "2026-06-11-headline-003",
+      "date": "2026-06-11",
+      "title_original": "These in-demand jobs pay over $100,000 — and offer raises that keep ahead of inflation",
+      "title_zh": "這些熱門職位年薪逾十萬美元，或有助抵禦通脹壓力",
+      "source": "MarketWatch",
+      "url": "https://www.marketwatch.com/story/these-in-demand-jobs-pay-over-100-000-and-offer-raises-that-keep-ahead-of-inflation-29c2ad1a?mod=mw_rss_topstories",
+      "published_at": "Thu, 11 Jun 2026 14:33:00 GMT",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "科技、AI與平台"
+      ],
+      "summary_zh": "MarketWatch 報道聚焦「這些熱門職位年薪逾十萬美元，或有助抵禦通脹壓力」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 MarketWatch，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 10,
+      "heat_score": 85,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "MarketWatch"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
       "id": "2026-06-11-headline-004",
       "date": "2026-06-11",
-      "title_original": "Oracle shares tumble 11% on increased capital raise, cash concerns",
-      "title_zh": "Oracle 股份 tumble 11% on increased capital raise, cash concerns",
+      "title_original": "Trump threatens to seize Kharg Island and other Iran oil infrastructure",
+      "title_zh": "Trump threatens to seize Kharg Island and other Iran 油價 infrastructure",
       "source": "CNBC",
-      "url": "https://www.cnbc.com/2026/06/11/oracle-shares-tumble-11percent-on-increased-capital-raise-cash-concerns.html",
-      "published_at": "Thu, 11 Jun 2026 15:32:25 GMT",
-      "category": "企業、財報與交易",
+      "url": "https://www.cnbc.com/2026/06/11/trump-says-us-will-seize-kharg-island-and-other-oil-infrastructure-points.html",
+      "published_at": "Thu, 11 Jun 2026 15:36:26 GMT",
+      "category": "能源、外匯與商品",
       "themes": [
-        "企業、財報與交易",
+        "能源、外匯與商品",
         "半導體與供應鏈"
       ],
-      "summary_zh": "CNBC 報道聚焦「Oracle 股份 tumble 11% on increased capital raise, cash concerns」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "summary_zh": "CNBC 報道聚焦「Trump threatens to seize Kharg Island and other Iran 油價 infrastructure」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
       "key_facts": [
         "原文來源為 CNBC，保留原文連結供查證。",
         "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
@@ -248,17 +248,17 @@
     {
       "id": "2026-06-11-headline-005",
       "date": "2026-06-11",
-      "title_original": "DoorDash lets customers use photos, prompts to order food and book reservations in latest AI push",
-      "title_zh": "DoorDash lets customers use photos, prompts to order food and book reservations in latest 人工智能 push",
+      "title_original": "Oracle shares tumble 11% on increased capital raise, cash concerns",
+      "title_zh": "Oracle 股份 tumble 11% on increased capital raise, cash concerns",
       "source": "CNBC",
-      "url": "https://www.cnbc.com/2026/06/11/doordash-ai-ordering-automation.html",
-      "published_at": "Thu, 11 Jun 2026 13:00:01 GMT",
-      "category": "科技、AI與平台",
+      "url": "https://www.cnbc.com/2026/06/11/oracle-shares-tumble-11percent-on-increased-capital-raise-cash-concerns.html",
+      "published_at": "Thu, 11 Jun 2026 15:32:25 GMT",
+      "category": "企業、財報與交易",
       "themes": [
-        "科技、AI與平台",
+        "企業、財報與交易",
         "中國與亞洲觀察"
       ],
-      "summary_zh": "CNBC 報道聚焦「DoorDash lets customers use photos, prompts to order food and book reservations in latest 人工智能 push」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "summary_zh": "CNBC 報道聚焦「Oracle 股份 tumble 11% on increased capital raise, cash concerns」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
       "key_facts": [
         "原文來源為 CNBC，保留原文連結供查證。",
         "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
@@ -278,17 +278,17 @@
     {
       "id": "2026-06-11-headline-006",
       "date": "2026-06-11",
-      "title_original": "SpaceX soon-to-be millionaires are set to spend big on luxury homes, watches and private jet travel",
-      "title_zh": "焦點新聞：SpaceX soon-to-be millionaires are set to spend big on luxury homes, watches and private jet travel",
+      "title_original": "DoorDash lets customers use photos, prompts to order food and book reservations in latest AI push",
+      "title_zh": "DoorDash lets customers use photos, prompts to order food and book reservations in latest 人工智能 push",
       "source": "CNBC",
-      "url": "https://www.cnbc.com/2026/06/11/spacex-millionaires-wealth-spending.html",
-      "published_at": "Thu, 11 Jun 2026 14:17:18 GMT",
-      "category": "全球市場與宏觀",
+      "url": "https://www.cnbc.com/2026/06/11/doordash-ai-ordering-automation.html",
+      "published_at": "Thu, 11 Jun 2026 13:00:01 GMT",
+      "category": "科技、AI與平台",
       "themes": [
-        "全球市場與宏觀",
+        "科技、AI與平台",
         "能源、外匯與商品"
       ],
-      "summary_zh": "CNBC 報道聚焦「焦點新聞：SpaceX soon-to-be millionaires are set to spend big on luxury homes, watches and private jet travel」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "summary_zh": "CNBC 報道聚焦「DoorDash lets customers use photos, prompts to order food and book reservations in latest 人工智能 push」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
       "key_facts": [
         "原文來源為 CNBC，保留原文連結供查證。",
         "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
@@ -308,25 +308,55 @@
     {
       "id": "2026-06-11-headline-007",
       "date": "2026-06-11",
-      "title_original": "Bezos opens up about AI startup Prometheus after $12 billion raise: 'We're not being secretive'",
-      "title_zh": "Bezos opens up about 人工智能 startup Prometheus after $12 billion raise: 'We're not being secretive'",
-      "source": "CNBC Technology",
-      "url": "https://www.cnbc.com/2026/06/11/project-prometheus-bezos-bajaj-live-updates.html",
-      "published_at": "2026-06-11T23:39:35+08:00",
-      "category": "科技、AI與平台",
+      "title_original": "SpaceX soon-to-be millionaires are set to spend big on luxury homes, watches and private jet travel",
+      "title_zh": "焦點新聞：SpaceX soon-to-be millionaires are set to spend big on luxury homes, watches and private jet travel",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/11/spacex-millionaires-wealth-spending.html",
+      "published_at": "Thu, 11 Jun 2026 14:17:18 GMT",
+      "category": "全球市場與宏觀",
       "themes": [
-        "科技、AI與平台",
+        "全球市場與宏觀",
         "全球市場與宏觀"
       ],
-      "summary_zh": "CNBC Technology 報道聚焦「Bezos opens up about 人工智能 startup Prometheus after $12 billion raise: 'We're not being secretive'」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "summary_zh": "CNBC 報道聚焦「焦點新聞：SpaceX soon-to-be millionaires are set to spend big on luxury homes, watches and private jet travel」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
       "key_facts": [
-        "原文來源為 CNBC Technology，保留原文連結供查證。",
+        "原文來源為 CNBC，保留原文連結供查證。",
         "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
       ],
       "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
       "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
       "importance_score": 8,
       "heat_score": 77,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-11-headline-008",
+      "date": "2026-06-11",
+      "title_original": "Oracle shares tumble 11% on increased capital raise, cash concerns",
+      "title_zh": "Oracle 股份 tumble 11% on increased capital raise, cash concerns",
+      "source": "CNBC Technology",
+      "url": "https://www.cnbc.com/2026/06/11/oracle-shares-tumble-11percent-on-increased-capital-raise-cash-concerns.html",
+      "published_at": "2026-06-11T23:44:31+08:00",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易",
+        "企業、財報與交易"
+      ],
+      "summary_zh": "CNBC Technology 報道聚焦「Oracle 股份 tumble 11% on increased capital raise, cash concerns」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 CNBC Technology，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 7,
+      "heat_score": 76,
       "source_count": 1,
       "sources_reporting_same_topic": [
         "CNBC Technology"
@@ -336,7 +366,7 @@
       "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
     },
     {
-      "id": "2026-06-11-headline-008",
+      "id": "2026-06-11-headline-009",
       "date": "2026-06-11",
       "title_original": "Stocks Sink in Broad AI Rout Sparked by China's DeepSeek",
       "title_zh": "股票 Sink in Broad 人工智能 Rout Sparked by 中國's DeepSeek",
@@ -346,39 +376,9 @@
       "category": "科技、AI與平台",
       "themes": [
         "科技、AI與平台",
-        "企業、財報與交易"
-      ],
-      "summary_zh": "WSJ Markets 報道聚焦「股票 Sink in Broad 人工智能 Rout Sparked by 中國's DeepSeek」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
-      "key_facts": [
-        "原文來源為 WSJ Markets，保留原文連結供查證。",
-        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
-      ],
-      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
-      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
-      "importance_score": 7,
-      "heat_score": 76,
-      "source_count": 1,
-      "sources_reporting_same_topic": [
-        "WSJ Markets"
-      ],
-      "position_signal": "ranked headline",
-      "time_horizon": "short_term",
-      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
-    },
-    {
-      "id": "2026-06-11-headline-009",
-      "date": "2026-06-11",
-      "title_original": "Comex Gold, Silver Settle Lower",
-      "title_zh": "Comex 金價, Silver Settle Lower",
-      "source": "WSJ Markets",
-      "url": "https://www.wsj.com/articles/gold-edges-lower-feds-rate-decision-in-focus-09dbfceb?mod=rss_markets_main",
-      "published_at": "Mon, 27 Jan 2025 14:01:00 -0500",
-      "category": "能源、外匯與商品",
-      "themes": [
-        "能源、外匯與商品",
         "科技、AI與平台"
       ],
-      "summary_zh": "WSJ Markets 報道聚焦「Comex 金價, Silver Settle Lower」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "summary_zh": "WSJ Markets 報道聚焦「股票 Sink in Broad 人工智能 Rout Sparked by 中國's DeepSeek」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
       "key_facts": [
         "原文來源為 WSJ Markets，保留原文連結供查證。",
         "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
@@ -398,17 +398,17 @@
     {
       "id": "2026-06-11-headline-010",
       "date": "2026-06-11",
-      "title_original": "DeepSeek Won't Sink U.S. AI Titans",
-      "title_zh": "DeepSeek Won't Sink U.S. 人工智能 Titans",
+      "title_original": "Comex Gold, Silver Settle Lower",
+      "title_zh": "Comex 金價, Silver Settle Lower",
       "source": "WSJ Markets",
-      "url": "https://www.wsj.com/articles/deepseek-us-ai-stocks-nvidia-broadcom-6cdfae81?mod=rss_markets_main",
-      "published_at": "Mon, 27 Jan 2025 13:12:00 -0500",
-      "category": "科技、AI與平台",
+      "url": "https://www.wsj.com/articles/gold-edges-lower-feds-rate-decision-in-focus-09dbfceb?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 14:01:00 -0500",
+      "category": "能源、外匯與商品",
       "themes": [
-        "科技、AI與平台",
+        "能源、外匯與商品",
         "半導體與供應鏈"
       ],
-      "summary_zh": "WSJ Markets 報道聚焦「DeepSeek Won't Sink U.S. 人工智能 Titans」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "summary_zh": "WSJ Markets 報道聚焦「Comex 金價, Silver Settle Lower」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
       "key_facts": [
         "原文來源為 WSJ Markets，保留原文連結供查證。",
         "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
@@ -428,19 +428,19 @@
     {
       "id": "2026-06-11-headline-011",
       "date": "2026-06-11",
-      "title_original": "What to Know About China's DeepSeek AI",
-      "title_zh": "What to Know About 中國's DeepSeek 人工智能",
-      "source": "WSJ Technology",
-      "url": "https://www.wsj.com/articles/deepseek-ai-china-tech-stocks-explained-ee6cc80e?mod=rss_Technology",
-      "published_at": "Mon, 27 Jan 2025 13:17:00 -0500",
+      "title_original": "DeepSeek Won't Sink U.S. AI Titans",
+      "title_zh": "DeepSeek Won't Sink U.S. 人工智能 Titans",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/deepseek-us-ai-stocks-nvidia-broadcom-6cdfae81?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 13:12:00 -0500",
       "category": "科技、AI與平台",
       "themes": [
         "科技、AI與平台",
         "中國與亞洲觀察"
       ],
-      "summary_zh": "WSJ Technology 報道聚焦「What to Know About 中國's DeepSeek 人工智能」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "summary_zh": "WSJ Markets 報道聚焦「DeepSeek Won't Sink U.S. 人工智能 Titans」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
       "key_facts": [
-        "原文來源為 WSJ Technology，保留原文連結供查證。",
+        "原文來源為 WSJ Markets，保留原文連結供查證。",
         "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
       ],
       "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
@@ -449,7 +449,7 @@
       "heat_score": 73,
       "source_count": 1,
       "sources_reporting_same_topic": [
-        "WSJ Technology"
+        "WSJ Markets"
       ],
       "position_signal": "ranked headline",
       "time_horizon": "short_term",
@@ -458,17 +458,17 @@
     {
       "id": "2026-06-11-headline-012",
       "date": "2026-06-11",
-      "title_original": "Silicon Valley Is Raving About a Made-in-China AI Model",
-      "title_zh": "Silicon Valley Is Raving About a Made-in-中國 人工智能 Model",
+      "title_original": "What to Know About China's DeepSeek AI",
+      "title_zh": "What to Know About 中國's DeepSeek 人工智能",
       "source": "WSJ Technology",
-      "url": "https://www.wsj.com/articles/china-ai-deepseek-chatbot-6ac4ad33?mod=rss_Technology",
-      "published_at": "Mon, 27 Jan 2025 09:36:00 -0500",
+      "url": "https://www.wsj.com/articles/deepseek-ai-china-tech-stocks-explained-ee6cc80e?mod=rss_Technology",
+      "published_at": "Mon, 27 Jan 2025 13:17:00 -0500",
       "category": "科技、AI與平台",
       "themes": [
         "科技、AI與平台",
         "能源、外匯與商品"
       ],
-      "summary_zh": "WSJ Technology 報道聚焦「Silicon Valley Is Raving About a Made-in-中國 人工智能 Model」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "summary_zh": "WSJ Technology 報道聚焦「What to Know About 中國's DeepSeek 人工智能」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
       "key_facts": [
         "原文來源為 WSJ Technology，保留原文連結供查證。",
         "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
@@ -579,6 +579,6 @@
       "region": "china"
     }
   ],
-  "generated_at": "2026-06-11T23:39:35+08:00",
+  "generated_at": "2026-06-11T23:44:31+08:00",
   "email_body_zh": "今日新聞摘要已更新。重點包括全球市場與宏觀數據、人工智能與半導體產業鏈、企業消息及能源外匯商品走勢。\n\n網站：https://news.tinydreamlab.com/"
 }
