@@ -336,6 +336,8 @@ def headline_to_zh(title: str) -> str:
         (r"Comex Gold, Silver Settle Lower", "Comex 黃金和白銀收低"),
         (r"DeepSeek Won't Sink U\.S\. AI Titans", "DeepSeek 未必足以擊沉美國人工智能巨頭"),
         (r"What to Know About China's DeepSeek AI", "中國 DeepSeek 人工智能有何值得留意"),
+        (r"Silicon Valley Is Raving About a Made-in-China AI Model", "矽谷熱議中國製人工智能模型"),
+        (r"Reid Hoffman Raises \$24\.6 Million for AI Cancer-Research Startup", "Reid Hoffman 為人工智能癌症研究初創融資 2,460 萬美元"),
         (r"\bcrude oil gains\b", "原油價格上升"),
         (r"\bslumps to 6-month low\b", "跌至六個月低位"),
         (r"\binflation fears rise\b", "通脹憂慮升溫"),
