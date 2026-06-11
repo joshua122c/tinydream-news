@@ -132,6 +132,21 @@ function cacheBrief(brief) {
   if (brief.update_id) state.briefs.set(brief.update_id, brief);
 }
 
+async function ensureArchiveBriefs() {
+  const jobs = asList(state.index.briefs).map(async (day) => {
+    const id = day.update_id || day.date;
+    if (state.briefs.has(id) || state.briefs.has(day.date)) return;
+    const file = day.latest_file || day.file || `data/briefs/${day.date}.json`;
+    try {
+      const brief = await readJson(dataPath(file));
+      cacheBrief(brief);
+    } catch (error) {
+      console.warn("Archive brief load failed", file, error);
+    }
+  });
+  await Promise.all(jobs);
+}
+
 function briefMetaFor(id) {
   for (const day of asList(state.index.briefs)) {
     if (day.date === id) return { file: day.latest_file || `data/briefs/${day.date}.json` };
@@ -186,15 +201,15 @@ function summarySection(brief) {
 
 function hotTopicsSection(brief) {
   const itemById = new Map(asList(brief.items).map((item) => [item.id, item]));
-  const cards = asList(brief.hot_topics)
-    .sort((a, b) => (a.rank || 99) - (b.rank || 99))
-    .map((topic) => {
+  const topics = asList(brief.hot_topics).sort((a, b) => (a.rank || 99) - (b.rank || 99));
+  const renderTopicCard = (topic, lead = false) => {
       const label = heatLabel(topic.heat_score, topic.heat_label);
       const related = asList(topic.item_ids).map((id) => itemById.get(id)).filter(Boolean);
-      return `<article class="topic-card"><div class="item-top"><span class="rank">#${escapeHtml(topic.rank || "")}</span><span class="badge ${heatClass(label)}">${escapeHtml(label)} · ${escapeHtml(topic.heat_score || 0)}</span></div><h3>${escapeHtml(topic.topic)}</h3><p>${escapeHtml(topic.one_line_reason || "")}</p><div class="focus-list">${asList(topic.main_sources).map((source) => `<span class="pill">${escapeHtml(source)}</span>`).join("")}</div>${related.length ? `<div class="related-items"><strong>${UI.relatedNews}</strong>${related.map((item) => `<a class="related-link" href="#item-${escapeHtml(item.id)}" data-item-jump="${escapeHtml(item.id)}"><strong>${escapeHtml(item.title_zh || item.title_original)}</strong><span>${escapeHtml(item.source)}</span></a>`).join("")}</div>` : ""}</article>`;
-    })
-    .join("");
-  return `<section class="section"><div class="section-head"><h2>${UI.focusRanking}</h2><p class="section-note">${UI.focusRankingNote}</p></div><div class="topic-grid">${cards}</div></section>`;
+      return `<article class="topic-card ${lead ? "lead-topic" : ""}"><div class="item-top"><span class="rank">#${escapeHtml(topic.rank || "")}</span><span class="badge ${heatClass(label)}">${escapeHtml(label)} · ${escapeHtml(topic.heat_score || 0)}</span></div><h3>${escapeHtml(topic.topic)}</h3><p>${escapeHtml(topic.one_line_reason || "")}</p><div class="focus-list">${asList(topic.main_sources).map((source) => `<span class="pill">${escapeHtml(source)}</span>`).join("")}</div>${related.length ? `<div class="related-items"><strong>${UI.relatedNews}</strong>${related.map((item) => `<a class="related-link" href="#item-${escapeHtml(item.id)}" data-item-jump="${escapeHtml(item.id)}"><strong>${escapeHtml(item.title_zh || item.title_original)}</strong><span>${escapeHtml(item.source)}</span></a>`).join("")}</div>` : ""}</article>`;
+  };
+  const lead = topics[0] ? renderTopicCard(topics[0], true) : "";
+  const rest = topics.slice(1).map((topic) => renderTopicCard(topic)).join("");
+  return `<section class="section"><div class="section-head"><h2>${UI.focusRanking}</h2><p class="section-note">${UI.focusRankingNote}</p></div><div class="topic-board">${lead}<div class="topic-grid">${rest}</div></div></section>`;
 }
 
 function categoriesSection(brief) {
@@ -248,7 +263,8 @@ function renderArchive() {
   app.innerHTML = `<section class="section"><div class="section-head"><h1>${UI.archive}</h1><p class="section-note">${UI.archiveNote}</p></div><div class="archive-list">${rows}</div></section>`;
 }
 
-function renderSearch(query) {
+async function renderSearch(query) {
+  await ensureArchiveBriefs();
   const input = document.querySelector("#global-search-input");
   if (input) input.value = query || state.globalQuery || "";
   const results = searchItems(query || state.globalQuery);
@@ -261,7 +277,8 @@ function renderSearch(query) {
 
 function renderSearchResult(result) {
   const item = result.item;
-  return `<article class="item-card"><div class="item-top"><div class="item-meta"><span>${escapeHtml(result.date)}</span><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(heatLabel(item.heat_score))}">${heatLabel(item.heat_score)} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(item.title_zh || item.title_original)}</h3><p>${escapeHtml(item.summary_zh || "")}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div><p><a class="action" href="${linkFor(`/briefs/${result.date}`)}" data-link>${UI.viewDailyBrief}</a> <a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p></article>`;
+  const briefId = result.update_id || result.date;
+  return `<article class="item-card"><div class="item-top"><div class="item-meta"><span>${escapeHtml(result.date)}</span><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(heatLabel(item.heat_score))}">${heatLabel(item.heat_score)} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(item.title_zh || item.title_original)}</h3><p>${escapeHtml(item.summary_zh || "")}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div><p><a class="action" href="${linkFor(`/briefs/${briefId}`)}" data-link>${UI.viewDailyBrief}</a> <a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p></article>`;
 }
 
 function renderTopics() {
@@ -275,13 +292,22 @@ function renderTopic(slug) {
   app.innerHTML = `<section class="section"><div class="section-head"><h1>${escapeHtml(title)}</h1><p class="section-note">${UI.topicNote}</p></div>${matches.length ? `<div class="item-list">${matches.map(renderItem).join("")}</div>` : `<p>${UI.noRelatedItems}</p>`}</section>`;
 }
 
-function getAllBriefs() { return state.brief ? [state.brief] : []; }
+function getAllBriefs() {
+  const values = [...state.briefs.values()];
+  const seen = new Set();
+  return values.filter((brief) => {
+    const key = brief.update_id || brief.date;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
 function getBriefByDate(date) { return getAllBriefs().find((brief) => brief.date === date); }
 
 function searchItems(query) {
   const normalized = String(query || "").trim().toLowerCase();
   if (!normalized) return [];
-  return getAllBriefs().flatMap((brief) => asList(brief.items).map((item) => ({ date: brief.date, item, haystack: [brief.title, brief.deck, brief.daily_summary_zh, item.title_zh, item.title_original, item.source, item.category, item.summary_zh, item.market_impact, item.tracking_value, ...asList(item.themes), ...asList(item.key_facts), ...asList(item.sources_reporting_same_topic)].join(" ").toLowerCase() }))).filter((entry) => entry.haystack.includes(normalized)).sort((a, b) => (b.item.heat_score || 0) - (a.item.heat_score || 0));
+  return getAllBriefs().flatMap((brief) => asList(brief.items).map((item) => ({ date: brief.date, update_id: brief.update_id, item, haystack: [brief.title, brief.deck, brief.daily_summary_zh, item.title_zh, item.title_original, item.source, item.category, item.summary_zh, item.market_impact, item.tracking_value, ...asList(item.themes), ...asList(item.key_facts), ...asList(item.sources_reporting_same_topic)].join(" ").toLowerCase() }))).filter((entry) => entry.haystack.includes(normalized)).sort((a, b) => (b.item.heat_score || 0) - (a.item.heat_score || 0));
 }
 
 function tagsSidebar() {
