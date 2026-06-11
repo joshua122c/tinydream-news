@@ -14,13 +14,16 @@ from email.message import EmailMessage
 from pathlib import Path
 
 HK_TZ = timezone(timedelta(hours=8))
-TODAY = datetime.now(HK_TZ).strftime("%Y-%m-%d")
-GENERATED_AT = datetime.now(HK_TZ).isoformat(timespec="seconds")
+NOW_HK = datetime.now(HK_TZ)
+TODAY = NOW_HK.strftime("%Y-%m-%d")
+UPDATE_ID = NOW_HK.strftime("%Y-%m-%d-%H%M")
+GENERATED_AT = NOW_HK.isoformat(timespec="seconds")
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = REPO_ROOT / "data"
 BRIEFS_DIR = DATA_DIR / "briefs"
 INDEX_PATH = DATA_DIR / "index.json"
-BRIEF_PATH = BRIEFS_DIR / f"{TODAY}.json"
+BRIEF_PATH = BRIEFS_DIR / f"{UPDATE_ID}.json"
+DAILY_LATEST_PATH = BRIEFS_DIR / f"{TODAY}.json"
 USER_AGENT = "Mozilla/5.0 (compatible; TinyDreamNewsRadar/1.0; +https://news.tinydreamlab.com/)"
 
 SOURCE_CONFIGS = [
@@ -122,6 +125,10 @@ def to_traditional(value):
     if isinstance(value, dict):
         return {key: to_traditional(item) for key, item in value.items()}
     return value
+
+
+def as_list(value):
+    return value if isinstance(value, list) else []
 
 
 def fetch_url(url: str) -> tuple[int, str]:
@@ -485,6 +492,8 @@ def call_cloudflare_ai(candidates: list[dict], sources: list[dict]) -> dict:
 def normalize_brief(brief: dict, sources: list[dict]) -> dict:
     brief = to_traditional(brief)
     brief["date"] = TODAY
+    brief["update_id"] = UPDATE_ID
+    brief["update_file"] = f"data/briefs/{UPDATE_ID}.json"
     brief["generated_at"] = brief.get("generated_at") or GENERATED_AT
     if not brief.get("sources"):
         brief["sources"] = sources
@@ -546,19 +555,48 @@ def build_index_entry(brief: dict) -> dict:
                 break
         if len(top_themes) >= 5:
             break
-    return {"date": brief["date"], "title": brief["title"], "summary": brief["deck"], "top_themes": top_themes, "hot_topic_count": len(brief.get("hot_topics", [])), "item_count": len(brief.get("items", [])), "generated_at": brief["generated_at"]}
+    return {
+        "date": brief["date"],
+        "update_id": UPDATE_ID,
+        "file": f"data/briefs/{UPDATE_ID}.json",
+        "latest_file": f"data/briefs/{TODAY}.json",
+        "title": brief["title"],
+        "summary": brief["deck"],
+        "top_themes": top_themes,
+        "hot_topic_count": len(brief.get("hot_topics", [])),
+        "item_count": len(brief.get("items", [])),
+        "generated_at": brief["generated_at"],
+    }
 
 
 def update_index(brief: dict) -> dict:
     if INDEX_PATH.exists():
         index = json.loads(INDEX_PATH.read_text(encoding="utf-8"))
     else:
-        index = {"latest_date": TODAY, "briefs": []}
+        index = {"latest_date": TODAY, "latest_update_id": UPDATE_ID, "latest_file": f"data/briefs/{TODAY}.json", "briefs": []}
     entry = build_index_entry(brief)
     briefs = [b for b in index.get("briefs", []) if b.get("date") != TODAY]
+    previous = next((b for b in index.get("briefs", []) if b.get("date") == TODAY), None)
+    updates = as_list(previous.get("updates")) if previous else []
+    updates = [u for u in updates if u.get("update_id") != UPDATE_ID]
+    updates.append({
+        "update_id": UPDATE_ID,
+        "file": f"data/briefs/{UPDATE_ID}.json",
+        "generated_at": brief["generated_at"],
+        "item_count": len(brief.get("items", [])),
+        "hot_topic_count": len(brief.get("hot_topics", [])),
+        "title": brief["title"],
+    })
+    updates.sort(key=lambda row: row.get("update_id", ""), reverse=True)
+    entry["updates"] = updates
     briefs.append(entry)
     briefs.sort(key=lambda row: row.get("date", ""), reverse=True)
-    return to_traditional({"latest_date": TODAY, "briefs": briefs})
+    return to_traditional({
+        "latest_date": TODAY,
+        "latest_update_id": UPDATE_ID,
+        "latest_file": f"data/briefs/{TODAY}.json",
+        "briefs": briefs,
+    })
 
 
 def build_fallback_brief(candidates: list[dict], sources: list[dict], error: str) -> dict:
@@ -597,6 +635,8 @@ def build_fallback_brief(candidates: list[dict], sources: list[dict], error: str
     print(f"Warning: generated reader-safe headline brief. Internal reason: {error}")
     return to_traditional({
         "date": TODAY,
+        "update_id": UPDATE_ID,
+        "update_file": f"data/briefs/{UPDATE_ID}.json",
         "title": "每日國際財經與科技新聞摘要",
         "deck": "今日焦點集中於美國利率與通脹線索、科技股與人工智能投資，以及主要企業和產業鏈消息。",
         "daily_summary_zh": "今日國際財經與科技新聞以宏觀數據、利率預期、人工智能與半導體產業鏈為主軸。網站已按題材熱度和來源可信度整理多條原文入口，方便先掌握重點，再按需要打開原文深入閱讀。",
@@ -650,11 +690,14 @@ def main() -> None:
         validate_brief(brief)
     index = update_index(brief)
     write_json(BRIEF_PATH, brief)
+    write_json(DAILY_LATEST_PATH, brief)
     write_json(INDEX_PATH, index)
     json.loads(BRIEF_PATH.read_text(encoding="utf-8"))
+    json.loads(DAILY_LATEST_PATH.read_text(encoding="utf-8"))
     json.loads(INDEX_PATH.read_text(encoding="utf-8"))
     send_email(brief)
     print(f"Generated {BRIEF_PATH}")
+    print(f"Updated daily latest {DAILY_LATEST_PATH}")
     print(f"Updated {INDEX_PATH}")
 
 
