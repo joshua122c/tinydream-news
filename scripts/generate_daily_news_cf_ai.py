@@ -323,9 +323,28 @@ def compact_source(source: dict) -> dict:
 def headline_to_zh(title: str) -> str:
     text = clean_text(title)
     patterns = [
+        (r"Treasury yields are steady after hot producer prices reading, crude oil gains", "美國生產者價格數據偏熱後，美債孳息率保持平穩，原油價格上升"),
         (r"Treasury yields are steady after hot producer prices reading", "美國生產者價格數據偏熱後，美債孳息率保持平穩"),
+        (r"Gold slumps to 6-month low even as inflation fears rise\. Here's why bullion is out of favor", "即使通脹憂慮升溫，金價仍跌至六個月低位：黃金為何失寵"),
         (r"Trump might 'love the inflation,' but consumers are feeling the pain", "特朗普或淡化通脹壓力，但消費者正承受物價痛楚"),
         (r"These in-demand jobs pay over \$100,000 .*", "這些熱門職位年薪逾十萬美元，或有助抵禦通脹壓力"),
+        (r"Trump threatens to seize Kharg Island and other Iran oil infrastructure", "特朗普威脅控制哈爾克島及其他伊朗石油基建"),
+        (r"Oracle shares tumble 11% on increased capital raise, cash concerns", "甲骨文擬增加融資引發現金流憂慮，股價急跌 11%"),
+        (r"DoorDash lets customers use photos, prompts to order food and book reservations in latest AI push", "DoorDash 推出人工智能功能，讓用戶以相片和提示點餐及訂座"),
+        (r"SpaceX soon-to-be millionaires are set to spend big on luxury homes, watches and private jet travel", "SpaceX 新一批準富豪預料將大手購入豪宅、名錶和私人飛機旅程"),
+        (r"Stocks Sink in Broad AI Rout Sparked by China's DeepSeek", "中國 DeepSeek 觸發人工智能股拋售，美股相關板塊普遍下跌"),
+        (r"Comex Gold, Silver Settle Lower", "Comex 黃金和白銀收低"),
+        (r"DeepSeek Won't Sink U\.S\. AI Titans", "DeepSeek 未必足以擊沉美國人工智能巨頭"),
+        (r"What to Know About China's DeepSeek AI", "中國 DeepSeek 人工智能有何值得留意"),
+        (r"\bcrude oil gains\b", "原油價格上升"),
+        (r"\bslumps to 6-month low\b", "跌至六個月低位"),
+        (r"\binflation fears rise\b", "通脹憂慮升溫"),
+        (r"\bbullion\b", "黃金"),
+        (r"\bout of favor\b", "失寵"),
+        (r"\btumble\b", "急跌"),
+        (r"\bincreased capital raise\b", "增加融資"),
+        (r"\bcash concerns\b", "現金流憂慮"),
+        (r"\bDeepSeek\b", "DeepSeek"),
         (r"\bTreasury yields\b", "美債孳息率"),
         (r"\bproducer prices\b", "生產者價格"),
         (r"\binflation\b", "通脹"),
@@ -342,6 +361,10 @@ def headline_to_zh(title: str) -> str:
         (r"\bstocks?\b", "股票"),
         (r"\bmarkets?\b", "市場"),
         (r"\bshares\b", "股份"),
+        (r"\bOracle\b", "甲骨文"),
+        (r"\bDoorDash\b", "DoorDash"),
+        (r"\bSpaceX\b", "SpaceX"),
+        (r"\bIran\b", "伊朗"),
         (r"\bChina\b", "中國"),
         (r"\bApple\b", "蘋果"),
         (r"\bMicrosoft\b", "微軟"),
@@ -537,7 +560,14 @@ def update_index(brief: dict) -> dict:
 
 
 def build_fallback_brief(candidates: list[dict], sources: list[dict], error: str) -> dict:
-    usable = [item for item in candidates if item.get("title") and item.get("url")]
+    usable = []
+    seen_titles = set()
+    for item in candidates:
+        title_key = clean_text(item.get("title", "")).lower()
+        if not title_key or not item.get("url") or title_key in seen_titles:
+            continue
+        seen_titles.add(title_key)
+        usable.append(item)
     if not usable:
         usable = [{"source": source["name"], "title": source["name"], "url": source["url"]} for source in sources]
     while len(usable) < 12:
@@ -603,13 +633,18 @@ def main() -> None:
     candidates, sources = collect_news_candidates()
     if len(candidates) < 10:
         print(f"Warning: only collected {len(candidates)} candidate headlines.")
-    try:
-        brief = call_cloudflare_ai(candidates, sources)
-        brief = normalize_brief(brief, sources)
-        validate_brief(brief)
-    except Exception as exc:
-        print(f"Warning: AI brief generation failed; using reader-safe headline brief. Reason: {exc}")
-        brief = build_fallback_brief(candidates, sources, str(exc))
+    if os.environ.get("ENABLE_AI_BRIEF", "0").strip() == "1":
+        try:
+            brief = call_cloudflare_ai(candidates, sources)
+            brief = normalize_brief(brief, sources)
+            validate_brief(brief)
+        except Exception as exc:
+            print(f"Warning: AI brief generation failed; using reader-safe headline brief. Reason: {exc}")
+            brief = build_fallback_brief(candidates, sources, str(exc))
+            validate_brief(brief)
+    else:
+        print("AI full-brief generation disabled; using structured headline brief.")
+        brief = build_fallback_brief(candidates, sources, "AI full-brief generation disabled")
         validate_brief(brief)
     index = update_index(brief)
     write_json(BRIEF_PATH, brief)
