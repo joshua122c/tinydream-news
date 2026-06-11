@@ -11,7 +11,7 @@
   "hot_topics": [
     {
       "rank": 1,
-      "topic": "Trump says 'I love the inflation' after consumer price index",
+      "topic": "Analysis: Trump said he loves inflation. Why that should be ",
       "heat_score": 78,
       "heat_label": "High",
       "source_count": 1,
@@ -26,7 +26,7 @@
     },
     {
       "rank": 2,
-      "topic": "Here's the inflation breakdown for May 2026 — in one chart",
+      "topic": "Oil jumps as U.S. fresh strikes on Iran raise worries of ext",
       "heat_score": 74,
       "heat_label": "Medium",
       "source_count": 1,
@@ -41,12 +41,12 @@
     },
     {
       "rank": 3,
-      "topic": "Amazon trucking expansion sparks freight stock sell-off",
+      "topic": "Analysis: Trump said he loves inflation. Why that should be ",
       "heat_score": 70,
       "heat_label": "Medium",
       "source_count": 1,
       "main_sources": [
-        "CNBC Top News"
+        "CNBC Markets"
       ],
       "item_ids": [
         "2026-06-11-headline-003"
@@ -103,11 +103,11 @@
     {
       "id": "2026-06-11-headline-001",
       "date": "2026-06-11",
-      "title_original": "Trump says 'I love the inflation' after consumer price index hits 3-year high",
-      "title_zh": "Trump says 'I love the inflation' after consumer price index hits 3-year high",
+      "title_original": "Analysis: Trump said he loves inflation. Why that should be music to Kevin Warsh's ears",
+      "title_zh": "Analysis: Trump said he loves inflation. Why that should be music to Kevin Warsh's ears",
       "source": "CNBC Top News",
-      "url": "https://www.cnbc.com/2026/06/10/trump-inflation-cpi-iran-oil.html",
-      "published_at": "2026-06-11T00:43:47+08:00",
+      "url": "https://www.cnbc.com/2026/06/10/trump-inflation-fed-chair-kevin-warsh-analysis.html",
+      "published_at": "2026-06-11T09:31:20+08:00",
       "category": "全球市場與宏觀",
       "themes": [
         "全球市場與宏觀",
@@ -133,15 +133,15 @@
     {
       "id": "2026-06-11-headline-002",
       "date": "2026-06-11",
-      "title_original": "Here's the inflation breakdown for May 2026 — in one chart",
-      "title_zh": "Here's the inflation breakdown for May 2026 — in one chart",
+      "title_original": "Oil jumps as U.S. fresh strikes on Iran raise worries of extended disruption to energy flows",
+      "title_zh": "Oil jumps as U.S. fresh strikes on Iran raise worries of extended disruption to energy flows",
       "source": "CNBC Top News",
-      "url": "https://www.cnbc.com/2026/06/10/heres-the-inflation-breakdown-for-may-2026-in-one-chart.html",
-      "published_at": "2026-06-11T00:43:47+08:00",
+      "url": "https://www.cnbc.com/2026/06/11/brent-wti-oil-prices-us-launches-fresh-strikes-on-iran-.html",
+      "published_at": "2026-06-11T09:31:20+08:00",
       "category": "企業、財報與交易",
       "themes": [
         "企業、財報與交易",
-        "全球市場與宏觀"
+        "能源、外匯與商品"
       ],
       "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
       "key_facts": [
@@ -163,15 +163,15 @@
     {
       "id": "2026-06-11-headline-003",
       "date": "2026-06-11",
-      "title_original": "Amazon trucking expansion sparks freight stock sell-off",
-      "title_zh": "Amazon trucking expansion sparks freight stock sell-off",
-      "source": "CNBC Top News",
-      "url": "https://www.cnbc.com/2026/06/10/amazon-trucking-expansion-freight-stock-selloff.html",
-      "published_at": "2026-06-11T00:43:47+08:00",
+      "title_original": "Analysis: Trump said he loves inflation. Why that should be music to Kevin Warsh's ears",
+      "title_zh": "Analysis: Trump said he loves inflation. Why that should be music to Kevin Warsh's ears",
+      "source": "CNBC Markets",
+      "url": "https://www.cnbc.com/2026/06/10/trump-inflation-fed-chair-kevin-warsh-analysis.html",
+      "published_at": "2026-06-11T09:31:20+08:00",
       "category": "科技、AI與平台",
       "themes": [
         "科技、AI與平台",
-        "企業、財報與交易"
+        "全球市場與宏觀"
       ],
       "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
       "key_facts": [
@@ -184,7 +184,7 @@
       "heat_score": 70,
       "source_count": 1,
       "sources_reporting_same_topic": [
-        "CNBC Top News"
+        "CNBC Markets"
       ],
       "position_signal": "headline candidate",
       "time_horizon": "short_term",
@@ -193,15 +193,15 @@
     {
       "id": "2026-06-11-headline-004",
       "date": "2026-06-11",
-      "title_original": "Cramer still likes recently spun FedEx Freight despite the emergence of new rival",
-      "title_zh": "Cramer still likes recently spun FedEx Freight despite the emergence of new rival",
-      "source": "CNBC Technology",
-      "url": "https://www.cnbc.com/2026/06/10/cramer-still-likes-fedex-freight-despite-emergence-of-new-rival.html",
-      "published_at": "2026-06-11T00:43:47+08:00",
+      "title_original": "Oracle beats on earnings, but stock drops on plans to raise another $20 billion",
+      "title_zh": "Oracle beats on earnings, but stock drops on plans to raise another $20 billion",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/06/10/oracle-orcl-q4-earnings-report-2026.html",
+      "published_at": "2026-06-11T09:31:20+08:00",
       "category": "半導體與供應鏈",
       "themes": [
         "半導體與供應鏈",
-        "全球市場與宏觀"
+        "企業、財報與交易"
       ],
       "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
       "key_facts": [
@@ -214,7 +214,7 @@
       "heat_score": 66,
       "source_count": 1,
       "sources_reporting_same_topic": [
-        "CNBC Technology"
+        "CNBC Top News"
       ],
       "position_signal": "headline candidate",
       "time_horizon": "short_term",
@@ -223,15 +223,15 @@
     {
       "id": "2026-06-11-headline-005",
       "date": "2026-06-11",
-      "title_original": "Stocks Sink in Broad AI Rout Sparked by China's DeepSeek",
-      "title_zh": "Stocks Sink in Broad AI Rout Sparked by China's DeepSeek",
-      "source": "WSJ Markets",
-      "url": "https://www.wsj.com/articles/nikkei-may-rise-as-weak-yen-raises-earnings-hopes-776a8056?mod=rss_markets_main",
-      "published_at": "2026-06-11T00:43:47+08:00",
+      "title_original": "Trump says 'I love the inflation' after consumer price index hits 3-year high",
+      "title_zh": "Trump says 'I love the inflation' after consumer price index hits 3-year high",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/06/10/trump-inflation-cpi-iran-oil.html",
+      "published_at": "2026-06-11T09:31:20+08:00",
       "category": "中國與亞洲觀察",
       "themes": [
         "中國與亞洲觀察",
-        "科技、AI與平台"
+        "全球市場與宏觀"
       ],
       "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
       "key_facts": [
@@ -244,7 +244,7 @@
       "heat_score": 62,
       "source_count": 1,
       "sources_reporting_same_topic": [
-        "WSJ Markets"
+        "CNBC Top News"
       ],
       "position_signal": "headline candidate",
       "time_horizon": "short_term",
@@ -253,11 +253,11 @@
     {
       "id": "2026-06-11-headline-006",
       "date": "2026-06-11",
-      "title_original": "Comex Gold, Silver Settle Lower",
-      "title_zh": "Comex Gold, Silver Settle Lower",
-      "source": "WSJ Markets",
-      "url": "https://www.wsj.com/articles/gold-edges-lower-feds-rate-decision-in-focus-09dbfceb?mod=rss_markets_main",
-      "published_at": "2026-06-11T00:43:47+08:00",
+      "title_original": "Oil prices rise after Trump says U.S. will attack Iran 'very hard'",
+      "title_zh": "Oil prices rise after Trump says U.S. will attack Iran 'very hard'",
+      "source": "CNBC Top News",
+      "url": "https://www.cnbc.com/2026/06/10/oil-price-us-completes-iran-strikes-after-apache-helicopter-attack.html",
+      "published_at": "2026-06-11T09:31:20+08:00",
       "category": "能源、外匯與商品",
       "themes": [
         "能源、外匯與商品",
@@ -274,7 +274,7 @@
       "heat_score": 58,
       "source_count": 1,
       "sources_reporting_same_topic": [
-        "WSJ Markets"
+        "CNBC Top News"
       ],
       "position_signal": "headline candidate",
       "time_horizon": "short_term",
@@ -374,6 +374,6 @@
       "region": "china"
     }
   ],
-  "generated_at": "2026-06-11T00:43:47+08:00",
+  "generated_at": "2026-06-11T09:31:20+08:00",
   "email_body_zh": "今日新聞摘要已更新。網站已整理公開新聞標題、來源和原文連結，方便快速瀏覽和後續追蹤。\n\n網站：https://news.tinydreamlab.com/"
 }
