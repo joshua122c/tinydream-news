@@ -1,26 +1,34 @@
 {
   "latest_date": "2026-06-12",
-  "latest_update_id": "2026-06-12-0145",
+  "latest_update_id": "2026-06-12-0747",
   "latest_file": "data/briefs/2026-06-12.json",
   "briefs": [
     {
       "date": "2026-06-12",
-      "update_id": "2026-06-12-0145",
-      "file": "data/briefs/2026-06-12-0145.json",
+      "update_id": "2026-06-12-0747",
+      "file": "data/briefs/2026-06-12-0747.json",
       "latest_file": "data/briefs/2026-06-12.json",
       "title": "每日國際財經與科技新聞摘要",
       "summary": "今日焦點集中於美國利率與通脹線索、科技股與人工智能投資，以及主要企業和產業鏈消息。",
       "top_themes": [
         "全球市場與宏觀",
         "企業、財報與交易",
-        "半導體與供應鏈",
         "科技、AI與平台",
+        "半導體與供應鏈",
         "中國與亞洲觀察"
       ],
       "hot_topic_count": 5,
       "item_count": 12,
-      "generated_at": "2026-06-12T01:45:19+08:00",
+      "generated_at": "2026-06-12T07:47:39+08:00",
       "updates": [
+        {
+          "update_id": "2026-06-12-0747",
+          "file": "data/briefs/2026-06-12-0747.json",
+          "generated_at": "2026-06-12T07:47:39+08:00",
+          "item_count": 12,
+          "hot_topic_count": 5,
+          "title": "每日國際財經與科技新聞摘要"
+        },
         {
           "update_id": "2026-06-12-0145",
           "file": "data/briefs/2026-06-12-0145.json",
