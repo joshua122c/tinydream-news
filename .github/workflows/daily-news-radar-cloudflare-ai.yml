@@ -3,8 +3,11 @@ name: Daily Finance Tech News Radar - Cloudflare AI
 on:
   workflow_dispatch:
   schedule:
-    # 08:00 Hong Kong time = 00:00 UTC.
-    - cron: "0 0 * * *"
+    # Avoid the start of the hour because GitHub Actions scheduled runs can be delayed or dropped at high-load times.
+    # Hong Kong time = UTC + 8.
+    - cron: "17 0 * * *"  # 08:17 HKT primary run
+    - cron: "47 0 * * *"  # 08:47 HKT backup run
+    - cron: "17 1 * * *"  # 09:17 HKT second backup run
 
 permissions:
   contents: write
@@ -21,13 +24,33 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Check whether today's brief already exists
+        id: daily_check
+        run: |
+          git fetch origin main
+          git checkout main
+          git pull --ff-only origin main
+          TODAY="$(TZ=Asia/Hong_Kong date +%F)"
+          echo "today=${TODAY}" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event_name }}" = "schedule" ] && [ -f "data/briefs/${TODAY}.json" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Daily brief already exists for ${TODAY}; scheduled backup run will skip generation."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Daily brief will be generated for ${TODAY}."
+          fi
 
       - name: Set up Python
+        if: steps.daily_check.outputs.exists != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Generate daily brief with Cloudflare Workers AI
+        if: steps.daily_check.outputs.exists != 'true'
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -38,6 +61,7 @@ jobs:
         run: python scripts/generate_daily_news_cf_ai.py
 
       - name: Commit website data
+        if: steps.daily_check.outputs.exists != 'true'
         run: |
           git config user.name "tinydream-news-bot"
           git config user.email "tinydream-news-bot@users.noreply.github.com"
@@ -45,7 +69,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
-            TODAY="$(TZ=Asia/Hong_Kong date +%F)"
-            git commit -m "Add daily news brief ${TODAY}"
+            git commit -m "Add daily news brief ${{ steps.daily_check.outputs.today }}"
             git push
           fi
