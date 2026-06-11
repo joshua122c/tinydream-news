@@ -1,5 +1,5 @@
 const app = document.querySelector("#app");
-const state = { index: null, brief: null, categorySlug: "all", query: "", globalQuery: "" };
+const state = { index: null, brief: null, briefs: new Map(), categorySlug: "all", query: "", globalQuery: "" };
 
 const escapeHtml = (value = "") =>
   String(value)
@@ -41,7 +41,7 @@ const UI = {
   globalSearchPlaceholder: "搜尋 Nvidia、Fed、AI cloud...",
   noMatchingItems: "沒有符合條件的新聞。",
   archive: "歸檔",
-  archiveNote: "回看過往每日摘要與主要新聞線索。",
+  archiveNote: "回看過往每日摘要與同日多次更新紀錄。",
   viewDailyBrief: "查看當日摘要",
   topics: "主題",
   topicsNote: "以正式標籤追蹤近期反覆出現的市場與科技主題。",
@@ -76,7 +76,9 @@ async function boot() {
   try {
     state.index = await readJson(dataPath("data/index.json"));
     const latestDate = state.index.latest_date || state.index.briefs?.[0]?.date;
-    state.brief = await readJson(dataPath(`data/briefs/${latestDate}.json`));
+    const latestFile = state.index.latest_file || `data/briefs/${latestDate}.json`;
+    state.brief = await readJson(dataPath(latestFile));
+    cacheBrief(state.brief);
     bindNavigation();
     render();
   } catch (error) {
@@ -124,7 +126,31 @@ function route() {
 function getSearchQuery() { return new URLSearchParams(location.search).get("q") || ""; }
 function navigateToSearch(query) { history.pushState({}, "", `/search?q=${encodeURIComponent(query || "")}`); render(); }
 
-function render() {
+function cacheBrief(brief) {
+  if (!brief) return;
+  state.briefs.set(brief.date, brief);
+  if (brief.update_id) state.briefs.set(brief.update_id, brief);
+}
+
+function briefMetaFor(id) {
+  for (const day of asList(state.index.briefs)) {
+    if (day.date === id) return { file: day.latest_file || `data/briefs/${day.date}.json` };
+    const update = asList(day.updates).find((entry) => entry.update_id === id);
+    if (update) return { file: update.file };
+  }
+  return null;
+}
+
+async function loadBrief(id) {
+  if (state.briefs.has(id)) return state.briefs.get(id);
+  const meta = briefMetaFor(id);
+  if (!meta?.file) return null;
+  const brief = await readJson(dataPath(meta.file));
+  cacheBrief(brief);
+  return brief;
+}
+
+async function render() {
   const current = route();
   state.categorySlug = "all";
   state.query = "";
@@ -132,15 +158,16 @@ function render() {
   if (current.name === "search") return renderSearch(current.query);
   if (current.name === "topics") return renderTopics();
   if (current.name === "topic") return renderTopic(current.slug);
-  return renderBrief(current.name === "brief" ? current.date : state.brief.date, current.name === "home");
+  return renderBrief(current.name === "brief" ? current.date : (state.brief.update_id || state.brief.date), current.name === "home");
 }
 
-function renderBrief(date, isHome = false) {
-  const brief = state.brief;
-  if (date !== brief.date) {
-    app.innerHTML = `<section class="error"><p class="eyebrow">找不到摘要</p><h1>${escapeHtml(date)}</h1><p>目前 V1 只載入 ${escapeHtml(brief.date)} 的 sample data。</p></section>`;
+async function renderBrief(id, isHome = false) {
+  const brief = await loadBrief(id);
+  if (!brief) {
+    app.innerHTML = `<section class="error"><p class="eyebrow">找不到摘要</p><h1>${escapeHtml(id)}</h1><p>Archive 未有這個更新版本的資料。</p></section>`;
     return;
   }
+  state.brief = brief;
 
   app.innerHTML = `${hero(brief, isHome)}<div class="content-layout"><div class="brief-main">${summarySection(brief)}${hotTopicsSection(brief)}${categoriesSection(brief)}${sourcesSection(brief)}</div>${tagsSidebar()}</div>`;
   bindCategoryControls(brief);
@@ -148,7 +175,9 @@ function renderBrief(date, isHome = false) {
 
 function hero(brief, isHome) {
   const indexEntry = state.index.briefs?.find((item) => item.date === brief.date) || {};
-  return `<section class="hero"><div><p class="eyebrow">${escapeHtml(brief.date)} · ${UI.latestBrief}</p><h1>${escapeHtml(brief.title || "每日財經與科技摘要")}</h1><p class="deck">${escapeHtml(brief.deck || indexEntry.summary || "")}</p>${isHome ? `<p><a class="action" href="${linkFor(`/briefs/${brief.date}`)}" data-link>${UI.readFullBrief}</a></p>` : ""}</div><aside class="hero-meta" aria-label="Brief metrics"><div class="metric-grid"><div class="metric"><b>${asList(brief.hot_topics).length}</b><span>${UI.hotTopics}</span></div><div class="metric"><b>${asList(brief.items).length}</b><span>${UI.newsItems}</span></div><div class="metric"><b>${asList(brief.categories).length}</b><span>${UI.categories}</span></div><div class="metric"><b>${asList(brief.sources).length}</b><span>${UI.sources}</span></div></div><div class="focus-list">${asList(brief.market_focus).map((item) => `<span class="pill">${escapeHtml(item)}</span>`).join("")}</div></aside></section>`;
+  const briefId = brief.update_id || brief.date;
+  const updateTime = brief.generated_at ? ` · ${escapeHtml(new Date(brief.generated_at).toLocaleTimeString("zh-HK", { hour: "2-digit", minute: "2-digit" }))}` : "";
+  return `<section class="hero"><div><p class="eyebrow">${escapeHtml(brief.date)}${updateTime} · ${UI.latestBrief}</p><h1>${escapeHtml(brief.title || "每日財經與科技摘要")}</h1><p class="deck">${escapeHtml(brief.deck || indexEntry.summary || "")}</p>${isHome ? `<p><a class="action" href="${linkFor(`/briefs/${briefId}`)}" data-link>${UI.readFullBrief}</a></p>` : ""}</div><aside class="hero-meta" aria-label="Brief metrics"><div class="metric-grid"><div class="metric"><b>${asList(brief.hot_topics).length}</b><span>${UI.hotTopics}</span></div><div class="metric"><b>${asList(brief.items).length}</b><span>${UI.newsItems}</span></div><div class="metric"><b>${asList(brief.categories).length}</b><span>${UI.categories}</span></div><div class="metric"><b>${asList(brief.sources).length}</b><span>${UI.sources}</span></div></div><div class="focus-list">${asList(brief.market_focus).map((item) => `<span class="pill">${escapeHtml(item)}</span>`).join("")}</div></aside></section>`;
 }
 
 function summarySection(brief) {
@@ -207,7 +236,15 @@ function sourcesSection(brief) {
 }
 
 function renderArchive() {
-  const rows = asList(state.index.briefs).map((brief) => { const fullBrief = getBriefByDate(brief.date); const itemLinks = asList(fullBrief?.items).slice().sort((a, b) => (b.heat_score || 0) - (a.heat_score || 0)).slice(0, 5).map((item) => `<a class="archive-link" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer"><strong>${escapeHtml(item.title_zh || item.title_original)}</strong><span>${escapeHtml(item.source)}</span></a>`).join(""); return `<article class="archive-row"><p class="eyebrow">${escapeHtml(brief.date)}</p><h3><a href="${linkFor(`/briefs/${brief.date}`)}" data-link>${escapeHtml(brief.title)}</a></h3><p>${escapeHtml(brief.summary || "")}</p><div class="focus-list">${asList(brief.top_themes).map((theme) => `<span class="pill">${escapeHtml(theme)}</span>`).join("")}</div>${itemLinks ? `<div class="archive-links">${itemLinks}</div>` : ""}</article>`; }).join("");
+  const rows = asList(state.index.briefs).map((brief) => {
+    const fullBrief = getBriefByDate(brief.date);
+    const itemLinks = asList(fullBrief?.items).slice().sort((a, b) => (b.heat_score || 0) - (a.heat_score || 0)).slice(0, 5).map((item) => `<a class="archive-link" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer"><strong>${escapeHtml(item.title_zh || item.title_original)}</strong><span>${escapeHtml(item.source)}</span></a>`).join("");
+    const updates = asList(brief.updates).map((update) => {
+      const time = update.generated_at ? new Date(update.generated_at).toLocaleTimeString("zh-HK", { hour: "2-digit", minute: "2-digit" }) : update.update_id;
+      return `<a class="archive-link" href="${linkFor(`/briefs/${update.update_id}`)}" data-link><strong>${escapeHtml(time)} 更新</strong><span>${escapeHtml(update.item_count || 0)} 則</span></a>`;
+    }).join("");
+    return `<article class="archive-row"><p class="eyebrow">${escapeHtml(brief.date)}</p><h3><a href="${linkFor(`/briefs/${brief.update_id || brief.date}`)}" data-link>${escapeHtml(brief.title)}</a></h3><p>${escapeHtml(brief.summary || "")}</p><div class="focus-list">${asList(brief.top_themes).map((theme) => `<span class="pill">${escapeHtml(theme)}</span>`).join("")}</div>${updates ? `<div class="archive-links"><strong>更新紀錄</strong>${updates}</div>` : ""}${itemLinks ? `<div class="archive-links"><strong>本日焦點入口</strong>${itemLinks}</div>` : ""}</article>`;
+  }).join("");
   app.innerHTML = `<section class="section"><div class="section-head"><h1>${UI.archive}</h1><p class="section-note">${UI.archiveNote}</p></div><div class="archive-list">${rows}</div></section>`;
 }
 
