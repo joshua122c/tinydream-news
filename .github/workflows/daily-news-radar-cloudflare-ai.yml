@@ -3,8 +3,8 @@ name: Daily Finance Tech News Radar - Cloudflare AI
 on:
   workflow_dispatch:
   schedule:
-    # 22:24 Hong Kong time = 14:24 UTC.
-    - cron: "24 14 * * *"
+    # 22:09 Hong Kong time = 14:09 UTC.
+    - cron: "9 14 * * *"
 
 permissions:
   contents: write
