@@ -1,0 +1,586 @@
+{
+  "date": "2026-06-12",
+  "update_id": "2026-06-12-0015",
+  "update_file": "data/briefs/2026-06-12-0015.json",
+  "title": "每日國際財經與科技新聞摘要",
+  "deck": "今日焦點集中於美國利率與通脹線索、科技股與人工智能投資，以及主要企業和產業鏈消息。",
+  "daily_summary_zh": "今日國際財經與科技新聞以宏觀數據、利率預期、人工智能與半導體產業鏈為主軸。網站已按題材熱度和來源可信度整理多條原文入口，方便先掌握重點，再按需要打開原文深入閱讀。",
+  "market_focus": [
+    "全球市場與宏觀",
+    "科技、AI與平台",
+    "半導體與供應鏈",
+    "企業、財報與交易"
+  ],
+  "hot_topics": [
+    {
+      "rank": 1,
+      "topic": "美國生產者價格數據偏熱後，美債孳息率保持平穩，原油價格上升",
+      "heat_score": 92,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC Markets"
+      ],
+      "item_ids": [
+        "2026-06-12-headline-001"
+      ],
+      "one_line_reason": "此題材同時觸及宏觀預期、科技產業或主要市場價格，適合作為今日優先閱讀焦點。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。"
+    },
+    {
+      "rank": 2,
+      "topic": "即使通脹憂慮升溫，金價仍跌至六個月低位：黃金為何失寵",
+      "heat_score": 90,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC"
+      ],
+      "item_ids": [
+        "2026-06-12-headline-002"
+      ],
+      "one_line_reason": "此題材同時觸及宏觀預期、科技產業或主要市場價格，適合作為今日優先閱讀焦點。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。"
+    },
+    {
+      "rank": 3,
+      "topic": "特朗普威脅控制哈爾克島及其他伊朗石油基建",
+      "heat_score": 81,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC"
+      ],
+      "item_ids": [
+        "2026-06-12-headline-003"
+      ],
+      "one_line_reason": "此題材同時觸及宏觀預期、科技產業或主要市場價格，適合作為今日優先閱讀焦點。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。"
+    },
+    {
+      "rank": 4,
+      "topic": "甲骨文擬增加融資引發現金流憂慮，股價急跌 11%",
+      "heat_score": 80,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC"
+      ],
+      "item_ids": [
+        "2026-06-12-headline-004"
+      ],
+      "one_line_reason": "此題材同時觸及宏觀預期、科技產業或主要市場價格，適合作為今日優先閱讀焦點。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。"
+    },
+    {
+      "rank": 5,
+      "topic": "焦點新聞：Some Pentagon workers ordered to shelter in place as air quality issue is i",
+      "heat_score": 79,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC"
+      ],
+      "item_ids": [
+        "2026-06-12-headline-005"
+      ],
+      "one_line_reason": "此題材同時觸及宏觀預期、科技產業或主要市場價格，適合作為今日優先閱讀焦點。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。"
+    }
+  ],
+  "categories": [
+    {
+      "name": "全球市場與宏觀",
+      "slug": "global-markets-macro",
+      "item_ids": [
+        "2026-06-12-headline-001",
+        "2026-06-12-headline-002",
+        "2026-06-12-headline-005",
+        "2026-06-12-headline-006",
+        "2026-06-12-headline-007"
+      ]
+    },
+    {
+      "name": "企業、財報與交易",
+      "slug": "companies-earnings-deals",
+      "item_ids": [
+        "2026-06-12-headline-004"
+      ]
+    },
+    {
+      "name": "科技、AI與平台",
+      "slug": "technology-ai-platforms",
+      "item_ids": [
+        "2026-06-12-headline-008",
+        "2026-06-12-headline-010",
+        "2026-06-12-headline-011",
+        "2026-06-12-headline-012"
+      ]
+    },
+    {
+      "name": "能源、外匯與商品",
+      "slug": "energy-fx-commodities",
+      "item_ids": [
+        "2026-06-12-headline-003",
+        "2026-06-12-headline-009"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "2026-06-12-headline-001",
+      "date": "2026-06-12",
+      "title_original": "Treasury yields are steady after hot producer prices reading, crude oil gains",
+      "title_zh": "美國生產者價格數據偏熱後，美債孳息率保持平穩，原油價格上升",
+      "source": "CNBC Markets",
+      "url": "https://www.cnbc.com/2026/06/11/treasury-yields-flat-as-investors-monitor-inflation-data-us-strikes-in-iran.html",
+      "published_at": "2026-06-12T00:15:12+08:00",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "全球市場與宏觀"
+      ],
+      "summary_zh": "CNBC Markets 報道聚焦「美國生產者價格數據偏熱後，美債孳息率保持平穩，原油價格上升」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 CNBC Markets，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 10,
+      "heat_score": 92,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC Markets"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-12-headline-002",
+      "date": "2026-06-12",
+      "title_original": "Gold slumps to 6-month low even as inflation fears rise. Here's why bullion is out of favor",
+      "title_zh": "即使通脹憂慮升溫，金價仍跌至六個月低位：黃金為何失寵",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/11/gold-slumps-to-6-month-low-even-as-inflation-fears-rise-heres-why-bullion-is-out-of-favor.html",
+      "published_at": "Thu, 11 Jun 2026 15:51:17 GMT",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "企業、財報與交易"
+      ],
+      "summary_zh": "CNBC 報道聚焦「即使通脹憂慮升溫，金價仍跌至六個月低位：黃金為何失寵」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 CNBC，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 10,
+      "heat_score": 90,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-12-headline-003",
+      "date": "2026-06-12",
+      "title_original": "Trump threatens to seize Kharg Island and other Iran oil infrastructure",
+      "title_zh": "特朗普威脅控制哈爾克島及其他伊朗石油基建",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/11/trump-says-us-will-seize-kharg-island-and-other-oil-infrastructure-points.html",
+      "published_at": "Thu, 11 Jun 2026 16:06:32 GMT",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "科技、AI與平台"
+      ],
+      "summary_zh": "CNBC 報道聚焦「特朗普威脅控制哈爾克島及其他伊朗石油基建」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 CNBC，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 10,
+      "heat_score": 81,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-12-headline-004",
+      "date": "2026-06-12",
+      "title_original": "Oracle shares tumble 11% on increased capital raise, cash concerns",
+      "title_zh": "甲骨文擬增加融資引發現金流憂慮，股價急跌 11%",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/11/oracle-shares-tumble-11percent-on-increased-capital-raise-cash-concerns.html",
+      "published_at": "Thu, 11 Jun 2026 15:32:25 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易",
+        "半導體與供應鏈"
+      ],
+      "summary_zh": "CNBC 報道聚焦「甲骨文擬增加融資引發現金流憂慮，股價急跌 11%」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 CNBC，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 9,
+      "heat_score": 80,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-12-headline-005",
+      "date": "2026-06-12",
+      "title_original": "Some Pentagon workers ordered to shelter in place as air quality issue is investigated",
+      "title_zh": "焦點新聞：Some Pentagon workers ordered to shelter in place as air quality issue is investigated",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/11/pentagon-lockdown-air-quality-issue.html",
+      "published_at": "Thu, 11 Jun 2026 15:55:00 GMT",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "中國與亞洲觀察"
+      ],
+      "summary_zh": "CNBC 報道聚焦「焦點新聞：Some Pentagon workers ordered to shelter in place as air quality issue is investigated」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 CNBC，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 9,
+      "heat_score": 79,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-12-headline-006",
+      "date": "2026-06-12",
+      "title_original": "SpaceX soon-to-be millionaires are set to spend big on luxury homes, watches and private jet travel",
+      "title_zh": "SpaceX 新一批準富豪預料將大手購入豪宅、名錶和私人飛機旅程",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/11/spacex-millionaires-wealth-spending.html",
+      "published_at": "Thu, 11 Jun 2026 14:17:18 GMT",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "能源、外匯與商品"
+      ],
+      "summary_zh": "CNBC 報道聚焦「SpaceX 新一批準富豪預料將大手購入豪宅、名錶和私人飛機旅程」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 CNBC，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 8,
+      "heat_score": 78,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-12-headline-007",
+      "date": "2026-06-12",
+      "title_original": "Avalanche, latest crypto treasury platform, set to start trading on Nasdaq as proxy trade evolves",
+      "title_zh": "焦點新聞：Avalanche, latest crypto treasury platform, set to start trading on Nasdaq as proxy trade evolves",
+      "source": "CNBC Technology",
+      "url": "https://www.cnbc.com/2026/06/11/avalanche-focused-treasury-firm-launches-on-nasdaq-as-crypto-proxy-trade-evolves.html",
+      "published_at": "2026-06-12T00:15:12+08:00",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "全球市場與宏觀"
+      ],
+      "summary_zh": "CNBC Technology 報道聚焦「焦點新聞：Avalanche, latest crypto treasury platform, set to start trading on Nasdaq as proxy trade evolves」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 CNBC Technology，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 8,
+      "heat_score": 77,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC Technology"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-12-headline-008",
+      "date": "2026-06-12",
+      "title_original": "Stocks Sink in Broad AI Rout Sparked by China's DeepSeek",
+      "title_zh": "中國 DeepSeek 觸發人工智能股拋售，美股相關板塊普遍下跌",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/nikkei-may-rise-as-weak-yen-raises-earnings-hopes-776a8056?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 14:26:00 -0500",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "企業、財報與交易"
+      ],
+      "summary_zh": "WSJ Markets 報道聚焦「中國 DeepSeek 觸發人工智能股拋售，美股相關板塊普遍下跌」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 WSJ Markets，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 7,
+      "heat_score": 76,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Markets"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-12-headline-009",
+      "date": "2026-06-12",
+      "title_original": "Comex Gold, Silver Settle Lower",
+      "title_zh": "Comex 黃金和白銀收低",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/gold-edges-lower-feds-rate-decision-in-focus-09dbfceb?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 14:01:00 -0500",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "科技、AI與平台"
+      ],
+      "summary_zh": "WSJ Markets 報道聚焦「Comex 黃金和白銀收低」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 WSJ Markets，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 7,
+      "heat_score": 75,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Markets"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-12-headline-010",
+      "date": "2026-06-12",
+      "title_original": "DeepSeek Won't Sink U.S. AI Titans",
+      "title_zh": "DeepSeek 未必足以擊沉美國人工智能巨頭",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/deepseek-us-ai-stocks-nvidia-broadcom-6cdfae81?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 13:12:00 -0500",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "半導體與供應鏈"
+      ],
+      "summary_zh": "WSJ Markets 報道聚焦「DeepSeek 未必足以擊沉美國人工智能巨頭」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 WSJ Markets，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 6,
+      "heat_score": 74,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Markets"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-12-headline-011",
+      "date": "2026-06-12",
+      "title_original": "What to Know About China's DeepSeek AI",
+      "title_zh": "中國 DeepSeek 人工智能有何值得留意",
+      "source": "WSJ Technology",
+      "url": "https://www.wsj.com/articles/deepseek-ai-china-tech-stocks-explained-ee6cc80e?mod=rss_Technology",
+      "published_at": "Mon, 27 Jan 2025 13:17:00 -0500",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "中國與亞洲觀察"
+      ],
+      "summary_zh": "WSJ Technology 報道聚焦「中國 DeepSeek 人工智能有何值得留意」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 WSJ Technology，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 6,
+      "heat_score": 73,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Technology"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    },
+    {
+      "id": "2026-06-12-headline-012",
+      "date": "2026-06-12",
+      "title_original": "Silicon Valley Is Raving About a Made-in-China AI Model",
+      "title_zh": "矽谷熱議中國製人工智能模型",
+      "source": "WSJ Technology",
+      "url": "https://www.wsj.com/articles/china-ai-deepseek-chatbot-6ac4ad33?mod=rss_Technology",
+      "published_at": "Mon, 27 Jan 2025 09:36:00 -0500",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "能源、外匯與商品"
+      ],
+      "summary_zh": "WSJ Technology 報道聚焦「矽谷熱議中國製人工智能模型」。這條消息被列入今日國際財經與科技追蹤清單，反映市場正關注宏觀數據、企業動向、科技投資或產業鏈變化。",
+      "key_facts": [
+        "原文來源為 WSJ Technology，保留原文連結供查證。",
+        "此新聞被系統按來源層級、題材關聯和市場敏感度排序。"
+      ],
+      "market_impact": "短線可觀察其對相關資產價格、科技股估值、利率預期或產業鏈情緒的影響。",
+      "reporter_angle": "後續應追蹤是否有更多主流來源跟進、公司或監管機構是否回應，以及市場價格是否出現連鎖反應。",
+      "importance_score": 5,
+      "heat_score": 72,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Technology"
+      ],
+      "position_signal": "ranked headline",
+      "time_horizon": "short_term",
+      "tracking_value": "適合作為當日市場與科技新聞版面的追蹤入口。"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Reuters Markets",
+      "url": "https://www.reuters.com/markets/",
+      "access": "Blocked",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "Reuters Technology",
+      "url": "https://www.reuters.com/technology/",
+      "access": "Blocked",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "CNBC Top News",
+      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+      "access": "Full",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "CNBC Markets",
+      "url": "https://www.cnbc.com/markets/",
+      "access": "Full",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "CNBC Technology",
+      "url": "https://www.cnbc.com/technology/",
+      "access": "Full",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "WSJ Markets",
+      "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "access": "Full",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "WSJ Technology",
+      "url": "https://feeds.a.dj.com/rss/RSSWSJD.xml",
+      "access": "Full",
+      "tier": 1,
+      "region": "global"
+    },
+    {
+      "name": "MarketWatch Top Stories",
+      "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
+      "access": "Full",
+      "tier": 2,
+      "region": "global"
+    },
+    {
+      "name": "TechCrunch AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/",
+      "access": "Full",
+      "tier": 2,
+      "region": "global"
+    },
+    {
+      "name": "TechCrunch Startups",
+      "url": "https://techcrunch.com/category/startups/",
+      "access": "Full",
+      "tier": 2,
+      "region": "global"
+    },
+    {
+      "name": "Wallstreetcn",
+      "url": "https://wallstreetcn.com/",
+      "access": "Full",
+      "tier": 3,
+      "region": "china"
+    },
+    {
+      "name": "Caixin",
+      "url": "https://www.caixin.com/",
+      "access": "Full",
+      "tier": 3,
+      "region": "china"
+    },
+    {
+      "name": "LatePost",
+      "url": "https://www.latepost.com/",
+      "access": "Full",
+      "tier": 3,
+      "region": "china"
+    }
+  ],
+  "generated_at": "2026-06-12T00:15:12+08:00",
+  "email_body_zh": "今日新聞摘要已更新。重點包括全球市場與宏觀數據、人工智能與半導體產業鏈、企業消息及能源外匯商品走勢。\n\n網站：https://news.tinydreamlab.com/"
+}
