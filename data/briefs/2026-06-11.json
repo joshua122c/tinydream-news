@@ -11,12 +11,12 @@
   "hot_topics": [
     {
       "rank": 1,
-      "topic": "Analysis: Trump said he loves inflation. Why that should be ",
+      "topic": "Treasury yields are steady after hot producer prices reading",
       "heat_score": 78,
       "heat_label": "High",
       "source_count": 1,
       "main_sources": [
-        "CNBC Top News"
+        "CNBC Markets"
       ],
       "item_ids": [
         "2026-06-11-headline-001"
@@ -26,7 +26,7 @@
     },
     {
       "rank": 2,
-      "topic": "Oil jumps as U.S. fresh strikes on Iran raise worries of ext",
+      "topic": "Trump might 'love the inflation,' but consumers are feeling ",
       "heat_score": 74,
       "heat_label": "Medium",
       "source_count": 1,
@@ -41,12 +41,12 @@
     },
     {
       "rank": 3,
-      "topic": "Analysis: Trump said he loves inflation. Why that should be ",
+      "topic": "These in-demand jobs pay over $100,000 — and offer raises th",
       "heat_score": 70,
       "heat_label": "Medium",
       "source_count": 1,
       "main_sources": [
-        "CNBC Markets"
+        "MarketWatch Top Stories"
       ],
       "item_ids": [
         "2026-06-11-headline-003"
@@ -103,11 +103,11 @@
     {
       "id": "2026-06-11-headline-001",
       "date": "2026-06-11",
-      "title_original": "Analysis: Trump said he loves inflation. Why that should be music to Kevin Warsh's ears",
-      "title_zh": "Analysis: Trump said he loves inflation. Why that should be music to Kevin Warsh's ears",
-      "source": "CNBC Top News",
-      "url": "https://www.cnbc.com/2026/06/10/trump-inflation-fed-chair-kevin-warsh-analysis.html",
-      "published_at": "2026-06-11T09:31:20+08:00",
+      "title_original": "Treasury yields are steady after hot producer prices reading, crude oil gains",
+      "title_zh": "Treasury yields are steady after hot producer prices reading, crude oil gains",
+      "source": "CNBC Markets",
+      "url": "https://www.cnbc.com/2026/06/11/treasury-yields-flat-as-investors-monitor-inflation-data-us-strikes-in-iran.html",
+      "published_at": "2026-06-11T23:05:49+08:00",
       "category": "全球市場與宏觀",
       "themes": [
         "全球市場與宏觀",
@@ -124,7 +124,7 @@
       "heat_score": 78,
       "source_count": 1,
       "sources_reporting_same_topic": [
-        "CNBC Top News"
+        "CNBC Markets"
       ],
       "position_signal": "headline candidate",
       "time_horizon": "short_term",
@@ -133,15 +133,15 @@
     {
       "id": "2026-06-11-headline-002",
       "date": "2026-06-11",
-      "title_original": "Oil jumps as U.S. fresh strikes on Iran raise worries of extended disruption to energy flows",
-      "title_zh": "Oil jumps as U.S. fresh strikes on Iran raise worries of extended disruption to energy flows",
+      "title_original": "Trump might 'love the inflation,' but consumers are feeling the pain, experts say",
+      "title_zh": "Trump might 'love the inflation,' but consumers are feeling the pain, experts say",
       "source": "CNBC Top News",
-      "url": "https://www.cnbc.com/2026/06/11/brent-wti-oil-prices-us-launches-fresh-strikes-on-iran-.html",
-      "published_at": "2026-06-11T09:31:20+08:00",
+      "url": "https://www.cnbc.com/2026/06/11/trump-inflation-cpi.html",
+      "published_at": "2026-06-11T23:05:49+08:00",
       "category": "企業、財報與交易",
       "themes": [
         "企業、財報與交易",
-        "能源、外匯與商品"
+        "全球市場與宏觀"
       ],
       "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
       "key_facts": [
@@ -163,11 +163,11 @@
     {
       "id": "2026-06-11-headline-003",
       "date": "2026-06-11",
-      "title_original": "Analysis: Trump said he loves inflation. Why that should be music to Kevin Warsh's ears",
-      "title_zh": "Analysis: Trump said he loves inflation. Why that should be music to Kevin Warsh's ears",
-      "source": "CNBC Markets",
-      "url": "https://www.cnbc.com/2026/06/10/trump-inflation-fed-chair-kevin-warsh-analysis.html",
-      "published_at": "2026-06-11T09:31:20+08:00",
+      "title_original": "These in-demand jobs pay over $100,000 — and offer raises that keep ahead of inflation",
+      "title_zh": "These in-demand jobs pay over $100,000 — and offer raises that keep ahead of inflation",
+      "source": "MarketWatch Top Stories",
+      "url": "https://www.marketwatch.com/story/these-in-demand-jobs-pay-over-100-000-and-offer-raises-that-keep-ahead-of-inflation-29c2ad1a?mod=mw_rss_topstories",
+      "published_at": "2026-06-11T23:05:49+08:00",
       "category": "科技、AI與平台",
       "themes": [
         "科技、AI與平台",
@@ -184,7 +184,7 @@
       "heat_score": 70,
       "source_count": 1,
       "sources_reporting_same_topic": [
-        "CNBC Markets"
+        "MarketWatch Top Stories"
       ],
       "position_signal": "headline candidate",
       "time_horizon": "short_term",
@@ -193,15 +193,15 @@
     {
       "id": "2026-06-11-headline-004",
       "date": "2026-06-11",
-      "title_original": "Oracle beats on earnings, but stock drops on plans to raise another $20 billion",
-      "title_zh": "Oracle beats on earnings, but stock drops on plans to raise another $20 billion",
+      "title_original": "Trump threatens to seize Kharg Island and other Iran oil infrastructure",
+      "title_zh": "Trump threatens to seize Kharg Island and other Iran oil infrastructure",
       "source": "CNBC Top News",
-      "url": "https://www.cnbc.com/2026/06/10/oracle-orcl-q4-earnings-report-2026.html",
-      "published_at": "2026-06-11T09:31:20+08:00",
+      "url": "https://www.cnbc.com/2026/06/11/trump-says-us-will-seize-kharg-island-and-other-oil-infrastructure-points.html",
+      "published_at": "2026-06-11T23:05:49+08:00",
       "category": "半導體與供應鏈",
       "themes": [
         "半導體與供應鏈",
-        "企業、財報與交易"
+        "能源、外匯與商品"
       ],
       "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
       "key_facts": [
@@ -223,15 +223,15 @@
     {
       "id": "2026-06-11-headline-005",
       "date": "2026-06-11",
-      "title_original": "Trump says 'I love the inflation' after consumer price index hits 3-year high",
-      "title_zh": "Trump says 'I love the inflation' after consumer price index hits 3-year high",
+      "title_original": "DoorDash lets customers use photos, prompts to order food and book reservations in latest AI push",
+      "title_zh": "DoorDash lets customers use photos, prompts to order food and book reservations in latest AI push",
       "source": "CNBC Top News",
-      "url": "https://www.cnbc.com/2026/06/10/trump-inflation-cpi-iran-oil.html",
-      "published_at": "2026-06-11T09:31:20+08:00",
+      "url": "https://www.cnbc.com/2026/06/11/doordash-ai-ordering-automation.html",
+      "published_at": "2026-06-11T23:05:49+08:00",
       "category": "中國與亞洲觀察",
       "themes": [
         "中國與亞洲觀察",
-        "全球市場與宏觀"
+        "科技、AI與平台"
       ],
       "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
       "key_facts": [
@@ -253,15 +253,15 @@
     {
       "id": "2026-06-11-headline-006",
       "date": "2026-06-11",
-      "title_original": "Oil prices rise after Trump says U.S. will attack Iran 'very hard'",
-      "title_zh": "Oil prices rise after Trump says U.S. will attack Iran 'very hard'",
+      "title_original": "SpaceX soon-to-be millionaires are set to spend big on luxury homes, watches and private jet travel",
+      "title_zh": "SpaceX soon-to-be millionaires are set to spend big on luxury homes, watches and private jet travel",
       "source": "CNBC Top News",
-      "url": "https://www.cnbc.com/2026/06/10/oil-price-us-completes-iran-strikes-after-apache-helicopter-attack.html",
-      "published_at": "2026-06-11T09:31:20+08:00",
+      "url": "https://www.cnbc.com/2026/06/11/spacex-millionaires-wealth-spending.html",
+      "published_at": "2026-06-11T23:05:49+08:00",
       "category": "能源、外匯與商品",
       "themes": [
         "能源、外匯與商品",
-        "能源、外匯與商品"
+        "全球市場與宏觀"
       ],
       "summary_zh": "這條新聞根據公開標題、來源和原文連結整理，保留可追蹤的新聞入口，方便快速瀏覽和後續查證。",
       "key_facts": [
@@ -374,6 +374,6 @@
       "region": "china"
     }
   ],
-  "generated_at": "2026-06-11T09:31:20+08:00",
+  "generated_at": "2026-06-11T23:05:49+08:00",
   "email_body_zh": "今日新聞摘要已更新。網站已整理公開新聞標題、來源和原文連結，方便快速瀏覽和後續追蹤。\n\n網站：https://news.tinydreamlab.com/"
 }
