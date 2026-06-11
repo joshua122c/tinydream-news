@@ -289,6 +289,11 @@ def ai_request(account_id: str, api_token: str, model: str, messages: list[dict]
         fail(f"Cloudflare Workers AI failed: {raw}")
     result = data.get("result", {})
     text = result.get("response") or result.get("text") or result.get("content")
+    if isinstance(text, (dict, list)):
+        return json.dumps(text, ensure_ascii=False)
+    if not text and isinstance(result.get("choices"), list) and result["choices"]:
+        message = result["choices"][0].get("message", {})
+        text = message.get("content")
     if not text:
         fail(f"Cloudflare Workers AI response missing text: {raw[:1000]}")
     return text
@@ -441,7 +446,7 @@ def build_prompt(candidates: list[dict], sources: list[dict]) -> str:
 def call_cloudflare_ai(candidates: list[dict], sources: list[dict]) -> dict:
     account_id = env_required("CLOUDFLARE_ACCOUNT_ID")
     api_token = env_required("CLOUDFLARE_API_TOKEN")
-    model = os.environ.get("CF_AI_MODEL", "@cf/meta/llama-3.1-8b-instruct").strip()
+    model = os.environ.get("CF_AI_MODEL", "@cf/qwen/qwen2.5-coder-32b-instruct").strip()
     system = "You are a careful news editor. Output strict valid JSON only, using Traditional Chinese for reader-facing fields."
     text = ai_request(account_id, api_token, model, [{"role": "system", "content": system}, {"role": "user", "content": build_prompt(candidates, sources)}])
     try:
