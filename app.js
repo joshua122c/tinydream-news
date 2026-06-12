@@ -104,6 +104,15 @@ function displaySummary(item) {
   return `${source} 的報道涉及${category}的重要變化。這條新聞值得留意，因為它可能影響投資者對市場風險、企業盈利或產業趨勢的判斷。`;
 }
 
+function sourceSignal(item) {
+  const count = Number(item?.source_count || 1);
+  const sources = asList(item?.sources_reporting_same_topic);
+  if (count <= 1) return `<span>${escapeHtml(item?.source || "主要來源")}</span>`;
+  const label = `${count} 個來源`;
+  const detail = sources.slice(0, 3).join("、");
+  return `<span class="source-signal" title="${escapeHtml(detail)}">${escapeHtml(label)}</span>`;
+}
+
 function heatLabel(score = 0, explicit) {
   if (explicit) return explicit;
   if (score >= 75) return "High";
@@ -315,7 +324,7 @@ function frontPageSection(brief) {
 function renderLeadStory(item, topic) {
   const label = heatLabel(item.heat_score);
   return `<article class="lead-story" id="item-${escapeHtml(item.id)}">
-    <div class="item-top"><span class="rank">#${escapeHtml(topic?.rank || 1)}</span><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span></div>
+    <div class="item-top"><div class="item-meta"><span class="rank">#${escapeHtml(topic?.rank || 1)}</span>${sourceSignal(item)}<span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span></div>
     <h3>${escapeHtml(displayTitle(item))}</h3>
     <p>${escapeHtml(displaySummary(item))}</p>
     <div class="focus-list">${asList(item.themes).slice(0, 4).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div>
@@ -326,7 +335,7 @@ function renderLeadStory(item, topic) {
 function renderCompactStory(item, index) {
   const label = heatLabel(item.heat_score);
   return `<article class="compact-story" id="item-${escapeHtml(item.id)}">
-    <div class="item-meta"><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span></div>
+    <div class="item-meta">${sourceSignal(item)}<span>${escapeHtml(item.category)}</span></div>
     <h3>${escapeHtml(displayTitle(item))}</h3>
     <p>${escapeHtml(displaySummary(item))}</p>
     <div class="compact-bottom"><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></div>
@@ -336,7 +345,7 @@ function renderCompactStory(item, index) {
 function renderTopicChip(topic) {
   const label = heatLabel(topic.heat_score, topic.heat_label);
   return `<a class="topic-chip" href="#item-${escapeHtml(asList(topic.item_ids)[0] || "")}" data-item-jump="${escapeHtml(asList(topic.item_ids)[0] || "")}">
-    <span>#${escapeHtml(topic.rank || "")}</span>
+    <span>#${escapeHtml(topic.rank || "")} · ${escapeHtml(topic.source_count || 1)} 來源</span>
     <strong>${escapeHtml(topic.topic || "")}</strong>
     <em class="${heatClass(label)}">${escapeHtml(topic.heat_score || 0)}</em>
   </a>`;
@@ -391,7 +400,7 @@ function renderItems(brief, categorySlug, query) {
 function renderItem(item) {
   const label = heatLabel(item.heat_score);
   return `<article class="item-card" id="item-${escapeHtml(item.id)}">
-    <div class="item-top"><div class="item-meta"><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span><span>${escapeHtml(item.time_horizon || "")}</span></div><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span></div>
+    <div class="item-top"><div class="item-meta">${sourceSignal(item)}<span>${escapeHtml(item.category)}</span><span>${escapeHtml(item.time_horizon || "")}</span></div><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span></div>
     <h3>${escapeHtml(displayTitle(item))}</h3>
     <p>${escapeHtml(displaySummary(item))}</p>
     <div class="focus-list">${asList(item.themes).slice(0, 4).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div>
@@ -451,7 +460,7 @@ async function renderSearch(query) {
 function renderSearchResult(result) {
   const item = result.item;
   const briefId = result.update_id || result.date;
-  return `<article class="item-card"><div class="item-top"><div class="item-meta"><span>${escapeHtml(result.date)}</span><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(heatLabel(item.heat_score))}">${heatLabel(item.heat_score)} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(displayTitle(item))}</h3><p>${escapeHtml(displaySummary(item))}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div><p><a class="action" href="${linkFor(`/briefs/${briefId}`)}" data-link>${UI.viewDailyBrief}</a> <a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p></article>`;
+  return `<article class="item-card"><div class="item-top"><div class="item-meta"><span>${escapeHtml(result.date)}</span>${sourceSignal(item)}<span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(heatLabel(item.heat_score))}">${heatLabel(item.heat_score)} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(displayTitle(item))}</h3><p>${escapeHtml(displaySummary(item))}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div><p><a class="action" href="${linkFor(`/briefs/${briefId}`)}" data-link>${UI.viewDailyBrief}</a> <a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p></article>`;
 }
 
 function renderTopics() {
