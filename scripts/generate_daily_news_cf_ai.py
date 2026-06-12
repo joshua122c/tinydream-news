@@ -237,7 +237,7 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
         extracted = extract_rss_candidates(config["name"], config["url"], body) if config["kind"] == "rss" else extract_page_candidates(config["name"], config["url"], body)
         for candidate in extracted[: config.get("max_items", 8)]:
             lower_title = candidate.get("title", "").lower()
-            if re.search(r"personal trainer|elderly mother|medicaid|social security|retirement|mortgage|home together|inheritance|divorce", lower_title):
+            if re.search(r"personal trainer|elderly mother|medicaid|social security|retirement|mortgage|home together|inheritance|divorce|market talk", lower_title):
                 continue
             candidate["source_tier"] = config.get("tier", 3)
             candidate["category"] = infer_category(candidate.get("title", ""))
@@ -310,6 +310,9 @@ def headline_to_zh(title: str, category: str) -> str:
         (r"Trump picks former SEC Chairman.*", "特朗普提名前 SEC 主席出任國家情報總監，監管與政策人事受關注"),
         (r"What energy insiders.*oil prices.*Iran deal.*", "華府能源人士評估油價與伊朗協議前景"),
         (r"Analysis: Trump said he loves inflation.*", "特朗普通脹言論引發對 Fed 主席人選和政策路徑的討論"),
+        (r"Pimco is warning about a spike in defaults.*", "Pimco 警告違約風險升溫，收益型投資組合配置受關注"),
+        (r"DeepSeek Won.*Sink U\.S\. AI Titans.*", "DeepSeek 未必拖垮美國 AI 巨頭，競爭壓力仍需重估"),
+        (r"Swiss franc, Japanese yen Rise as DeepSeek News Boosts Safe Havens.*", "DeepSeek 消息推升避險需求，瑞郎和日圓走強"),
         (r"Treasury yields are steady after hot producer prices reading.*", "美債收益率在生產者價格數據偏熱後靠穩，市場重新評估利率路徑"),
         (r"Gold slumps to 6-month low.*", "通脹憂慮升溫但金價跌至六個月低位，避險需求未有承接"),
         (r"Trump might 'love the inflation,'.*", "通脹壓力仍困擾消費者，市場關注政策言論與民生壓力"),
@@ -501,6 +504,7 @@ def validate_brief(brief: dict) -> None:
     if not isinstance(items, list) or len(items) < 10:
         fail("items must contain at least 10 entries.")
     item_ids = set()
+    title_counts = {}
     for item in items:
         for field in REQUIRED_ITEM_FIELDS:
             if field not in item:
@@ -508,10 +512,14 @@ def validate_brief(brief: dict) -> None:
         if item["id"] in item_ids:
             fail(f"Duplicate item id: {item['id']}")
         item_ids.add(item["id"])
+        title_counts[item["title_zh"]] = title_counts.get(item["title_zh"], 0) + 1
         if not has_cjk(item["title_zh"]) or looks_mostly_english(item["title_zh"]):
             fail(f"title_zh is not acceptable Traditional Chinese: {item['title_zh']}")
         if any(phrase in item["summary_zh"] for phrase in BAD_READER_PHRASES):
             fail(f"summary_zh contains bad phrase: {item['id']}")
+    duplicate_titles = [title for title, count in title_counts.items() if count > 1]
+    if duplicate_titles:
+        fail(f"Duplicate title_zh values: {duplicate_titles}")
 
     hot_topics = brief.get("hot_topics")
     if not isinstance(hot_topics, list) or not (3 <= len(hot_topics) <= 5):
