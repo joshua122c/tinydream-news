@@ -118,10 +118,12 @@ def headline_entity(title: str) -> str:
     stop_phrases = {
         "Wall Street", "BofA", "Citi", "Mizuho", "Analyst Report", "The", "A", "An",
         "Here", "What", "I", "My", "We", "Is This", "US", "U.S", "New", "Friday", "Monday", "Tuesday", "Wednesday", "Thursday",
+        "Says", "Say", "Said", "Launches", "Raises",
     }
     for phrase in re.findall(r"\b[A-Z][A-Za-z0-9&.-]*(?:\s+[A-Z][A-Za-z0-9&.-]*){0,2}\b", title or ""):
         cleaned = phrase.strip(" ,:;.-")
         cleaned = re.sub(r"^(New|US|U\.S\.?)\s+", "", cleaned)
+        cleaned = re.sub(r"\s+(Says|Say|Said|Launches|Raises)$", "", cleaned)
         if not cleaned or cleaned in stop_phrases:
             continue
         if any(part in stop_phrases for part in cleaned.split()) and len(cleaned.split()) <= 2:
@@ -656,18 +658,18 @@ def keyword_headline(title: str, category: str) -> str:
         prefix = f"{company} 帶動" if company else "AI 與半導體"
         return f"{prefix}投資熱潮延續，估值與供應鏈受關注"
     if re.search(r"earnings|shares|stock|ipo|deal|merger|revenue|profit|acquire|acquisition|hostile bid|\bbid\b", text):
-        prefix = f"{entity} 消息" if entity else "企業交易消息"
+        prefix = f"圍繞 {entity} 的企業消息" if entity else "企業交易消息"
         return f"{prefix}牽動投資者對盈利與估值的判斷"
     if re.search(r"china|asia|japan|hong kong|taiwan", text):
         return "中國及亞洲市場消息影響區內風險情緒"
     if entity:
         if category == "企業、財報與交易":
-            return f"{entity} 相關消息牽動投資者對盈利與估值的判斷"
+            return f"圍繞 {entity} 的企業消息牽動盈利與估值判斷"
         if category == "科技、AI與平台":
-            return f"{entity} 相關科技消息牽動平台競爭與成長預期"
+            return f"圍繞 {entity} 的科技消息牽動平台競爭與成長預期"
         if category == "能源、外匯與商品":
-            return f"{entity} 相關價格變化牽動商品與外匯市場情緒"
-        return f"{entity} 相關市場消息牽動投資者風險判斷"
+            return f"圍繞 {entity} 的價格變化牽動商品與外匯市場情緒"
+        return f"圍繞 {entity} 的市場消息牽動投資者風險判斷"
     return "重要財經與科技消息值得今日追蹤"
 
 
