@@ -107,6 +107,7 @@ def looks_like_generic_editorial_title(value: str) -> bool:
     text = value or ""
     generic_fragments = [
         "企業交易消息牽動",
+        "企業消息牽動投資者",
         "市場消息牽動投資者",
         "重要財經與科技消息",
         "相關價格變化牽動",
@@ -450,6 +451,7 @@ def candidate_allowed(source_name: str, link: str, title: str) -> bool:
         "assets investors should buy", "investors should buy", "should buy if",
         "best travel stock", "best dividend stock", "best ai stock", "best growth stock",
         "stock portfolio", "hedge fund portfolio", "university stock portfolio",
+        "orion cmc",
     ]
     if any(term in lower_title for term in skip_terms):
         return False
@@ -618,9 +620,17 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
             candidate["score"] = headline_score(candidate)
             all_candidates.append(candidate)
 
-    keywords = re.compile(r"fed|inflation|treasury|yield|dollar|oil|gold|nvidia|amd|tsmc|semiconductor|chip|\bai\b|artificial intelligence|cloud|apple|tesla|microsoft|google|meta|amazon|ipo|earnings|通脹|利率|半導體|人工智能|黃金|美元", re.I)
+    keywords = re.compile(
+        r"fed|inflation|treasury|yield|dollar|oil|gold|tariff|sanction|hormuz|iran|"
+        r"economy|gdp|fraud|conviction|appeal|bank|listing|stock exchange|delist|"
+        r"deal|merger|acquisition|acquire|\bto buy\b|shares|stock falls|stock rises|"
+        r"nvidia|amd|tsmc|semiconductor|chip|\bai\b|artificial intelligence|cloud|"
+        r"apple|tesla|microsoft|google|meta|amazon|ipo|earnings|"
+        r"通脹|利率|半導體|人工智能|黃金|美元",
+        re.I,
+    )
     filtered = [item for item in all_candidates if keywords.search(item["title"])]
-    if len(filtered) < 24:
+    if len(filtered) < MIN_ITEM_COUNT:
         filtered = all_candidates
     filtered.sort(key=lambda item: item.get("score", 0), reverse=True)
 
@@ -752,6 +762,7 @@ def headline_to_zh(title: str, category: str) -> str:
         (r"UK economy shrank by 0\.1% in April.*", "英國 4 月經濟收縮 0.1%，地緣風險拖累增長"),
         (r"Barclays to buy GoHenry.*", "Barclays 收購兒童扣帳卡應用 GoHenry，擴大年輕客群布局"),
         (r"Paddy Power owner Flutter to scrap listing.*London Stock Exchange.*", "Flutter 擬撤銷倫敦上市地位，重心進一步轉向美國市場"),
+        (r"Charles Cole indicted for defrauding Napster.*239M shares.*", "Charles Cole 被控欺詐 Napster 2.39 億股，涉案股份交易受關注"),
         (r"Treasury yields are steady after hot producer prices reading.*", "美債收益率在生產者價格數據偏熱後靠穩，市場重新評估利率路徑"),
         (r"Gold slumps to 6-month low.*", "通脹憂慮升溫但金價跌至六個月低位，避險需求未有承接"),
         (r"Trump might 'love the inflation,'.*", "通脹壓力仍困擾消費者，市場關注政策言論與民生壓力"),
