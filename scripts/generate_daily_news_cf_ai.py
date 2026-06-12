@@ -699,7 +699,7 @@ def keyword_headline(title: str, category: str) -> str:
     company_match = re.search(r"\b(Nvidia|Apple|Microsoft|Google|Alphabet|Amazon|Meta|Tesla|Oracle|SpaceX|OpenAI|AMD|TSMC|Intel|Broadcom|GlobalFoundries|Arm Holdings|SanDisk|Seagate|Waymo|DigitalBridge|Equinix|QXO|Beacon|Rocket Lab|Circle|Warner Bros\.? Discovery|Warner)\b", title, re.I)
     company = company_match.group(1) if company_match else ""
     entity = company or headline_entity(title)
-    if entity.lower() in {"oil", "crude", "gold", "silver", "comex", "trump", "u.s", "us", "global", "market", "markets"}:
+    if entity.lower() in {"oil", "crude", "gold", "silver", "comex", "trump", "u.s", "us", "global", "market", "markets", "iran"}:
         entity = ""
     if re.search(r"coffee|cocoa|wheat|corn|tariff", text):
         return "農產品與關稅消息牽動商品價格，通脹預期再受關注"
@@ -754,6 +754,7 @@ def headline_to_zh(title: str, category: str) -> str:
         (r"DeepSeek Won.*Sink U\.S\. AI Titans.*", "DeepSeek 未必拖垮美國 AI 巨頭，競爭壓力仍需重估"),
         (r"Swiss franc, Japanese yen Rise as DeepSeek News Boosts Safe Havens.*", "DeepSeek 消息推升避險需求，瑞郎和日圓走強"),
         (r"Oil prices fall on proposed U\.S\.-Iran peace deal.*", "美伊和平協議憧憬拖低油價，市場押注霍爾木茲海峽重開"),
+        (r"Global oil prices drop to \$88.*Iran peace deal.*", "油價跌至每桶 88 美元附近，市場憧憬伊朗和平協議最快周末達成"),
         (r"Proposed Iran-U\.S\. deal would reopen Hormuz.*", "伊朗官媒稱美伊協議或重開霍爾木茲海峽並解除石油制裁"),
         (r"Trump claims US and Iran on verge of signing peace agreement.*", "特朗普稱美伊接近簽署和平協議，德黑蘭稱尚未作最終決定"),
         (r"Trump denies Iran's account of deal terms.*", "特朗普否認伊朗對協議條款的說法，並譴責新一輪無人機攻擊"),
