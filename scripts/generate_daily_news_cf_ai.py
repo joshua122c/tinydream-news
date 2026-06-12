@@ -458,6 +458,7 @@ def keyword_headline(title: str, category: str) -> str:
     text = f"{title} {category}".lower()
     company_match = re.search(r"\b(Nvidia|Apple|Microsoft|Google|Alphabet|Amazon|Meta|Tesla|Oracle|SpaceX|OpenAI|AMD|TSMC|Intel|Broadcom|GlobalFoundries|Arm Holdings|SanDisk|Seagate|Waymo|DigitalBridge|Equinix|QXO|Beacon|Rocket Lab|Circle|Warner Bros\.? Discovery|Warner)\b", title, re.I)
     company = company_match.group(1) if company_match else ""
+    entity = company or headline_entity(title)
     if re.search(r"coffee|cocoa|wheat|corn|tariff", text):
         return "農產品與關稅消息牽動商品價格，通脹預期再受關注"
     if re.search(r"natural gas|gas falls|gas prices", text):
@@ -474,11 +475,10 @@ def keyword_headline(title: str, category: str) -> str:
         prefix = f"{company} 帶動" if company else "AI 與半導體"
         return f"{prefix}投資熱潮延續，估值與供應鏈受關注"
     if re.search(r"earnings|shares|stock|ipo|deal|merger|revenue|profit|acquire|acquisition|hostile bid|\bbid\b", text):
-        prefix = f"{company} 消息" if company else "企業消息"
+        prefix = f"{entity} 消息" if entity else "企業交易消息"
         return f"{prefix}牽動投資者對盈利與估值的判斷"
     if re.search(r"china|asia|japan|hong kong|taiwan", text):
         return "中國及亞洲市場消息影響區內風險情緒"
-    entity = company or headline_entity(title)
     if entity:
         if category == "企業、財報與交易":
             return f"{entity} 相關消息牽動投資者對盈利與估值的判斷"
