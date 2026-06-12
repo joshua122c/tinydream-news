@@ -126,6 +126,62 @@ def clean_text(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip()
 
 
+SIMPLIFIED_TO_TRADITIONAL_PHRASES = [
+    ("首席执行员", "行政總裁"),
+    ("执行员", "執行員"),
+    ("执行", "執行"),
+    ("报道", "報道"),
+    ("美国", "美國"),
+    ("认为", "認為"),
+    ("时候", "時候"),
+    ("公开", "公開"),
+    ("预计", "預計"),
+    ("进行", "進行"),
+    ("过去", "過去"),
+    ("创下", "創下"),
+    ("纪录", "紀錄"),
+    ("经济", "經濟"),
+    ("制裁", "制裁"),
+    ("启动", "啟動"),
+    ("认购", "認購"),
+    ("极其", "極其"),
+    ("负责", "負責"),
+    ("电话", "電話"),
+    ("纽约", "紐約"),
+    ("专场", "專場"),
+    ("访谈", "訪談"),
+    ("顶级", "頂級"),
+    ("投资者", "投資者"),
+    ("到场", "到場"),
+    ("分支机构", "分支機構"),
+    ("线上", "線上"),
+    ("散户", "散戶"),
+    ("这一次", "這一次"),
+    ("请", "請"),
+    ("最贵", "最貴"),
+    ("盲盒 昨天", "盲盒"),
+    ("个", "個"),
+    ("亿", "億"),
+    ("万", "萬"),
+    ("约", "約"),
+    ("将", "將"),
+    ("让", "讓"),
+    ("与", "與"),
+]
+
+
+def to_traditional_zh(value: str) -> str:
+    text = value or ""
+    for simplified, traditional in SIMPLIFIED_TO_TRADITIONAL_PHRASES:
+        text = text.replace(simplified, traditional)
+    return clean_text(text)
+
+
+def contains_common_simplified_zh(value: str) -> bool:
+    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个"
+    return any(char in (value or "") for char in simplified_chars)
+
+
 def clean_feed_text(value: str) -> str:
     value = re.sub(r"<!\[CDATA\[(.*?)\]\]>", r"\1", value or "", flags=re.S)
     return clean_text(value)
@@ -354,19 +410,19 @@ def summarize_from_context(title_zh: str, original_title: str, source: str, cont
             continue
         if has_cjk(text):
             sentences = re.split(r"(?<=[。！？])", text)
-            summary = clean_text("".join(sentences[:3]))[:360]
+            summary = to_traditional_zh("".join(sentences[:3]))[:360]
             if summary_supported_by_text(summary, text, original_title):
                 return summary, basis, "verified_from_source_text"
         prompt = (
             "你是香港繁體中文財經新聞編輯。只根據下面提供的原文內容寫新聞摘要，不可以加入推測、評論、投資建議或原文沒有的背景。\n"
-            "請輸出 2 至 3 句香港繁體中文，不要使用簡體字，必須包含原文中的具體公司/人物/數字/事件。"
+            "請輸出 2 至 3 句香港繁體中文，不要使用簡體字；公司名和人名可以保留英文，不要自行音譯。必須包含原文中的具體公司/人物/數字/事件。"
             "如果原文內容不足以摘要，請只輸出 NO_VERIFIABLE_SUMMARY。\n\n"
             f"中文題目：{title_zh}\n"
             f"原文題目：{original_title}\n"
             f"來源：{source}\n"
             f"可讀原文內容：{text[:3200]}"
         )
-        summary = call_cloudflare_ai(prompt)
+        summary = to_traditional_zh(call_cloudflare_ai(prompt))
         if summary_supported_by_text(summary, text, original_title):
             return summary, basis, "verified_from_source_text"
     return "", first_basis, "summary_unavailable_after_source_check" if first_basis else "no_verifiable_source_text"
@@ -737,7 +793,9 @@ def keyword_headline(title: str, category: str) -> str:
 def headline_to_zh(title: str, category: str) -> str:
     title = clean_text(title)
     if has_cjk(title) and not looks_mostly_english(title):
-        return title
+        if re.search(r"史上最大的 IPO.*最贵的盲盒", title):
+            return "史上最大 IPO：SpaceX 估值成為市場最貴盲盒"
+        return to_traditional_zh(title)
 
     patterns = [
         (r"SpaceX raising \$75 billion.*IPO.*Nasdaq.*", "SpaceX 擬透過破紀錄 IPO 集資 750 億美元，市場等待 Nasdaq 首日表現"),
@@ -986,8 +1044,12 @@ def validate_brief(brief: dict) -> None:
             fail(f"title_zh looks like a generic editorial placeholder: {item['title_zh']} | original: {item.get('title_original')}")
         if not has_cjk(item["title_zh"]) or looks_mostly_english(item["title_zh"]):
             fail(f"title_zh is not acceptable Traditional Chinese: {item['title_zh']}")
+        if contains_common_simplified_zh(item["title_zh"]):
+            fail(f"title_zh contains common simplified Chinese characters: {item['title_zh']}")
         if any(phrase in item["summary_zh"] for phrase in BAD_READER_PHRASES):
             fail(f"summary_zh contains bad phrase: {item['id']}")
+        if item.get("summary_zh") and contains_common_simplified_zh(item["summary_zh"]):
+            fail(f"summary_zh contains common simplified Chinese characters: {item['id']}")
         if item.get("summary_zh") and not item.get("summary_basis"):
             fail(f"summary_zh must include summary_basis: {item['id']}")
         if item.get("summary_zh") and item.get("summary_status") != "verified_from_source_text":
