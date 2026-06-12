@@ -107,10 +107,11 @@ def clean_text(value: str) -> str:
 def headline_entity(title: str) -> str:
     stop_phrases = {
         "Wall Street", "BofA", "Citi", "Mizuho", "Analyst Report", "The", "A", "An",
-        "Here", "What", "Friday", "Monday", "Tuesday", "Wednesday", "Thursday",
+        "Here", "What", "Is This", "US", "U.S", "New", "Friday", "Monday", "Tuesday", "Wednesday", "Thursday",
     }
     for phrase in re.findall(r"\b[A-Z][A-Za-z0-9&.-]*(?:\s+[A-Z][A-Za-z0-9&.-]*){0,2}\b", title or ""):
         cleaned = phrase.strip(" ,:;.-")
+        cleaned = re.sub(r"^(New|US|U\.S\.?)\s+", "", cleaned)
         if not cleaned or cleaned in stop_phrases:
             continue
         if any(part in stop_phrases for part in cleaned.split()) and len(cleaned.split()) <= 2:
@@ -237,6 +238,7 @@ def candidate_allowed(source_name: str, link: str, title: str) -> bool:
         "inherited", "no experience with investing", "what should i do with this money",
         "price target", "buy rating", "sell rating", "neutral rating",
         "remains positive on", "raises pt", "analysts bullish",
+        "is this", "best stock",
     ]
     if any(term in lower_title for term in skip_terms):
         return False
@@ -432,7 +434,7 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
         family = source_family(topic.get("source", ""))
         if category_counts.get(category, 0) >= CATEGORY_LIMIT:
             continue
-        if family_counts.get(family, 0) >= SOURCE_FAMILY_LIMIT and len(grouped) >= 10:
+        if family_counts.get(family, 0) >= SOURCE_FAMILY_LIMIT:
             continue
         grouped.append(topic)
         category_counts[category] = category_counts.get(category, 0) + 1
@@ -446,7 +448,12 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
             key = title_dedupe_key(item.get("title", ""))
             if key in used_keys:
                 continue
-            grouped.append(build_topic_candidate(cluster_key(item.get("title", "")), [item], family_counts))
+            topic = build_topic_candidate(cluster_key(item.get("title", "")), [item], family_counts)
+            family = source_family(topic.get("source", ""))
+            if family_counts.get(family, 0) >= 6 and len(grouped) >= 10:
+                continue
+            grouped.append(topic)
+            family_counts[family] = family_counts.get(family, 0) + 1
             used_keys.add(key)
             if len(grouped) >= 12:
                 break
@@ -468,7 +475,9 @@ def keyword_headline(title: str, category: str) -> str:
     if re.search(r"treasury|yield|fed|rates|inflation|cpi|producer prices|jobs", text):
         return "利率與通脹預期牽動美債和股市走向"
     if re.search(r"oil|crude|gas|commodity|dollar|yen|euro", text):
-        return "能源、外匯與商品價格成為市場焦點"
+        if entity:
+            return f"{entity} 相關價格變化牽動商品與外匯市場情緒"
+        return "能源與外匯價格波動升溫，市場重估通脹與避險交易"
     if re.search(r"autonomous|robotaxi|self-driving|waymo", text):
         return "Waymo 擴大自動駕駛服務，平台變現與城市營運能力受檢視"
     if re.search(r"\bai\b|artificial intelligence|chip|semiconductor|data center|cloud", text):
