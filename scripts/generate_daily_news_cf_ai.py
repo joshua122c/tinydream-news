@@ -48,6 +48,7 @@ SOURCE_CONFIGS = [
 
 SOURCE_FAMILY_LIMIT = 4
 CATEGORY_LIMIT = 5
+MIN_ITEM_COUNT = 10
 
 CATEGORY_TAXONOMY = [
     ("全球市場與宏觀", "global-markets-macro"),
@@ -100,6 +101,21 @@ def looks_mostly_english(value: str) -> bool:
     letters = len(re.findall(r"[A-Za-z]", value or ""))
     cjk = len(re.findall(r"[\u3400-\u9fff]", value or ""))
     return letters > 12 and letters > cjk * 1.3
+
+
+def looks_like_generic_editorial_title(value: str) -> bool:
+    text = value or ""
+    generic_fragments = [
+        "企業交易消息牽動",
+        "市場消息牽動投資者",
+        "重要財經與科技消息",
+        "相關價格變化牽動",
+    ]
+    if any(fragment in text for fragment in generic_fragments):
+        return True
+    if re.search(r"^圍繞\s+(Is|US|U\.S\.|UK|Trump|Oil|Gold|Comex)\b", text):
+        return True
+    return False
 
 
 def clean_text(value: str) -> str:
@@ -403,6 +419,20 @@ def candidate_allowed(source_name: str, link: str, title: str) -> bool:
     lower_link = (link or "").lower()
     if not lower_link.startswith(("http://", "https://")):
         return False
+    parsed = urllib.parse.urlparse(lower_link)
+    path = parsed.path.rstrip("/")
+    nav_paths = {
+        "", "/", "/site", "/site/index", "/business", "/markets", "/technology",
+        "/startups", "/wealth", "/personal-finance", "/news", "/world", "/tag",
+    }
+    if path in nav_paths:
+        return False
+    if "latepost.com" in lower_link and "/news/" not in lower_link:
+        return False
+    if "wallstreetcn.com" in lower_link and "/articles/" not in lower_link:
+        return False
+    if "caixin.com" in lower_link and not re.search(r"/20\d{2}-\d{2}-\d{2}/|/20\d{2}/", lower_link):
+        return False
     skip_terms = [
         "personal trainer", "elderly mother", "medicaid", "social security", "retirement",
         "mortgage", "home together", "inheritance", "divorce", "market talk", "sponsored",
@@ -418,12 +448,18 @@ def candidate_allowed(source_name: str, link: str, title: str) -> bool:
         "massive gap-up", "gap-up", "propels", "diane keaton", "annie hall", "bonhams", "auction",
         "adviser", "advisor", "annuities", "fire him", "fire her", "undervalued",
         "assets investors should buy", "investors should buy", "should buy if",
+        "best travel stock", "best dividend stock", "best ai stock", "best growth stock",
+        "stock portfolio", "hedge fund portfolio", "university stock portfolio",
     ]
     if any(term in lower_title for term in skip_terms):
         return False
     if re.search(r"^(i|my|we|our|these)\b|what should i|what do i", lower_title):
         return False
     if re.search(r"\b(should|could)\s+(i|we|investors)\s+(buy|sell|fire|do)\b|do we fire|should we fire|still undervalued", lower_title):
+        return False
+    if re.search(r"^is\s+.+\s+(stock\s+)?(a\s+)?(buy|sell|hold)\b|is\s+.+\s+stock\s+worth", lower_title):
+        return False
+    if re.search(r"^is\s+.+\bthe\s+best\b.*\bstock\b", lower_title):
         return False
     generic_nav_titles = {
         "media & entertainment", "banking & finance", "business", "markets",
@@ -590,11 +626,15 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
 
     unique_candidates = []
     seen_titles = set()
+    seen_urls = set()
     for item in filtered:
         key = title_dedupe_key(item["title"])
-        if not key or key in seen_titles:
+        url_key = re.sub(r"[?#].*$", "", (item.get("url") or "").lower().rstrip("/"))
+        if not key or key in seen_titles or (url_key and url_key in seen_urls):
             continue
         seen_titles.add(key)
+        if url_key:
+            seen_urls.add(url_key)
         unique_candidates.append(item)
         if len(unique_candidates) >= 72:
             break
@@ -633,7 +673,7 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
                 continue
             topic = build_topic_candidate(cluster_key(item.get("title", "")), [item], family_counts)
             family = source_family(topic.get("source", ""))
-            if family_counts.get(family, 0) >= 6 and len(grouped) >= 10:
+            if family_counts.get(family, 0) >= SOURCE_FAMILY_LIMIT:
                 continue
             grouped.append(topic)
             family_counts[family] = family_counts.get(family, 0) + 1
@@ -649,6 +689,8 @@ def keyword_headline(title: str, category: str) -> str:
     company_match = re.search(r"\b(Nvidia|Apple|Microsoft|Google|Alphabet|Amazon|Meta|Tesla|Oracle|SpaceX|OpenAI|AMD|TSMC|Intel|Broadcom|GlobalFoundries|Arm Holdings|SanDisk|Seagate|Waymo|DigitalBridge|Equinix|QXO|Beacon|Rocket Lab|Circle|Warner Bros\.? Discovery|Warner)\b", title, re.I)
     company = company_match.group(1) if company_match else ""
     entity = company or headline_entity(title)
+    if entity.lower() in {"oil", "crude", "gold", "silver", "comex", "trump", "u.s", "us"}:
+        entity = ""
     if re.search(r"coffee|cocoa|wheat|corn|tariff", text):
         return "農產品與關稅消息牽動商品價格，通脹預期再受關注"
     if re.search(r"natural gas|gas falls|gas prices", text):
@@ -701,6 +743,15 @@ def headline_to_zh(title: str, category: str) -> str:
         (r"Pimco is warning about a spike in defaults.*", "Pimco 警告違約風險升溫，收益型投資組合配置受關注"),
         (r"DeepSeek Won.*Sink U\.S\. AI Titans.*", "DeepSeek 未必拖垮美國 AI 巨頭，競爭壓力仍需重估"),
         (r"Swiss franc, Japanese yen Rise as DeepSeek News Boosts Safe Havens.*", "DeepSeek 消息推升避險需求，瑞郎和日圓走強"),
+        (r"Oil prices fall on proposed U\.S\.-Iran peace deal.*", "美伊和平協議憧憬拖低油價，市場押注霍爾木茲海峽重開"),
+        (r"Proposed Iran-U\.S\. deal would reopen Hormuz.*", "伊朗官媒稱美伊協議或重開霍爾木茲海峽並解除石油制裁"),
+        (r"Trump claims US and Iran on verge of signing peace agreement.*", "特朗普稱美伊接近簽署和平協議，德黑蘭稱尚未作最終決定"),
+        (r"Trump denies Iran's account of deal terms.*", "特朗普否認伊朗對協議條款的說法，並譴責新一輪無人機攻擊"),
+        (r"Meta reportedly begins dismantling.*Manus deal.*", "Meta 據報按北京要求拆解 Manus 交易，AI 併購監管風險升溫"),
+        (r"Sam Bankman-Fried loses bid to appeal.*FTX.*", "FTX 創辦人上訴失敗，欺詐定罪維持不變"),
+        (r"UK economy shrank by 0\.1% in April.*", "英國 4 月經濟收縮 0.1%，地緣風險拖累增長"),
+        (r"Barclays to buy GoHenry.*", "Barclays 收購兒童扣帳卡應用 GoHenry，擴大年輕客群布局"),
+        (r"Paddy Power owner Flutter to scrap listing.*London Stock Exchange.*", "Flutter 擬撤銷倫敦上市地位，重心進一步轉向美國市場"),
         (r"Treasury yields are steady after hot producer prices reading.*", "美債收益率在生產者價格數據偏熱後靠穩，市場重新評估利率路徑"),
         (r"Gold slumps to 6-month low.*", "通脹憂慮升溫但金價跌至六個月低位，避險需求未有承接"),
         (r"Trump might 'love the inflation,'.*", "通脹壓力仍困擾消費者，市場關注政策言論與民生壓力"),
@@ -839,10 +890,10 @@ def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
     usable = candidates[:12]
     if not usable:
         fail("No usable news candidates were collected from accessible sources.")
-    while len(usable) < 12:
-        usable.append(usable[len(usable) % max(1, len(usable))])
+    if len(usable) < MIN_ITEM_COUNT:
+        fail(f"Only {len(usable)} usable news candidates were collected after quality filters.")
 
-    items = [build_item(candidate, idx) for idx, candidate in enumerate(usable[:12], start=1)]
+    items = [build_item(candidate, idx) for idx, candidate in enumerate(usable, start=1)]
     categories = []
     for name, slug in CATEGORY_TAXONOMY:
         refs = [item["id"] for item in items if item["category"] == name]
@@ -900,8 +951,8 @@ def validate_brief(brief: dict) -> None:
         if phrase in text_dump:
             fail(f"Reader-facing brief contains bad phrase: {phrase}")
     items = brief.get("items")
-    if not isinstance(items, list) or len(items) < 10:
-        fail("items must contain at least 10 entries.")
+    if not isinstance(items, list) or len(items) < MIN_ITEM_COUNT:
+        fail(f"items must contain at least {MIN_ITEM_COUNT} entries.")
     item_ids = set()
     title_counts = {}
     summary_counts = {}
@@ -919,6 +970,8 @@ def validate_brief(brief: dict) -> None:
         source_family_counts[source_family(item.get("source", ""))] = source_family_counts.get(source_family(item.get("source", "")), 0) + 1
         if item["title_zh"] in BAD_GENERIC_TITLES:
             fail(f"title_zh is too generic: {item['title_zh']}")
+        if looks_like_generic_editorial_title(item["title_zh"]):
+            fail(f"title_zh looks like a generic editorial placeholder: {item['title_zh']}")
         if not has_cjk(item["title_zh"]) or looks_mostly_english(item["title_zh"]):
             fail(f"title_zh is not acceptable Traditional Chinese: {item['title_zh']}")
         if any(phrase in item["summary_zh"] for phrase in BAD_READER_PHRASES):
@@ -938,7 +991,7 @@ def validate_brief(brief: dict) -> None:
     accessible_families = {source_family(source.get("name", "")) for source in brief.get("sources", []) if source.get("access") == "Full"}
     if len(accessible_families) >= 3 and source_family_counts:
         dominant_family, dominant_count = max(source_family_counts.items(), key=lambda pair: pair[1])
-        if dominant_count > 6:
+        if dominant_count > SOURCE_FAMILY_LIMIT:
             fail(f"Source concentration too high: {dominant_family} has {dominant_count} of {len(items)} items.")
 
     hot_topics = brief.get("hot_topics")
