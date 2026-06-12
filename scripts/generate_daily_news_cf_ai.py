@@ -536,6 +536,7 @@ def candidate_allowed(source_name: str, link: str, title: str) -> bool:
         "massive gap-up", "gap-up", "propels", "diane keaton", "annie hall", "bonhams", "auction",
         "adviser", "advisor", "annuities", "fire him", "fire her", "undervalued",
         "assets investors should buy", "investors should buy", "should buy if",
+        "stocks to buy", "stock to buy", "to buy right now", "buy right now",
         "best travel stock", "best dividend stock", "best ai stock", "best growth stock",
         "stock portfolio", "hedge fund portfolio", "university stock portfolio",
         "orion cmc",
