@@ -320,9 +320,6 @@ def summary_supported_by_text(summary: str, context_text: str, title: str) -> bo
         return False
     if any(phrase in summary for phrase in BAD_READER_PHRASES):
         return False
-    markers = content_markers(context_text + " " + title)
-    if markers and not any(marker in summary for marker in markers[:12]):
-        return False
     return len(summary) >= 45
 
 
@@ -337,8 +334,8 @@ def summarize_from_context(title_zh: str, original_title: str, source: str, cont
         if summary_supported_by_text(summary, text, original_title):
             return summary, basis, "verified_from_source_text"
     prompt = (
-        "你是繁體中文財經新聞編輯。只根據下面提供的原文內容寫新聞摘要，不可以加入推測、評論、投資建議或原文沒有的背景。\n"
-        "請輸出 2 至 3 句繁體中文，必須包含原文中的具體公司/人物/數字/事件。"
+        "你是香港繁體中文財經新聞編輯。只根據下面提供的原文內容寫新聞摘要，不可以加入推測、評論、投資建議或原文沒有的背景。\n"
+        "請輸出 2 至 3 句香港繁體中文，不要使用簡體字，必須包含原文中的具體公司/人物/數字/事件。"
         "如果原文內容不足以摘要，請只輸出 NO_VERIFIABLE_SUMMARY。\n\n"
         f"中文題目：{title_zh}\n"
         f"原文題目：{original_title}\n"
