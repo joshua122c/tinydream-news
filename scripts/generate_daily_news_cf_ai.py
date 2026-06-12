@@ -135,7 +135,7 @@ def headline_entity(title: str) -> str:
     stop_phrases = {
         "Wall Street", "BofA", "Citi", "Mizuho", "Analyst Report", "The", "A", "An",
         "Here", "What", "I", "My", "We", "Is This", "US", "U.S", "New", "Friday", "Monday", "Tuesday", "Wednesday", "Thursday",
-        "Says", "Say", "Said", "Launches", "Raises", "Our", "These",
+        "Says", "Say", "Said", "Launches", "Raises", "Our", "These", "Global", "Market", "Markets",
     }
     for phrase in re.findall(r"\b[A-Z][A-Za-z0-9&.-]*(?:\s+[A-Z][A-Za-z0-9&.-]*){0,2}\b", title or ""):
         cleaned = phrase.strip(" ,:;.-")
@@ -699,7 +699,7 @@ def keyword_headline(title: str, category: str) -> str:
     company_match = re.search(r"\b(Nvidia|Apple|Microsoft|Google|Alphabet|Amazon|Meta|Tesla|Oracle|SpaceX|OpenAI|AMD|TSMC|Intel|Broadcom|GlobalFoundries|Arm Holdings|SanDisk|Seagate|Waymo|DigitalBridge|Equinix|QXO|Beacon|Rocket Lab|Circle|Warner Bros\.? Discovery|Warner)\b", title, re.I)
     company = company_match.group(1) if company_match else ""
     entity = company or headline_entity(title)
-    if entity.lower() in {"oil", "crude", "gold", "silver", "comex", "trump", "u.s", "us"}:
+    if entity.lower() in {"oil", "crude", "gold", "silver", "comex", "trump", "u.s", "us", "global", "market", "markets"}:
         entity = ""
     if re.search(r"coffee|cocoa|wheat|corn|tariff", text):
         return "農產品與關稅消息牽動商品價格，通脹預期再受關注"
@@ -982,7 +982,7 @@ def validate_brief(brief: dict) -> None:
         if item["title_zh"] in BAD_GENERIC_TITLES:
             fail(f"title_zh is too generic: {item['title_zh']}")
         if looks_like_generic_editorial_title(item["title_zh"]):
-            fail(f"title_zh looks like a generic editorial placeholder: {item['title_zh']}")
+            fail(f"title_zh looks like a generic editorial placeholder: {item['title_zh']} | original: {item.get('title_original')}")
         if not has_cjk(item["title_zh"]) or looks_mostly_english(item["title_zh"]):
             fail(f"title_zh is not acceptable Traditional Chinese: {item['title_zh']}")
         if any(phrase in item["summary_zh"] for phrase in BAD_READER_PHRASES):
