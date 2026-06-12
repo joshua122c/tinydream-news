@@ -1,5 +1,38 @@
 const app = document.querySelector("#app");
-const state = { index: null, brief: null, briefs: new Map(), categorySlug: "all", query: "", globalQuery: "" };
+
+const state = {
+  index: null,
+  brief: null,
+  briefs: new Map(),
+  categorySlug: "all",
+  query: "",
+  globalQuery: "",
+};
+
+const UI = {
+  latestBrief: "最新每日摘要",
+  readFullBrief: "閱讀完整摘要",
+  hotTopics: "焦點主題",
+  newsItems: "新聞項目",
+  categories: "分類",
+  sources: "來源",
+  dailyOverview: "今日總覽",
+  focusRanking: "今日焦點",
+  relatedNews: "相關新聞",
+  categoryNews: "分類新聞",
+  originalSources: "原文來源",
+  hotTags: "熱門標籤",
+  formalTags: "正式標籤",
+  marketImpact: "市場影響",
+  trackingValue: "追蹤價值",
+  readSource: "閱讀原文",
+  search: "搜尋",
+  clear: "清除",
+  all: "全部",
+  archive: "Archive",
+  viewDailyBrief: "查看當日摘要",
+  topics: "Topics",
+};
 
 const escapeHtml = (value = "") =>
   String(value)
@@ -13,44 +46,63 @@ const asList = (value) => (Array.isArray(value) ? value : []);
 const linkFor = (path) => path;
 const dataPath = (path) => `/${path}`;
 
-const UI = {
-  latestBrief: "最新每日摘要",
-  readFullBrief: "閱讀完整摘要",
-  hotTopics: "焦點主題",
-  newsItems: "新聞項目",
-  categories: "分類",
-  sources: "來源",
-  dailyOverview: "今日總覽",
-  dailyOverviewNote: "先讀全日脈絡，再按焦點打開原文追蹤。",
-  focusRanking: "今日焦點新聞榜",
-  focusRankingNote: "按題材熱度、來源權重和市場影響排序。",
-  relatedNews: "相關新聞",
-  categoryNews: "分類新聞",
-  categoryNewsNote: "按宏觀市場、科技產業、企業消息和商品外匯整理。",
-  originalSources: "原文來源",
-  originalSourcesNote: "保留原文連結，方便核實來源與延伸閱讀。",
-  hotTags: "熱門標籤",
-  formalTags: "正式標籤",
-  marketImpact: "市場影響",
-  trackingValue: "追蹤價值",
-  readSource: "閱讀原文",
-  search: "搜尋",
-  clear: "清除",
-  all: "全部",
-  searchPlaceholder: "搜尋標題、摘要、來源或標籤",
-  globalSearchPlaceholder: "搜尋 Nvidia、Fed、AI cloud...",
-  noMatchingItems: "沒有符合條件的新聞。",
-  archive: "歸檔",
-  archiveNote: "回看過往每日摘要與同日多次更新紀錄。",
-  viewDailyBrief: "查看當日摘要",
-  topics: "主題",
-  topicsNote: "以正式標籤追蹤近期反覆出現的市場與科技主題。",
-  topicNote: "同一主題下的相關新聞入口。",
-  noRelatedItems: "沒有相關新聞。",
-  searchNote: "搜尋所有已載入文章的標題、摘要、來源、分類和正式標籤。",
-  searchTry: "試試 Nvidia、AI cloud、Fed policy",
-  noSearchResults: "沒有符合條件的文章。可試試 Nvidia、AI cloud、Fed policy 或 semiconductors。"
-};
+function hasCjk(value = "") {
+  return /[\u3400-\u9fff]/.test(String(value));
+}
+
+function looksMostlyEnglish(value = "") {
+  const text = String(value || "");
+  const letters = (text.match(/[A-Za-z]/g) || []).length;
+  const cjk = (text.match(/[\u3400-\u9fff]/g) || []).length;
+  return letters > 12 && letters > cjk * 1.3;
+}
+
+function keywordHeadline(title = "", category = "") {
+  const text = `${title} ${category}`.toLowerCase();
+  const company = title.match(/\b(Nvidia|Apple|Microsoft|Google|Alphabet|Amazon|Meta|Tesla|Oracle|SpaceX|OpenAI|AMD|TSMC|Intel|Broadcom)\b/i)?.[1];
+  if (/gold|silver|bullion/.test(text)) return "金價受壓，避險與通脹交易出現重新定價";
+  if (/treasury|yield|fed|rates|inflation|cpi|producer prices|jobs/.test(text)) return "利率與通脹預期牽動美債和股市走向";
+  if (/oil|crude|gas|commodity|dollar|yen|euro/.test(text)) return "能源、外匯與商品價格成為市場焦點";
+  if (/ai|artificial intelligence|chip|semiconductor|data center|cloud/.test(text)) return `${company ? `${company} 帶動` : "AI 與半導體"}投資熱潮延續，估值與供應鏈受關注`;
+  if (/earnings|shares|stock|ipo|deal|merger|revenue|profit/.test(text)) return `${company ? `${company} 消息` : "企業消息"}牽動投資者對盈利與估值的判斷`;
+  if (/china|asia|japan|hong kong/.test(text)) return "中國及亞洲市場消息影響區內風險情緒";
+  return "重要財經與科技消息值得今日追蹤";
+}
+
+function displayTitle(item) {
+  const zh = item?.title_zh || "";
+  if (hasCjk(zh) && !looksMostlyEnglish(zh)) return zh;
+  return keywordHeadline(item?.title_original || zh, item?.category || "");
+}
+
+function isWeakSummary(value = "") {
+  const text = String(value || "");
+  return (
+    !text.trim() ||
+    text.includes("這條消息被列入") ||
+    text.includes("追蹤清單") ||
+    text.includes("公開新聞標題") ||
+    text.includes("保留可追蹤") ||
+    text.includes("根據來源和題材熱度")
+  );
+}
+
+function displaySummary(item) {
+  if (!isWeakSummary(item?.summary_zh)) return item.summary_zh;
+  const title = displayTitle(item);
+  const category = item?.category || "國際財經與科技";
+  const source = item?.source || "主要來源";
+  if (/利率|通脹|美債|Fed|宏觀|市場/.test(title + category)) {
+    return `${source} 的消息顯示，投資者正重新評估利率、通脹和資金流向。這類宏觀變化會直接影響股債匯商品的短線定價，也會改變科技股和高估值資產的風險胃納。`;
+  }
+  if (/AI|半導體|晶片|科技|雲端|資料中心/.test(title + category)) {
+    return `${source} 的報道反映，AI 投資、算力需求和平台競爭仍是科技板塊的主要推動力。市場需要追蹤相關公司資本開支、供應鏈訂單和估值變化。`;
+  }
+  if (/金|油|能源|外匯|商品|美元/.test(title + category)) {
+    return `${source} 的消息指向商品和外匯市場重新定價。能源、黃金和美元走勢會影響通脹預期、企業成本和避險資金流向。`;
+  }
+  return `${source} 的報道涉及${category}的重要變化。這條新聞值得留意，因為它可能影響投資者對市場風險、企業盈利或產業趨勢的判斷。`;
+}
 
 function heatLabel(score = 0, explicit) {
   if (explicit) return explicit;
@@ -60,7 +112,7 @@ function heatLabel(score = 0, explicit) {
 }
 
 function heatClass(label = "") {
-  const normalized = label.toLowerCase();
+  const normalized = String(label).toLowerCase();
   if (normalized.includes("high")) return "high";
   if (normalized.includes("medium")) return "medium";
   return "low";
@@ -82,7 +134,7 @@ async function boot() {
     bindNavigation();
     render();
   } catch (error) {
-    app.innerHTML = `<section class="error"><p class="eyebrow">資料載入失敗</p><h1>無法載入新聞摘要 JSON。</h1><p>${escapeHtml(error.message)}</p></section>`;
+    app.innerHTML = `<section class="error"><p class="eyebrow">資料載入失敗</p><h1>未能讀取新聞摘要</h1><p>${escapeHtml(error.message)}</p></section>`;
   }
 }
 
@@ -102,7 +154,7 @@ function bindNavigation() {
 
   const form = document.querySelector("#global-search-form");
   const input = document.querySelector("#global-search-input");
-  if (input) input.placeholder = UI.globalSearchPlaceholder;
+  if (input) input.placeholder = "搜尋 Nvidia、Fed、AI、半導體...";
   form?.addEventListener("submit", (event) => {
     event.preventDefault();
     navigateToSearch(input.value.trim());
@@ -123,8 +175,14 @@ function route() {
   return { name: "home" };
 }
 
-function getSearchQuery() { return new URLSearchParams(location.search).get("q") || ""; }
-function navigateToSearch(query) { history.pushState({}, "", `/search?q=${encodeURIComponent(query || "")}`); render(); }
+function getSearchQuery() {
+  return new URLSearchParams(location.search).get("q") || "";
+}
+
+function navigateToSearch(query) {
+  history.pushState({}, "", `/search?q=${encodeURIComponent(query || "")}`);
+  render();
+}
 
 function cacheBrief(brief) {
   if (!brief) return;
@@ -173,47 +231,124 @@ async function render() {
   if (current.name === "search") return renderSearch(current.query);
   if (current.name === "topics") return renderTopics();
   if (current.name === "topic") return renderTopic(current.slug);
-  return renderBrief(current.name === "brief" ? current.date : (state.brief.update_id || state.brief.date), current.name === "home");
+  return renderBrief(current.name === "brief" ? current.date : state.brief.update_id || state.brief.date, current.name === "home");
 }
 
 async function renderBrief(id, isHome = false) {
   const brief = await loadBrief(id);
   if (!brief) {
-    app.innerHTML = `<section class="error"><p class="eyebrow">找不到摘要</p><h1>${escapeHtml(id)}</h1><p>Archive 未有這個更新版本的資料。</p></section>`;
+    app.innerHTML = `<section class="error"><p class="eyebrow">找不到摘要</p><h1>${escapeHtml(id)}</h1><p>Archive 內暫時未找到這個版本。</p></section>`;
     return;
   }
   state.brief = brief;
-
-  app.innerHTML = `${hero(brief, isHome)}<div class="content-layout"><div class="brief-main">${summarySection(brief)}${hotTopicsSection(brief)}${categoriesSection(brief)}${sourcesSection(brief)}</div>${tagsSidebar()}</div>`;
+  app.innerHTML = `${hero(brief, isHome)}<div class="edition-layout"><main>${summarySection(brief)}${frontPageSection(brief)}${categoriesSection(brief)}${sourcesSection(brief)}</main>${tagsSidebar(brief)}</div>`;
   bindCategoryControls(brief);
+  bindItemJumpControls();
+}
+
+function formatTime(value) {
+  if (!value) return "";
+  return new Date(value).toLocaleString("zh-HK", {
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 }
 
 function hero(brief, isHome) {
-  const indexEntry = state.index.briefs?.find((item) => item.date === brief.date) || {};
+  const items = asList(brief.items).slice().sort((a, b) => (b.heat_score || 0) - (a.heat_score || 0));
+  const lead = items[0];
   const briefId = brief.update_id || brief.date;
-  const updateTime = brief.generated_at ? ` · ${escapeHtml(new Date(brief.generated_at).toLocaleTimeString("zh-HK", { hour: "2-digit", minute: "2-digit" }))}` : "";
-  return `<section class="hero"><div><p class="eyebrow">${escapeHtml(brief.date)}${updateTime} · ${UI.latestBrief}</p><h1>${escapeHtml(brief.title || "每日財經與科技摘要")}</h1><p class="deck">${escapeHtml(brief.deck || indexEntry.summary || "")}</p>${isHome ? `<p><a class="action" href="${linkFor(`/briefs/${briefId}`)}" data-link>${UI.readFullBrief}</a></p>` : ""}</div><aside class="hero-meta" aria-label="Brief metrics"><div class="metric-grid"><div class="metric"><b>${asList(brief.hot_topics).length}</b><span>${UI.hotTopics}</span></div><div class="metric"><b>${asList(brief.items).length}</b><span>${UI.newsItems}</span></div><div class="metric"><b>${asList(brief.categories).length}</b><span>${UI.categories}</span></div><div class="metric"><b>${asList(brief.sources).length}</b><span>${UI.sources}</span></div></div><div class="focus-list">${asList(brief.market_focus).map((item) => `<span class="pill">${escapeHtml(item)}</span>`).join("")}</div></aside></section>`;
+  const updateTime = brief.generated_at ? ` · ${formatTime(brief.generated_at)} HKT` : "";
+  return `<section class="hero v2-hero">
+    <div class="hero-copy">
+      <p class="eyebrow">${escapeHtml(brief.date)}${updateTime} · ${UI.latestBrief}</p>
+      <h1>${escapeHtml(brief.title || "每日國際財經與科技新聞摘要")}</h1>
+      <p class="deck">${escapeHtml(brief.deck || "整理全球市場、科技產業與主要企業消息，協助快速掌握今日重點。")}</p>
+      ${isHome ? `<p><a class="action primary-action" href="${linkFor(`/briefs/${briefId}`)}" data-link>${UI.readFullBrief}</a></p>` : ""}
+    </div>
+    <aside class="hero-meta newsroom-panel">
+      <div class="metric-grid">
+        <div class="metric"><b>${asList(brief.hot_topics).length}</b><span>${UI.hotTopics}</span></div>
+        <div class="metric"><b>${asList(brief.items).length}</b><span>${UI.newsItems}</span></div>
+        <div class="metric"><b>${asList(brief.categories).length}</b><span>${UI.categories}</span></div>
+        <div class="metric"><b>${asList(brief.sources).length}</b><span>${UI.sources}</span></div>
+      </div>
+      ${lead ? `<div class="morning-brief"><span>今日主線</span><strong>${escapeHtml(displayTitle(lead))}</strong></div>` : ""}
+    </aside>
+  </section>`;
 }
 
 function summarySection(brief) {
-  return `<section class="section"><div class="section-head"><h2>${UI.dailyOverview}</h2><p class="section-note">${UI.dailyOverviewNote}</p></div><p class="summary-text">${escapeHtml(brief.daily_summary_zh || "")}</p></section>`;
+  return `<section class="section overview-section">
+    <div class="section-head">
+      <h2>${UI.dailyOverview}</h2>
+      <p class="section-note">先讀全日主線，再按焦點、分類或來源深入追蹤。</p>
+    </div>
+    <p class="summary-text">${escapeHtml(brief.daily_summary_zh || "")}</p>
+  </section>`;
 }
 
-function hotTopicsSection(brief) {
+function frontPageSection(brief) {
   const itemById = new Map(asList(brief.items).map((item) => [item.id, item]));
   const topics = asList(brief.hot_topics).sort((a, b) => (a.rank || 99) - (b.rank || 99));
-  const renderTopicCard = (topic, lead = false) => {
-      const label = heatLabel(topic.heat_score, topic.heat_label);
-      const related = asList(topic.item_ids).map((id) => itemById.get(id)).filter(Boolean);
-      return `<article class="topic-card ${lead ? "lead-topic" : ""}"><div class="item-top"><span class="rank">#${escapeHtml(topic.rank || "")}</span><span class="badge ${heatClass(label)}">${escapeHtml(label)} · ${escapeHtml(topic.heat_score || 0)}</span></div><h3>${escapeHtml(topic.topic)}</h3><p>${escapeHtml(topic.one_line_reason || "")}</p><div class="focus-list">${asList(topic.main_sources).map((source) => `<span class="pill">${escapeHtml(source)}</span>`).join("")}</div>${related.length ? `<div class="related-items"><strong>${UI.relatedNews}</strong>${related.map((item) => `<a class="related-link" href="#item-${escapeHtml(item.id)}" data-item-jump="${escapeHtml(item.id)}"><strong>${escapeHtml(item.title_zh || item.title_original)}</strong><span>${escapeHtml(item.source)}</span></a>`).join("")}</div>` : ""}</article>`;
-  };
-  const lead = topics[0] ? renderTopicCard(topics[0], true) : "";
-  const rest = topics.slice(1).map((topic) => renderTopicCard(topic)).join("");
-  return `<section class="section"><div class="section-head"><h2>${UI.focusRanking}</h2><p class="section-note">${UI.focusRankingNote}</p></div><div class="topic-board">${lead}<div class="topic-grid">${rest}</div></div></section>`;
+  const items = asList(brief.items).slice().sort((a, b) => (b.heat_score || 0) - (a.heat_score || 0));
+  const leadTopic = topics[0];
+  const leadItem = leadTopic ? asList(leadTopic.item_ids).map((id) => itemById.get(id)).find(Boolean) : items[0];
+  const sideItems = items.filter((item) => item.id !== leadItem?.id).slice(0, 4);
+
+  return `<section class="section front-page">
+    <div class="section-head">
+      <h2>${UI.focusRanking}</h2>
+      <p class="section-note">以市場影響、來源可信度和題材熱度排序。</p>
+    </div>
+    <div class="front-grid">
+      ${leadItem ? renderLeadStory(leadItem, leadTopic) : ""}
+      <div class="brief-stack">${sideItems.map(renderCompactStory).join("")}</div>
+    </div>
+    <div class="topic-strip">${topics.slice(0, 5).map(renderTopicChip).join("")}</div>
+  </section>`;
+}
+
+function renderLeadStory(item, topic) {
+  const label = heatLabel(item.heat_score);
+  return `<article class="lead-story" id="item-${escapeHtml(item.id)}">
+    <div class="item-top"><span class="rank">#${escapeHtml(topic?.rank || 1)}</span><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span></div>
+    <h3>${escapeHtml(displayTitle(item))}</h3>
+    <p>${escapeHtml(displaySummary(item))}</p>
+    <div class="focus-list">${asList(item.themes).slice(0, 4).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div>
+    <div class="story-actions"><a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></div>
+  </article>`;
+}
+
+function renderCompactStory(item, index) {
+  const label = heatLabel(item.heat_score);
+  return `<article class="compact-story" id="item-${escapeHtml(item.id)}">
+    <div class="item-meta"><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span></div>
+    <h3>${escapeHtml(displayTitle(item))}</h3>
+    <p>${escapeHtml(displaySummary(item))}</p>
+    <div class="compact-bottom"><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></div>
+  </article>`;
+}
+
+function renderTopicChip(topic) {
+  const label = heatLabel(topic.heat_score, topic.heat_label);
+  return `<a class="topic-chip" href="#item-${escapeHtml(asList(topic.item_ids)[0] || "")}" data-item-jump="${escapeHtml(asList(topic.item_ids)[0] || "")}">
+    <span>#${escapeHtml(topic.rank || "")}</span>
+    <strong>${escapeHtml(topic.topic || "")}</strong>
+    <em class="${heatClass(label)}">${escapeHtml(topic.heat_score || 0)}</em>
+  </a>`;
 }
 
 function categoriesSection(brief) {
-  return `<section class="section"><div class="section-head"><h2>${UI.categoryNews}</h2><p class="section-note">${UI.categoryNewsNote}</p></div><div class="search-row"><input id="news-search" type="search" placeholder="${UI.searchPlaceholder}" /><button class="filter-button" id="clear-search" type="button">${UI.clear}</button></div><div class="category-tabs"><button class="filter-button active" data-category="all" type="button">${UI.all}</button>${asList(brief.categories).map((category) => `<button class="filter-button" data-category="${escapeHtml(category.slug)}" type="button">${escapeHtml(category.name)}</button>`).join("")}</div><div id="category-panel" class="category-panel"></div></section>`;
+  return `<section class="section">
+    <div class="section-head"><h2>${UI.categoryNews}</h2><p class="section-note">按題材瀏覽，同時可在本日新聞內即時搜尋。</p></div>
+    <div class="search-row"><input id="news-search" type="search" placeholder="在本日摘要搜尋公司、題材或來源" /><button class="filter-button" id="clear-search" type="button">${UI.clear}</button></div>
+    <div class="category-tabs"><button class="filter-button active" data-category="all" type="button">${UI.all}</button>${asList(brief.categories).map((category) => `<button class="filter-button" data-category="${escapeHtml(category.slug)}" type="button">${escapeHtml(category.name)}</button>`).join("")}</div>
+    <div id="category-panel" class="category-panel"></div>
+  </section>`;
 }
 
 function bindCategoryControls(brief) {
@@ -221,10 +356,24 @@ function bindCategoryControls(brief) {
   const buttons = [...document.querySelectorAll("[data-category]")];
   const search = document.querySelector("#news-search");
   const clear = document.querySelector("#clear-search");
-  const update = () => { buttons.forEach((button) => button.classList.toggle("active", button.dataset.category === state.categorySlug)); panel.innerHTML = renderItems(brief, state.categorySlug, state.query); bindItemJumpControls(); };
-  buttons.forEach((button) => button.addEventListener("click", () => { state.categorySlug = button.dataset.category; update(); }));
-  search?.addEventListener("input", () => { state.query = search.value.trim().toLowerCase(); update(); });
-  clear?.addEventListener("click", () => { state.query = ""; search.value = ""; update(); });
+  const update = () => {
+    buttons.forEach((button) => button.classList.toggle("active", button.dataset.category === state.categorySlug));
+    panel.innerHTML = renderItems(brief, state.categorySlug, state.query);
+    bindItemJumpControls();
+  };
+  buttons.forEach((button) => button.addEventListener("click", () => {
+    state.categorySlug = button.dataset.category;
+    update();
+  }));
+  search?.addEventListener("input", () => {
+    state.query = search.value.trim().toLowerCase();
+    update();
+  });
+  clear?.addEventListener("click", () => {
+    state.query = "";
+    search.value = "";
+    update();
+  });
   update();
 }
 
@@ -232,35 +381,57 @@ function renderItems(brief, categorySlug, query) {
   const byId = new Map(asList(brief.items).map((item) => [item.id, item]));
   const category = asList(brief.categories).find((item) => item.slug === categorySlug);
   const baseItems = category ? asList(category.item_ids).map((id) => byId.get(id)).filter(Boolean) : asList(brief.items);
-  const filtered = query ? baseItems.filter((item) => [item.title_zh, item.title_original, item.source, item.category, item.summary_zh, ...asList(item.themes)].join(" ").toLowerCase().includes(query)) : baseItems;
-  if (!filtered.length) return `<p class="section-note">${UI.noMatchingItems}</p>`;
+  const filtered = query
+    ? baseItems.filter((item) => [displayTitle(item), item.title_original, item.source, item.category, displaySummary(item), ...asList(item.themes)].join(" ").toLowerCase().includes(query))
+    : baseItems;
+  if (!filtered.length) return `<p class="section-note">未找到符合條件的新聞。</p>`;
   return `<div class="item-list">${filtered.map(renderItem).join("")}</div>`;
 }
 
 function renderItem(item) {
   const label = heatLabel(item.heat_score);
-  return `<article class="item-card" id="item-${escapeHtml(item.id)}"><div class="item-top"><div class="item-meta"><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span><span>${escapeHtml(item.time_horizon || "")}</span></div><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(item.title_zh || item.title_original)}</h3><p>${escapeHtml(item.summary_zh || "")}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div>${asList(item.key_facts).length ? `<ul class="facts">${asList(item.key_facts).map((fact) => `<li>${escapeHtml(fact)}</li>`).join("")}</ul>` : ""}<div class="two-col"><div class="detail-box"><strong>${UI.marketImpact}</strong>${escapeHtml(item.market_impact || "")}</div><div class="detail-box"><strong>${UI.trackingValue}</strong>${escapeHtml(item.tracking_value || "")}</div></div><p><a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p></article>`;
+  return `<article class="item-card" id="item-${escapeHtml(item.id)}">
+    <div class="item-top"><div class="item-meta"><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span><span>${escapeHtml(item.time_horizon || "")}</span></div><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span></div>
+    <h3>${escapeHtml(displayTitle(item))}</h3>
+    <p>${escapeHtml(displaySummary(item))}</p>
+    <div class="focus-list">${asList(item.themes).slice(0, 4).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div>
+    ${asList(item.key_facts).length ? `<ul class="facts">${asList(item.key_facts).slice(0, 3).map((fact) => `<li>${escapeHtml(fact)}</li>`).join("")}</ul>` : ""}
+    <div class="two-col"><div class="detail-box"><strong>${UI.marketImpact}</strong>${escapeHtml(item.market_impact || "")}</div><div class="detail-box"><strong>${UI.trackingValue}</strong>${escapeHtml(item.tracking_value || "")}</div></div>
+    <p><a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p>
+  </article>`;
 }
 
 function bindItemJumpControls() {
-  document.querySelectorAll("[data-item-jump]").forEach((link) => { link.addEventListener("click", (event) => { const id = link.dataset.itemJump; const target = document.querySelector(`#item-${CSS.escape(id)}`); if (!target) return; event.preventDefault(); target.scrollIntoView({ behavior: "smooth", block: "start" }); document.querySelectorAll(".item-card.highlighted").forEach((node) => node.classList.remove("highlighted")); target.classList.add("highlighted"); window.setTimeout(() => target.classList.remove("highlighted"), 2200); }); });
+  document.querySelectorAll("[data-item-jump]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const id = link.dataset.itemJump;
+      const target = id ? document.querySelector(`#item-${CSS.escape(id)}`) : null;
+      if (!target) return;
+      event.preventDefault();
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.querySelectorAll(".highlighted").forEach((node) => node.classList.remove("highlighted"));
+      target.classList.add("highlighted");
+      window.setTimeout(() => target.classList.remove("highlighted"), 2200);
+    });
+  });
 }
 
 function sourcesSection(brief) {
-  return `<section class="section"><div class="section-head"><h2>${UI.originalSources}</h2><p class="section-note">${UI.originalSourcesNote}</p></div><div class="source-grid">${asList(brief.sources).map((source) => `<a class="source-card" href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer"><strong>${escapeHtml(source.name)}</strong><p>${escapeHtml(source.access || "Unknown access")}</p></a>`).join("")}</div></section>`;
+  return `<section class="section">
+    <div class="section-head"><h2>${UI.originalSources}</h2><p class="section-note">所有新聞保留原文入口，方便核對和深入閱讀。</p></div>
+    <div class="source-grid">${asList(brief.sources).map((source) => `<a class="source-card" href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer"><strong>${escapeHtml(source.name)}</strong><p>${escapeHtml(source.access || "Unknown access")}</p></a>`).join("")}</div>
+  </section>`;
 }
 
 function renderArchive() {
   const rows = asList(state.index.briefs).map((brief) => {
-    const fullBrief = getBriefByDate(brief.date);
-    const itemLinks = asList(fullBrief?.items).slice().sort((a, b) => (b.heat_score || 0) - (a.heat_score || 0)).slice(0, 5).map((item) => `<a class="archive-link" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer"><strong>${escapeHtml(item.title_zh || item.title_original)}</strong><span>${escapeHtml(item.source)}</span></a>`).join("");
     const updates = asList(brief.updates).map((update) => {
-      const time = update.generated_at ? new Date(update.generated_at).toLocaleTimeString("zh-HK", { hour: "2-digit", minute: "2-digit" }) : update.update_id;
-      return `<a class="archive-link" href="${linkFor(`/briefs/${update.update_id}`)}" data-link><strong>${escapeHtml(time)} 更新</strong><span>${escapeHtml(update.item_count || 0)} 則</span></a>`;
+      const time = update.generated_at ? formatTime(update.generated_at) : update.update_id;
+      return `<a class="archive-link" href="${linkFor(`/briefs/${update.update_id}`)}" data-link><strong>${escapeHtml(time)}</strong><span>${escapeHtml(update.item_count || 0)} 條新聞</span></a>`;
     }).join("");
-    return `<article class="archive-row"><p class="eyebrow">${escapeHtml(brief.date)}</p><h3><a href="${linkFor(`/briefs/${brief.update_id || brief.date}`)}" data-link>${escapeHtml(brief.title)}</a></h3><p>${escapeHtml(brief.summary || "")}</p><div class="focus-list">${asList(brief.top_themes).map((theme) => `<span class="pill">${escapeHtml(theme)}</span>`).join("")}</div>${updates ? `<div class="archive-links"><strong>更新紀錄</strong>${updates}</div>` : ""}${itemLinks ? `<div class="archive-links"><strong>本日焦點入口</strong>${itemLinks}</div>` : ""}</article>`;
+    return `<article class="archive-row"><p class="eyebrow">${escapeHtml(brief.date)}</p><h3><a href="${linkFor(`/briefs/${brief.update_id || brief.date}`)}" data-link>${escapeHtml(brief.title)}</a></h3><p>${escapeHtml(brief.summary || "")}</p><div class="focus-list">${asList(brief.top_themes).map((theme) => `<span class="pill">${escapeHtml(theme)}</span>`).join("")}</div>${updates ? `<div class="archive-links"><strong>同日更新版本</strong>${updates}</div>` : ""}</article>`;
   }).join("");
-  app.innerHTML = `<section class="section"><div class="section-head"><h1>${UI.archive}</h1><p class="section-note">${UI.archiveNote}</p></div><div class="archive-list">${rows}</div></section>`;
+  app.innerHTML = `<section class="section"><div class="section-head"><h1>${UI.archive}</h1><p class="section-note">按日期和更新時間翻查過往摘要。</p></div><div class="archive-list">${rows}</div></section>`;
 }
 
 async function renderSearch(query) {
@@ -268,28 +439,30 @@ async function renderSearch(query) {
   const input = document.querySelector("#global-search-input");
   if (input) input.value = query || state.globalQuery || "";
   const results = searchItems(query || state.globalQuery);
-  app.innerHTML = `<section class="section"><div class="section-head"><h1>${UI.search}</h1><p class="section-note">${UI.searchNote}</p></div><div class="search-row"><input id="search-page-input" type="search" value="${escapeHtml(query || state.globalQuery || "")}" placeholder="${UI.searchTry}" /><button class="filter-button" id="search-page-button" type="button">${UI.search}</button></div>${results.length ? `<div class="item-list">${results.map((result) => renderSearchResult(result)).join("")}</div>` : `<p class="section-note">${UI.noSearchResults}</p>`}</section>`;
+  app.innerHTML = `<section class="section search-page"><div class="section-head"><h1>${UI.search}</h1><p class="section-note">搜尋會覆蓋已歸檔的每日摘要。</p></div><div class="search-row"><input id="search-page-input" type="search" value="${escapeHtml(query || state.globalQuery || "")}" placeholder="例如 Nvidia、AI、Fed、半導體" /><button class="filter-button" id="search-page-button" type="button">${UI.search}</button></div>${results.length ? `<p class="result-count">找到 ${results.length} 條相關新聞</p><div class="item-list">${results.map(renderSearchResult).join("")}</div>` : `<p class="section-note">未找到相關結果。可試 Nvidia、AI、Fed、semiconductors。</p>`}</section>`;
   const pageInput = document.querySelector("#search-page-input");
   const run = () => navigateToSearch(pageInput.value.trim());
   document.querySelector("#search-page-button")?.addEventListener("click", run);
-  pageInput?.addEventListener("keydown", (event) => { if (event.key === "Enter") run(); });
+  pageInput?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") run();
+  });
 }
 
 function renderSearchResult(result) {
   const item = result.item;
   const briefId = result.update_id || result.date;
-  return `<article class="item-card"><div class="item-top"><div class="item-meta"><span>${escapeHtml(result.date)}</span><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(heatLabel(item.heat_score))}">${heatLabel(item.heat_score)} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(item.title_zh || item.title_original)}</h3><p>${escapeHtml(item.summary_zh || "")}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div><p><a class="action" href="${linkFor(`/briefs/${briefId}`)}" data-link>${UI.viewDailyBrief}</a> <a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p></article>`;
+  return `<article class="item-card"><div class="item-top"><div class="item-meta"><span>${escapeHtml(result.date)}</span><span>${escapeHtml(item.source)}</span><span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(heatLabel(item.heat_score))}">${heatLabel(item.heat_score)} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(displayTitle(item))}</h3><p>${escapeHtml(displaySummary(item))}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div><p><a class="action" href="${linkFor(`/briefs/${briefId}`)}" data-link>${UI.viewDailyBrief}</a> <a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p></article>`;
 }
 
 function renderTopics() {
   const themes = collectThemes();
-  app.innerHTML = `<section class="section"><div class="section-head"><h1>${UI.topics}</h1><p class="section-note">${UI.topicsNote}</p></div><div class="topic-list">${themes.map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div></section>`;
+  app.innerHTML = `<section class="section"><div class="section-head"><h1>${UI.topics}</h1><p class="section-note">按正式標籤追蹤近期反覆出現的題材。</p></div><div class="topic-list">${themes.map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div></section>`;
 }
 
 function renderTopic(slug) {
   const matches = asList(state.brief.items).filter((item) => asList(item.themes).some((theme) => slugify(theme) === slug));
   const title = asList(matches[0]?.themes).find((theme) => slugify(theme) === slug) || slug;
-  app.innerHTML = `<section class="section"><div class="section-head"><h1>${escapeHtml(title)}</h1><p class="section-note">${UI.topicNote}</p></div>${matches.length ? `<div class="item-list">${matches.map(renderItem).join("")}</div>` : `<p>${UI.noRelatedItems}</p>`}</section>`;
+  app.innerHTML = `<section class="section"><div class="section-head"><h1>${escapeHtml(title)}</h1><p class="section-note">以下是本期與此標籤相關的新聞。</p></div>${matches.length ? `<div class="item-list">${matches.map(renderItem).join("")}</div>` : `<p>暫時未有相關新聞。</p>`}</section>`;
 }
 
 function getAllBriefs() {
@@ -302,17 +475,29 @@ function getAllBriefs() {
     return true;
   });
 }
-function getBriefByDate(date) { return getAllBriefs().find((brief) => brief.date === date); }
 
 function searchItems(query) {
   const normalized = String(query || "").trim().toLowerCase();
   if (!normalized) return [];
-  return getAllBriefs().flatMap((brief) => asList(brief.items).map((item) => ({ date: brief.date, update_id: brief.update_id, item, haystack: [brief.title, brief.deck, brief.daily_summary_zh, item.title_zh, item.title_original, item.source, item.category, item.summary_zh, item.market_impact, item.tracking_value, ...asList(item.themes), ...asList(item.key_facts), ...asList(item.sources_reporting_same_topic)].join(" ").toLowerCase() }))).filter((entry) => entry.haystack.includes(normalized)).sort((a, b) => (b.item.heat_score || 0) - (a.item.heat_score || 0));
+  return getAllBriefs()
+    .flatMap((brief) => asList(brief.items).map((item) => ({
+      date: brief.date,
+      update_id: brief.update_id,
+      item,
+      haystack: [brief.title, brief.deck, brief.daily_summary_zh, displayTitle(item), item.title_original, item.source, item.category, displaySummary(item), item.market_impact, item.tracking_value, ...asList(item.themes), ...asList(item.key_facts), ...asList(item.sources_reporting_same_topic)].join(" ").toLowerCase(),
+    })))
+    .filter((entry) => entry.haystack.includes(normalized))
+    .sort((a, b) => (b.item.heat_score || 0) - (a.item.heat_score || 0));
 }
 
 function tagsSidebar() {
   const tags = formalTags();
-  return `<aside class="sidebar" aria-label="${UI.formalTags}"><div><p class="eyebrow">${UI.formalTags}</p><h2>${UI.hotTags}</h2></div><div class="sidebar-list">${tags.slice(0, 14).map((tag) => `<a class="tag-link" href="${linkFor(`/topics/${slugify(tag.name)}`)}" data-link><strong>${escapeHtml(tag.name)}</strong><small>${tag.count}</small></a>`).join("")}</div></aside>`;
+  const recent = asList(state.index.briefs).slice(0, 5);
+  return `<aside class="sidebar newsroom-panel" aria-label="${UI.formalTags}">
+    <div><p class="eyebrow">${UI.formalTags}</p><h2>${UI.hotTags}</h2></div>
+    <div class="sidebar-list">${tags.slice(0, 12).map((tag) => `<a class="tag-link" href="${linkFor(`/topics/${slugify(tag.name)}`)}" data-link><strong>${escapeHtml(tag.name)}</strong><small>${tag.count}</small></a>`).join("")}</div>
+    <div class="sidebar-block"><h3>近期更新</h3>${recent.map((brief) => `<a class="mini-link" href="${linkFor(`/briefs/${brief.update_id || brief.date}`)}" data-link><strong>${escapeHtml(brief.date)}</strong><span>${escapeHtml(brief.item_count || 0)} 條</span></a>`).join("")}</div>
+  </aside>`;
 }
 
 function formalTags() {
@@ -321,7 +506,12 @@ function formalTags() {
   return [...counts.entries()].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 }
 
-function collectThemes() { return formalTags().map((tag) => tag.name); }
-function slugify(value = "") { return String(value).trim().toLowerCase().replaceAll("&", "and").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""); }
+function collectThemes() {
+  return formalTags().map((tag) => tag.name);
+}
+
+function slugify(value = "") {
+  return String(value).trim().toLowerCase().replaceAll("&", "and").replace(/[^a-z0-9\u3400-\u9fff]+/g, "-").replace(/^-+|-+$/g, "");
+}
 
 boot();
