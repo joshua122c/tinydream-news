@@ -236,12 +236,15 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
             continue
         extracted = extract_rss_candidates(config["name"], config["url"], body) if config["kind"] == "rss" else extract_page_candidates(config["name"], config["url"], body)
         for candidate in extracted[: config.get("max_items", 8)]:
+            lower_title = candidate.get("title", "").lower()
+            if re.search(r"personal trainer|elderly mother|medicaid|social security|retirement|mortgage|home together|inheritance|divorce", lower_title):
+                continue
             candidate["source_tier"] = config.get("tier", 3)
             candidate["category"] = infer_category(candidate.get("title", ""))
             candidate["score"] = headline_score(candidate)
             all_candidates.append(candidate)
 
-    keywords = re.compile(r"fed|inflation|treasury|yield|dollar|oil|gold|nvidia|amd|tsmc|semiconductor|chip|ai|artificial intelligence|cloud|apple|tesla|microsoft|google|meta|amazon|ipo|earnings|通脹|利率|半導體|人工智能|黃金|美元", re.I)
+    keywords = re.compile(r"fed|inflation|treasury|yield|dollar|oil|gold|nvidia|amd|tsmc|semiconductor|chip|\bai\b|artificial intelligence|cloud|apple|tesla|microsoft|google|meta|amazon|ipo|earnings|通脹|利率|半導體|人工智能|黃金|美元", re.I)
     filtered = [item for item in all_candidates if keywords.search(item["title"])]
     if len(filtered) < 24:
         filtered = all_candidates
@@ -280,7 +283,7 @@ def keyword_headline(title: str, category: str) -> str:
         return "利率與通脹預期牽動美債和股市走向"
     if re.search(r"oil|crude|gas|commodity|dollar|yen|euro", text):
         return "能源、外匯與商品價格成為市場焦點"
-    if re.search(r"ai|artificial intelligence|chip|semiconductor|data center|cloud", text):
+    if re.search(r"\bai\b|artificial intelligence|chip|semiconductor|data center|cloud", text):
         prefix = f"{company} 帶動" if company else "AI 與半導體"
         return f"{prefix}投資熱潮延續，估值與供應鏈受關注"
     if re.search(r"earnings|shares|stock|ipo|deal|merger|revenue|profit", text):
@@ -329,7 +332,7 @@ def themes_for(category: str, title: str) -> list[str]:
     themes = [category]
     if re.search(r"fed|rates|yield|treasury|inflation|cpi|jobs", text):
         themes.append("利率與通脹")
-    if re.search(r"nvidia|ai|artificial intelligence|cloud|data center", text):
+    if re.search(r"nvidia|\bai\b|artificial intelligence|cloud|data center", text):
         themes.append("AI投資熱潮")
     if re.search(r"semiconductor|chip|tsmc|amd|intel", text):
         themes.append("半導體供應鏈")
