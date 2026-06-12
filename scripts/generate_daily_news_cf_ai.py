@@ -141,9 +141,14 @@ SIMPLIFIED_TO_TRADITIONAL_PHRASES = [
     ("创下", "創下"),
     ("纪录", "紀錄"),
     ("经济", "經濟"),
+    ("业务", "業務"),
+    ("数据", "數據"),
+    ("系统", "系統"),
+    ("员工", "員工"),
     ("制裁", "制裁"),
     ("启动", "啟動"),
     ("认购", "認購"),
+    ("分析师", "分析師"),
     ("极其", "極其"),
     ("负责", "負責"),
     ("电话", "電話"),
@@ -153,9 +158,11 @@ SIMPLIFIED_TO_TRADITIONAL_PHRASES = [
     ("顶级", "頂級"),
     ("投资者", "投資者"),
     ("到场", "到場"),
+    ("机构", "機構"),
     ("分支机构", "分支機構"),
     ("线上", "線上"),
     ("散户", "散戶"),
+    ("马斯克", "馬斯克"),
     ("这一次", "這一次"),
     ("请", "請"),
     ("最贵", "最貴"),
@@ -167,6 +174,7 @@ SIMPLIFIED_TO_TRADITIONAL_PHRASES = [
     ("将", "將"),
     ("让", "讓"),
     ("与", "與"),
+    ("为", "為"),
 ]
 
 
@@ -178,7 +186,7 @@ def to_traditional_zh(value: str) -> str:
 
 
 def contains_common_simplified_zh(value: str) -> bool:
-    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个"
+    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统"
     return any(char in (value or "") for char in simplified_chars)
 
 
@@ -1049,7 +1057,7 @@ def validate_brief(brief: dict) -> None:
         if any(phrase in item["summary_zh"] for phrase in BAD_READER_PHRASES):
             fail(f"summary_zh contains bad phrase: {item['id']}")
         if item.get("summary_zh") and contains_common_simplified_zh(item["summary_zh"]):
-            fail(f"summary_zh contains common simplified Chinese characters: {item['id']}")
+            fail(f"summary_zh contains common simplified Chinese characters: {item['id']} | summary: {item['summary_zh'][:180]}")
         if item.get("summary_zh") and not item.get("summary_basis"):
             fail(f"summary_zh must include summary_basis: {item['id']}")
         if item.get("summary_zh") and item.get("summary_status") != "verified_from_source_text":
