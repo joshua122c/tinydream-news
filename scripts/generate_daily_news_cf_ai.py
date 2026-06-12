@@ -60,7 +60,7 @@ CATEGORY_TAXONOMY = [
 
 REQUIRED_BRIEF_FIELDS = ["date", "title", "deck", "daily_summary_zh", "market_focus", "hot_topics", "categories", "items", "sources", "generated_at"]
 REQUIRED_HOT_TOPIC_FIELDS = ["rank", "topic", "heat_score", "heat_label", "source_count", "main_sources", "item_ids", "one_line_reason", "reporter_angle"]
-REQUIRED_ITEM_FIELDS = ["id", "date", "title_original", "title_zh", "source", "url", "published_at", "category", "themes", "summary_zh", "key_facts", "market_impact", "reporter_angle", "importance_score", "heat_score", "source_count", "sources_reporting_same_topic", "position_signal", "time_horizon", "tracking_value"]
+REQUIRED_ITEM_FIELDS = ["id", "date", "title_original", "title_zh", "source", "url", "published_at", "category", "themes", "summary_zh", "summary_basis", "summary_status", "key_facts", "market_impact", "reporter_angle", "importance_score", "heat_score", "source_count", "sources_reporting_same_topic", "position_signal", "time_horizon", "tracking_value"]
 
 BAD_READER_PHRASES = [
     "這條消息被列入",
@@ -70,6 +70,10 @@ BAD_READER_PHRASES = [
     "JSON",
     "fallback",
     "保底模式",
+    "市場真正關心的是",
+    "投資者需要留意",
+    "聚焦 AI 應用",
+    "仍是今日市場主線",
 ]
 
 BAD_GENERIC_TITLES = {
@@ -100,14 +104,20 @@ def looks_mostly_english(value: str) -> bool:
 
 def clean_text(value: str) -> str:
     value = re.sub(r"<[^>]+>", " ", value or "")
+    value = re.sub(r"<!\[CDATA\[(.*?)\]\]>", r"\1", value, flags=re.S)
     value = html.unescape(value)
     return re.sub(r"\s+", " ", value).strip()
+
+
+def clean_feed_text(value: str) -> str:
+    value = re.sub(r"<!\[CDATA\[(.*?)\]\]>", r"\1", value or "", flags=re.S)
+    return clean_text(value)
 
 
 def headline_entity(title: str) -> str:
     stop_phrases = {
         "Wall Street", "BofA", "Citi", "Mizuho", "Analyst Report", "The", "A", "An",
-        "Here", "What", "Is This", "US", "U.S", "New", "Friday", "Monday", "Tuesday", "Wednesday", "Thursday",
+        "Here", "What", "I", "My", "We", "Is This", "US", "U.S", "New", "Friday", "Monday", "Tuesday", "Wednesday", "Thursday",
     }
     for phrase in re.findall(r"\b[A-Z][A-Za-z0-9&.-]*(?:\s+[A-Z][A-Za-z0-9&.-]*){0,2}\b", title or ""):
         cleaned = phrase.strip(" ,:;.-")
@@ -163,21 +173,180 @@ def extract_rss_candidates(source_name: str, url: str, body: str) -> list[dict]:
         title_match = re.search(r"<title[^>]*>(.*?)</title>", item, re.I | re.S)
         link_match = re.search(r"<link[^>]*>(.*?)</link>", item, re.I | re.S)
         date_match = re.search(r"<pubDate[^>]*>(.*?)</pubDate>", item, re.I | re.S)
+        desc_match = re.search(r"<description[^>]*>(.*?)</description>", item, re.I | re.S)
+        content_match = re.search(r"<content:encoded[^>]*>(.*?)</content:encoded>", item, re.I | re.S)
         if not title_match:
             continue
         title = clean_text(title_match.group(1))
         link = clean_text(link_match.group(1)) if link_match else url
         if not (12 <= len(title) <= 180):
             continue
+        summary_hint = clean_feed_text((content_match or desc_match).group(1)) if (content_match or desc_match) else ""
         candidates.append({
             "source": source_name,
             "title": title,
             "url": absolute_url(url, link),
             "published_at_hint": clean_text(date_match.group(1)) if date_match else "",
+            "summary_hint": summary_hint,
+            "summary_hint_basis": "rss_description" if summary_hint else "",
         })
         if len(candidates) >= 30:
             break
     return candidates
+
+
+def text_is_useful_summary(value: str, title: str = "") -> bool:
+    text = clean_text(value)
+    if len(text) < 80:
+        return False
+    lower = text.lower()
+    if any(skip in lower for skip in ["subscribe", "newsletter", "cookie", "sign up", "advertisement", "all rights reserved"]):
+        return False
+    title_key = re.sub(r"[^a-z0-9\u3400-\u9fff]+", "", (title or "").lower())
+    text_key = re.sub(r"[^a-z0-9\u3400-\u9fff]+", "", lower)
+    return not (title_key and text_key.startswith(title_key) and len(text_key) < len(title_key) + 80)
+
+
+def extract_meta_description(body: str) -> str:
+    patterns = [
+        r"<meta\b[^>]*(?:name|property)=[\"'](?:description|og:description|twitter:description)[\"'][^>]*content=[\"']([^\"']+)[\"'][^>]*>",
+        r"<meta\b[^>]*content=[\"']([^\"']+)[\"'][^>]*(?:name|property)=[\"'](?:description|og:description|twitter:description)[\"'][^>]*>",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, body or "", flags=re.I | re.S)
+        if match:
+            return clean_text(match.group(1))
+    return ""
+
+
+def extract_jsonld_article_text(body: str) -> str:
+    pieces = []
+    for script in re.findall(r"<script[^>]+type=[\"']application/ld\+json[\"'][^>]*>(.*?)</script>", body or "", flags=re.I | re.S):
+        text = clean_text(script)
+        for key in ["articleBody", "description"]:
+            match = re.search(rf'"{key}"\s*:\s*"((?:\\.|[^"\\])*)"', text, flags=re.S)
+            if match:
+                try:
+                    pieces.append(json.loads(f'"{match.group(1)}"'))
+                except Exception:
+                    pieces.append(match.group(1))
+    return clean_text(" ".join(pieces))
+
+
+def extract_article_body_text(body: str) -> str:
+    html_body = re.sub(r"<(script|style|noscript|svg|footer|header|nav)\b.*?</\1>", " ", body or "", flags=re.I | re.S)
+    paragraphs = []
+    seen = set()
+    for raw in re.findall(r"<p\b[^>]*>(.*?)</p>", html_body, flags=re.I | re.S):
+        paragraph = clean_text(raw)
+        lower = paragraph.lower()
+        if not (70 <= len(paragraph) <= 900):
+            continue
+        if any(skip in lower for skip in ["subscribe", "newsletter", "advertisement", "cookies", "sign up", "all rights reserved", "read more"]):
+            continue
+        key = paragraph[:120].lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        paragraphs.append(paragraph)
+        if sum(len(p) for p in paragraphs) >= 2600:
+            break
+    return clean_text(" ".join(paragraphs))
+
+
+def article_context(candidate: dict) -> dict:
+    title = clean_text(candidate.get("title", ""))
+    hint = clean_text(candidate.get("summary_hint", ""))
+    context = {"basis": "", "text": "", "url_status": 0}
+    status, body = fetch_url(candidate.get("url", ""))
+    context["url_status"] = status
+    if status == 200:
+        article_text = extract_article_body_text(body)
+        if text_is_useful_summary(article_text, title) and len(article_text) >= 350:
+            return {"basis": "article_body", "text": article_text[:3600], "url_status": status}
+        jsonld_text = extract_jsonld_article_text(body)
+        if text_is_useful_summary(jsonld_text, title):
+            return {"basis": "jsonld_article", "text": jsonld_text[:3000], "url_status": status}
+        meta = extract_meta_description(body)
+        if text_is_useful_summary(meta, title):
+            return {"basis": "meta_description", "text": meta[:1200], "url_status": status}
+    if text_is_useful_summary(hint, title):
+        return {"basis": candidate.get("summary_hint_basis") or "rss_description", "text": hint[:1600], "url_status": status}
+    return context
+
+
+def call_cloudflare_ai(prompt: str) -> str:
+    account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
+    token = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
+    model = os.environ.get("CF_AI_MODEL", "@cf/qwen/qwen2.5-coder-32b-instruct").strip()
+    if not (account_id and token and model):
+        return ""
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{urllib.parse.quote(model, safe='@/-')}"
+    payload = json.dumps({"messages": [{"role": "user", "content": prompt}], "max_tokens": 420}, ensure_ascii=False).encode("utf-8")
+    request = urllib.request.Request(
+        url,
+        data=payload,
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json", "User-Agent": USER_AGENT},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=45) as response:
+            data = json.loads(response.read().decode("utf-8", errors="replace"))
+    except Exception as exc:
+        print(f"Cloudflare AI summary failed: {exc}")
+        return ""
+    result = data.get("result") if isinstance(data, dict) else {}
+    if isinstance(result, dict):
+        return clean_text(result.get("response") or result.get("text") or result.get("answer") or "")
+    return clean_text(result if isinstance(result, str) else "")
+
+
+def content_markers(value: str) -> list[str]:
+    markers = []
+    for token in re.findall(r"\$?\b[A-Z][A-Za-z0-9&.-]{1,}(?:\s+[A-Z][A-Za-z0-9&.-]{1,}){0,2}\b|\b\d+(?:[.,]\d+)?%?\b", value or ""):
+        token = token.strip(" ,.;:()[]")
+        if len(token) < 2 or token in {"The", "This", "That", "For", "New", "US"}:
+            continue
+        markers.append(token)
+    return list(dict.fromkeys(markers))[:20]
+
+
+def summary_supported_by_text(summary: str, context_text: str, title: str) -> bool:
+    if not summary or "NO_VERIFIABLE_SUMMARY" in summary:
+        return False
+    if not has_cjk(summary):
+        return False
+    if any(phrase in summary for phrase in BAD_READER_PHRASES):
+        return False
+    markers = content_markers(context_text + " " + title)
+    if markers and not any(marker in summary for marker in markers[:12]):
+        return False
+    return len(summary) >= 45
+
+
+def summarize_from_context(title_zh: str, original_title: str, source: str, context: dict) -> tuple[str, str, str]:
+    text = clean_text(context.get("text", ""))
+    basis = context.get("basis", "")
+    if not text:
+        return "", "", "no_verifiable_source_text"
+    if has_cjk(text):
+        sentences = re.split(r"(?<=[。！？])", text)
+        summary = clean_text("".join(sentences[:3]))[:360]
+        if summary_supported_by_text(summary, text, original_title):
+            return summary, basis, "verified_from_source_text"
+    prompt = (
+        "你是繁體中文財經新聞編輯。只根據下面提供的原文內容寫新聞摘要，不可以加入推測、評論、投資建議或原文沒有的背景。\n"
+        "請輸出 2 至 3 句繁體中文，必須包含原文中的具體公司/人物/數字/事件。"
+        "如果原文內容不足以摘要，請只輸出 NO_VERIFIABLE_SUMMARY。\n\n"
+        f"中文題目：{title_zh}\n"
+        f"原文題目：{original_title}\n"
+        f"來源：{source}\n"
+        f"可讀原文內容：{text[:3200]}"
+    )
+    summary = call_cloudflare_ai(prompt)
+    if summary_supported_by_text(summary, text, original_title):
+        return summary, basis, "verified_from_source_text"
+    return "", basis, "summary_unavailable_after_source_check"
 
 
 def source_label(source_name: str) -> str:
@@ -236,11 +405,14 @@ def candidate_allowed(source_name: str, link: str, title: str) -> bool:
         "cramer's top 10", "best deep value stock", "invest in now", "top stocks to buy",
         "focus list", "analyst picks", "analyst report:",
         "inherited", "no experience with investing", "what should i do with this money",
+        " i ", " my ", " what should ", "what do i",
         "price target", "buy rating", "sell rating", "neutral rating",
         "remains positive on", "raises pt", "analysts bullish",
         "is this", "best stock",
     ]
     if any(term in lower_title for term in skip_terms):
+        return False
+    if re.search(r"^(i|my|we)\b|what should i|what do i", lower_title):
         return False
     generic_nav_titles = {
         "media & entertainment", "banking & finance", "business", "markets",
@@ -559,44 +731,6 @@ def source_phrase(sources: list[str]) -> str:
     return sources[0] if sources else "主要來源"
 
 
-def editorial_summary(title_zh: str, original_title: str, category: str, sources: list[str], cluster: str = "") -> str:
-    text = f"{title_zh} {original_title} {category} {cluster}".lower()
-    source_text = source_phrase(sources)
-    if cluster == "spacex":
-        return f"{source_text}同時提到 SpaceX 上市、配售或估值相關消息，顯示市場不只在看單一 IPO 故事，也在評估私人科技巨頭上市後對風險偏好、財富效應和成長股估值的牽動。若後續定價或監管討論升溫，相關情緒可能外溢到太空、國防科技和高估值成長股。"
-    if cluster == "rates-inflation":
-        return f"{source_text}的報道集中在通脹、利率或美債收益率變化。這類消息會先影響美元和債市，再傳導到科技股估值、金融股利差和整體風險胃納，因此需要把數據本身與市場對 Fed 路徑的重新定價放在一起看。"
-    if cluster == "ai-platforms":
-        return f"{source_text}聚焦 AI 應用、雲端平台或算力投資。市場真正關心的是需求能否支撐資本開支，以及競爭壓力會否壓縮大型科技公司的利潤率；這會決定 AI 交易是繼續擴散，還是轉向挑選能兌現現金流的公司。"
-    if cluster == "semiconductors":
-        return f"{source_text}把焦點放在晶片、算力和供應鏈。半導體仍是 AI 基建的瓶頸與估值錨點，任何需求、產能或主要客戶採購節奏的變化，都可能快速反映到晶片股、設備商和資料中心概念股。"
-    if cluster == "iran-oil":
-        return f"{source_text}指向中東或原油供應風險。油價若因地緣消息重新定價，會同時影響通脹預期、航空與運輸成本、能源股表現和央行政策敘事，是宏觀與商品市場需要同步追蹤的變數。"
-    if cluster == "gold":
-        return f"{source_text}關注黃金或貴金屬價格變化。金價的訊號通常來自避險需求、美元和實質利率三方拉扯；若貴金屬走勢與通脹敘事背離，反而更能反映資金正在優先交易債息或美元。"
-    if cluster == "big-tech":
-        return f"{source_text}涉及大型科技公司的股價、盈利或策略消息。這類新聞的重點不只在單一公司，而是市場是否重新調整對平台型企業的成長、AI 投入回報和估值溢價的假設。"
-    if cluster == "china-asia":
-        return f"{source_text}提供中國或亞洲市場線索。區內政策、需求和供應鏈變化會透過股匯市場、科技硬件訂單和資金流傳導，適合與全球風險情緒一併觀察。"
-    if category == "全球市場與宏觀":
-        return f"{source_text}的報道反映宏觀數據、利率預期和資金流向仍是今日市場主線。投資者需要留意美債收益率、美元和股市估值如何回應，因為同一組數據可能同時改變風險胃納和科技股定價。"
-    if category == "科技、AI與平台":
-        return f"{source_text}顯示科技板塊的焦點仍集中在 AI 應用、雲端平台和算力投入。相關消息不只影響單一公司股價，也會牽動投資者對軟件、基建和資料中心需求的中期判斷。"
-    if category == "半導體與供應鏈":
-        return f"{source_text}的半導體消息是 AI 產業鏈的關鍵觀察點。晶片需求、供應鏈交付和資本開支預期，會直接影響市場對硬件公司和上游供應商的估值。"
-    if category == "企業、財報與交易":
-        return f"{source_text}的企業消息反映投資者正在重新衡量盈利能見度、現金流和估值水平。若事件涉及融資、併購或上市預期，後續仍要觀察市場是否把個別消息擴散到同業板塊。"
-    if category == "能源、外匯與商品":
-        if re.search(r"gold|黃金|金價", text):
-            return f"{source_text}指向金價走勢與避險需求、實質利率之間的拉扯。即使通脹憂慮存在，若美元或債息偏強，黃金仍可能面對資金流出和短線拋壓。"
-        if re.search(r"oil|crude|原油|能源", text):
-            return f"{source_text}的能源消息會影響通脹預期、企業成本和地緣風險定價。市場接下來會關注供應消息是否轉化為更廣泛的商品價格壓力。"
-        return f"{source_text}顯示商品和外匯市場正在重新反映通脹、利率和避險需求。這類價格變化往往會快速傳導到股市板塊輪動和企業成本預期。"
-    if category == "中國與亞洲觀察":
-        return f"{source_text}的亞洲市場消息反映區內政策、需求和供應鏈仍有變化。這類新聞需要與全球資金流和科技產業鏈一併觀察，才能判斷影響是否只限本地市場。"
-    return f"{source_text}指出今日國際財經與科技市場出現值得留意的變化。投資者可先掌握事件方向，再透過原文連結核對細節和後續發展。"
-
-
 def market_impact(category: str) -> str:
     impacts = {
         "全球市場與宏觀": "可能影響美債收益率、美元、股票估值和高風險資產配置。",
@@ -640,6 +774,12 @@ def build_item(candidate: dict, idx: int) -> dict:
     ]
     if related_titles:
         key_facts.append("代表性原始標題：" + "；".join(related_titles[:2]))
+    context = article_context(candidate)
+    summary_zh, summary_basis, summary_status = summarize_from_context(title_zh, original_title, source, context)
+    if summary_basis:
+        key_facts.append(f"摘要依據：{summary_basis}")
+    else:
+        key_facts.append("摘要狀態：未取得可核實正文或描述")
     return {
         "id": f"{TODAY}-headline-{idx:03d}",
         "date": TODAY,
@@ -650,17 +790,19 @@ def build_item(candidate: dict, idx: int) -> dict:
         "published_at": candidate.get("published_at_hint") or GENERATED_AT,
         "category": category,
         "themes": themes_for(category, original_title),
-        "summary_zh": editorial_summary(title_zh, " ".join(related_titles or [original_title]), category, same_topic_sources, cluster),
+        "summary_zh": summary_zh,
+        "summary_basis": summary_basis,
+        "summary_status": summary_status,
         "key_facts": key_facts[:4],
-        "market_impact": market_impact(category),
-        "reporter_angle": tracking_value(category),
+        "market_impact": "",
+        "reporter_angle": "",
         "importance_score": max(5, min(10, 11 - idx // 2)),
         "heat_score": heat_score,
         "source_count": source_count,
         "sources_reporting_same_topic": same_topic_sources,
         "position_signal": "merged_topic" if source_count > 1 or len(related) > 1 else "ranked_headline",
         "time_horizon": "short_term",
-        "tracking_value": tracking_value(category),
+        "tracking_value": "",
         "topic_key": cluster,
     }
 
@@ -761,7 +903,8 @@ def validate_brief(brief: dict) -> None:
             fail(f"Duplicate item id: {item['id']}")
         item_ids.add(item["id"])
         title_counts[item["title_zh"]] = title_counts.get(item["title_zh"], 0) + 1
-        summary_counts[item["summary_zh"]] = summary_counts.get(item["summary_zh"], 0) + 1
+        if item.get("summary_zh"):
+            summary_counts[item["summary_zh"]] = summary_counts.get(item["summary_zh"], 0) + 1
         source_family_counts[source_family(item.get("source", ""))] = source_family_counts.get(source_family(item.get("source", "")), 0) + 1
         if item["title_zh"] in BAD_GENERIC_TITLES:
             fail(f"title_zh is too generic: {item['title_zh']}")
@@ -769,6 +912,10 @@ def validate_brief(brief: dict) -> None:
             fail(f"title_zh is not acceptable Traditional Chinese: {item['title_zh']}")
         if any(phrase in item["summary_zh"] for phrase in BAD_READER_PHRASES):
             fail(f"summary_zh contains bad phrase: {item['id']}")
+        if item.get("summary_zh") and not item.get("summary_basis"):
+            fail(f"summary_zh must include summary_basis: {item['id']}")
+        if item.get("summary_zh") and item.get("summary_status") != "verified_from_source_text":
+            fail(f"summary_zh must be verified from source text: {item['id']}")
         if not isinstance(item.get("source_count"), int) or item["source_count"] < 1:
             fail(f"source_count must be a positive integer: {item['id']}")
     duplicate_titles = [title for title, count in title_counts.items() if count > 1]
