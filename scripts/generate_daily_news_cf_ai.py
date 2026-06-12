@@ -28,20 +28,26 @@ DAILY_LATEST_PATH = BRIEFS_DIR / f"{TODAY}.json"
 USER_AGENT = "Mozilla/5.0 (compatible; TinyDreamNewsRadar/2.0; +https://news.tinydreamlab.com/)"
 
 SOURCE_CONFIGS = [
-    {"name": "Reuters Markets", "url": "https://www.reuters.com/markets/", "kind": "page", "tier": 1, "max_items": 10},
-    {"name": "Reuters Technology", "url": "https://www.reuters.com/technology/", "kind": "page", "tier": 1, "max_items": 8},
-    {"name": "CNBC Top News", "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html", "kind": "rss", "tier": 1, "max_items": 10},
-    {"name": "CNBC Markets", "url": "https://www.cnbc.com/markets/", "kind": "page", "tier": 1, "max_items": 8},
-    {"name": "CNBC Technology", "url": "https://www.cnbc.com/technology/", "kind": "page", "tier": 1, "max_items": 8},
+    {"name": "Reuters Markets", "url": "https://www.reuters.com/markets/", "kind": "page", "tier": 1, "max_items": 12},
+    {"name": "Reuters Technology", "url": "https://www.reuters.com/technology/", "kind": "page", "tier": 1, "max_items": 10},
+    {"name": "CNBC Top News", "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html", "kind": "rss", "tier": 1, "max_items": 6},
+    {"name": "CNBC Markets", "url": "https://www.cnbc.com/markets/", "kind": "page", "tier": 1, "max_items": 5},
+    {"name": "CNBC Technology", "url": "https://www.cnbc.com/technology/", "kind": "page", "tier": 1, "max_items": 5},
     {"name": "WSJ Markets", "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml", "kind": "rss", "tier": 1, "max_items": 8},
     {"name": "WSJ Technology", "url": "https://feeds.a.dj.com/rss/RSSWSJD.xml", "kind": "rss", "tier": 1, "max_items": 6},
+    {"name": "Yahoo Finance", "url": "https://finance.yahoo.com/news/rssindex", "kind": "rss", "tier": 2, "max_items": 8},
     {"name": "MarketWatch Top Stories", "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories", "kind": "rss", "tier": 2, "max_items": 8},
+    {"name": "The Guardian Business", "url": "https://www.theguardian.com/business/rss", "kind": "rss", "tier": 2, "max_items": 6},
+    {"name": "Nikkei Asia Business", "url": "https://asia.nikkei.com/Business", "kind": "page", "tier": 2, "max_items": 5},
     {"name": "TechCrunch AI", "url": "https://techcrunch.com/category/artificial-intelligence/", "kind": "page", "tier": 2, "max_items": 6},
     {"name": "TechCrunch Startups", "url": "https://techcrunch.com/category/startups/", "kind": "page", "tier": 2, "max_items": 5},
     {"name": "Wallstreetcn", "url": "https://wallstreetcn.com/", "kind": "page", "tier": 3, "max_items": 3},
     {"name": "Caixin", "url": "https://www.caixin.com/", "kind": "page", "tier": 3, "max_items": 3},
     {"name": "LatePost", "url": "https://www.latepost.com/", "kind": "page", "tier": 3, "max_items": 3},
 ]
+
+SOURCE_FAMILY_LIMIT = 4
+CATEGORY_LIMIT = 5
 
 CATEGORY_TAXONOMY = [
     ("全球市場與宏觀", "global-markets-macro"),
@@ -65,6 +71,12 @@ BAD_READER_PHRASES = [
     "fallback",
     "保底模式",
 ]
+
+BAD_GENERIC_TITLES = {
+    "重要財經與科技消息值得今日追蹤",
+    "能源、外匯與商品價格成為市場焦點",
+    "企業消息牽動投資者對盈利與估值的判斷",
+}
 
 
 def fail(message: str) -> None:
@@ -90,6 +102,21 @@ def clean_text(value: str) -> str:
     value = re.sub(r"<[^>]+>", " ", value or "")
     value = html.unescape(value)
     return re.sub(r"\s+", " ", value).strip()
+
+
+def headline_entity(title: str) -> str:
+    stop_phrases = {
+        "Wall Street", "BofA", "Citi", "Mizuho", "Analyst Report", "The", "A", "An",
+        "Here", "What", "Friday", "Monday", "Tuesday", "Wednesday", "Thursday",
+    }
+    for phrase in re.findall(r"\b[A-Z][A-Za-z0-9&.-]*(?:\s+[A-Z][A-Za-z0-9&.-]*){0,2}\b", title or ""):
+        cleaned = phrase.strip(" ,:;.-")
+        if not cleaned or cleaned in stop_phrases:
+            continue
+        if any(part in stop_phrases for part in cleaned.split()) and len(cleaned.split()) <= 2:
+            continue
+        return cleaned
+    return ""
 
 
 def absolute_url(base_url: str, href: str) -> str:
@@ -154,12 +181,17 @@ def extract_rss_candidates(source_name: str, url: str, body: str) -> list[dict]:
 
 def source_label(source_name: str) -> str:
     labels = {
+        "Reuters Markets": "Reuters Markets",
+        "Reuters Technology": "Reuters Technology",
         "CNBC Top News": "CNBC",
         "CNBC Markets": "CNBC Markets",
         "CNBC Technology": "CNBC Technology",
         "WSJ Markets": "WSJ Markets",
         "WSJ Technology": "WSJ Technology",
+        "Yahoo Finance": "Yahoo Finance",
         "MarketWatch Top Stories": "MarketWatch",
+        "The Guardian Business": "The Guardian",
+        "Nikkei Asia Business": "Nikkei Asia",
         "TechCrunch AI": "TechCrunch AI",
         "TechCrunch Startups": "TechCrunch",
         "Wallstreetcn": "華爾街見聞",
@@ -169,18 +201,76 @@ def source_label(source_name: str) -> str:
     return labels.get(source_name, source_name or "主要來源")
 
 
+def source_family(source_name: str) -> str:
+    text = (source_name or "").lower()
+    if "cnbc" in text:
+        return "CNBC"
+    if "reuters" in text:
+        return "Reuters"
+    if "wsj" in text or "wall street journal" in text:
+        return "WSJ"
+    if "marketwatch" in text:
+        return "MarketWatch"
+    if "yahoo" in text:
+        return "Yahoo Finance"
+    if "guardian" in text:
+        return "The Guardian"
+    if "nikkei" in text:
+        return "Nikkei Asia"
+    if "techcrunch" in text:
+        return "TechCrunch"
+    return source_label(source_name)
+
+
+def candidate_allowed(source_name: str, link: str, title: str) -> bool:
+    lower_title = (title or "").lower()
+    lower_link = (link or "").lower()
+    if not lower_link.startswith(("http://", "https://")):
+        return False
+    skip_terms = [
+        "personal trainer", "elderly mother", "medicaid", "social security", "retirement",
+        "mortgage", "home together", "inheritance", "divorce", "market talk", "sponsored",
+        "newsletter", "podcast", "watch live", "live updates", "stock futures are little changed",
+        "plumber", "toilet", "cistern", "do i pay again", "should i pay",
+        "cramer's top 10", "best deep value stock", "invest in now", "top stocks to buy",
+        "focus list", "analyst picks", "analyst report:",
+        "inherited", "no experience with investing", "what should i do with this money",
+        "price target", "buy rating", "sell rating", "neutral rating",
+        "remains positive on", "raises pt", "analysts bullish",
+    ]
+    if any(term in lower_title for term in skip_terms):
+        return False
+    generic_nav_titles = {
+        "media & entertainment", "banking & finance", "business", "markets",
+        "technology", "startups", "wealth", "personal finance",
+    }
+    if lower_title in generic_nav_titles:
+        return False
+    word_count = len(re.findall(r"[A-Za-z\u3400-\u9fff][A-Za-z0-9\u3400-\u9fff-]*", title or ""))
+    important_terms = re.search(r"fed|inflation|treasury|yield|oil|gold|coffee|tariff|ai|chip|ipo|earnings|acquire|deal|merger|shares|stock|china|japan|asia", lower_title)
+    if word_count < 4 and not important_terms:
+        return False
+    if any(part in lower_link for part in ["/video/", "/watch/", "/pro/", "/select/", "/personal-finance/", "/quotes/"]):
+        return False
+    if "cnbc.com" in lower_link and not re.search(r"/20\d{2}/\d{2}/\d{2}/", lower_link):
+        return False
+    if "reuters.com" in lower_link and not re.search(r"/(markets|technology|business|world)/", lower_link):
+        return False
+    return True
+
+
 def infer_category(title: str) -> str:
     text = title.lower()
-    if re.search(r"nvidia|amd|tsmc|intel|broadcom|semiconductor|chip|chips|晶片|半導體", text):
+    if re.search(r"nvidia|amd|tsmc|intel|broadcom|globalfoundries|arm holdings|sandisk|seagate|semiconductor|chip|chips|晶片|半導體", text):
         return "半導體與供應鏈"
     if re.search(r"\bai\b|artificial intelligence|openai|cloud|data center|datacenter|software|平台|人工智能|雲端", text):
         return "科技、AI與平台"
     if re.search(r"fed|fomc|inflation|cpi|pce|yield|treasury|jobs|rates|producer prices|recession|通脹|利率|美債|就業", text):
         return "全球市場與宏觀"
-    if re.search(r"earnings|deal|merger|ipo|stock|shares|profit|revenue|buyback|財報|併購|上市|股份", text):
-        return "企業、財報與交易"
-    if re.search(r"oil|gas|gold|silver|dollar|yen|euro|commodity|crude|能源|黃金|美元|外匯|商品", text):
+    if re.search(r"oil|gas|gold|silver|dollar|yen|euro|commodity|crude|coffee|cocoa|wheat|corn|能源|黃金|美元|外匯|商品", text):
         return "能源、外匯與商品"
+    if re.search(r"earnings|deal|merger|ipo|stock|shares|profit|revenue|buyback|acquire|acquisition|hostile bid|\bbid\b|財報|併購|上市|股份", text):
+        return "企業、財報與交易"
     if re.search(r"china|hong kong|japan|asia|taiwan|中國|香港|日本|亞洲", text):
         return "中國與亞洲觀察"
     return "全球市場與宏觀"
@@ -206,7 +296,7 @@ def cluster_key(title: str) -> str:
     text = (title or "").lower()
     clusters = [
         ("spacex", r"spacex"),
-        ("iran-oil", r"iran|kharg|oil|crude"),
+        ("iran-oil", r"(iran|kharg).*(oil|crude)|oil.*iran|crude.*iran"),
         ("gold", r"gold|bullion|silver"),
         ("rates-inflation", r"fed|fomc|inflation|cpi|pce|treasury|yield|producer prices|jobs"),
         ("ai-platforms", r"\bai\b|artificial intelligence|openai|cloud|data center|datacenter"),
@@ -219,6 +309,70 @@ def cluster_key(title: str) -> str:
             return name
     words = re.findall(r"[a-zA-Z][a-zA-Z0-9]{3,}", text)
     return "-".join(words[:3]) or re.sub(r"[^a-z0-9\u3400-\u9fff]+", "", text)[:24]
+
+
+def title_dedupe_key(title: str) -> str:
+    return re.sub(r"[^a-z0-9\u3400-\u9fff]+", "", (title or "").lower())[:100]
+
+
+def topic_title_from_cluster(cluster: str, primary_title_zh: str, related: list[dict], category: str) -> str:
+    if len(related) <= 1:
+        return primary_title_zh
+    if cluster == "spacex":
+        return "SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應"
+    if cluster == "rates-inflation":
+        return "利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價"
+    if cluster == "ai-platforms":
+        return "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視"
+    if cluster == "semiconductors":
+        return "半導體供應鏈成為 AI 交易核心，晶片需求與資本開支持續牽動估值"
+    if cluster == "iran-oil":
+        return "中東與原油供應風險再受關注，能源價格牽動通脹與避險定價"
+    if cluster == "gold":
+        return "黃金與貴金屬走勢承壓，避險需求和實質利率出現拉扯"
+    if cluster == "big-tech":
+        return "大型科技股消息密集，投資者重估盈利能見度與估值支撐"
+    if cluster == "china-asia":
+        return "中國與亞洲市場消息升溫，區內資金流與供應鏈預期受關注"
+    return keyword_headline(primary_title_zh, category)
+
+
+def choose_topic_category(related: list[dict]) -> str:
+    scores = {}
+    for item in related:
+        category = item.get("category") or infer_category(item.get("title", ""))
+        scores[category] = scores.get(category, 0) + int(item.get("score", 0))
+    return max(scores.items(), key=lambda pair: pair[1])[0] if scores else "全球市場與宏觀"
+
+
+def choose_primary_candidate(related: list[dict], family_counts: dict) -> dict:
+    sorted_related = sorted(related, key=lambda item: item.get("score", 0), reverse=True)
+    for item in sorted_related:
+        family = source_family(item.get("source", ""))
+        if family_counts.get(family, 0) < SOURCE_FAMILY_LIMIT:
+            return item
+    return sorted_related[0]
+
+
+def build_topic_candidate(cluster: str, related: list[dict], family_counts: dict) -> dict:
+    primary = choose_primary_candidate(related, family_counts)
+    category = choose_topic_category(related)
+    related_sorted = sorted(related, key=lambda item: item.get("score", 0), reverse=True)
+    sources = list(dict.fromkeys(source_label(item.get("source", "")) for item in related_sorted))
+    families = list(dict.fromkeys(source_family(item.get("source", "")) for item in related_sorted))
+    source_count = len(sources)
+    group_score = max(item.get("score", 0) for item in related_sorted) + min(24, (source_count - 1) * 8 + (len(related_sorted) - 1) * 3)
+    return {
+        **primary,
+        "cluster_key": cluster,
+        "category": category,
+        "score": group_score,
+        "source_count": max(1, source_count),
+        "sources_reporting_same_topic": sources,
+        "source_families": families,
+        "related_candidates": related_sorted[:6],
+        "related_titles": [item.get("title", "") for item in related_sorted[:6]],
+    }
 
 
 def collect_news_candidates() -> tuple[list[dict], list[dict]]:
@@ -236,8 +390,7 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
             continue
         extracted = extract_rss_candidates(config["name"], config["url"], body) if config["kind"] == "rss" else extract_page_candidates(config["name"], config["url"], body)
         for candidate in extracted[: config.get("max_items", 8)]:
-            lower_title = candidate.get("title", "").lower()
-            if re.search(r"personal trainer|elderly mother|medicaid|social security|retirement|mortgage|home together|inheritance|divorce|market talk", lower_title):
+            if not candidate_allowed(config["name"], candidate.get("url", ""), candidate.get("title", "")):
                 continue
             candidate["source_tier"] = config.get("tier", 3)
             candidate["category"] = infer_category(candidate.get("title", ""))
@@ -250,47 +403,90 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
         filtered = all_candidates
     filtered.sort(key=lambda item: item.get("score", 0), reverse=True)
 
-    deduped = []
+    unique_candidates = []
     seen_titles = set()
-    cluster_counts = {}
-    category_counts = {}
     for item in filtered:
-        key = re.sub(r"[^a-z0-9\u3400-\u9fff]+", "", item["title"].lower())[:90]
+        key = title_dedupe_key(item["title"])
         if not key or key in seen_titles:
             continue
-        cluster = cluster_key(item["title"])
-        category = item.get("category") or "全球市場與宏觀"
-        if cluster_counts.get(cluster, 0) >= 2:
-            continue
-        if category_counts.get(category, 0) >= 5:
-            continue
         seen_titles.add(key)
-        cluster_counts[cluster] = cluster_counts.get(cluster, 0) + 1
-        category_counts[category] = category_counts.get(category, 0) + 1
-        deduped.append(item)
-        if len(deduped) >= 48:
+        unique_candidates.append(item)
+        if len(unique_candidates) >= 72:
             break
-    return deduped, sources
+
+    clusters = {}
+    for item in unique_candidates:
+        clusters.setdefault(cluster_key(item["title"]), []).append(item)
+
+    grouped = []
+    family_counts = {}
+    category_counts = {}
+    cluster_rows = sorted(
+        clusters.items(),
+        key=lambda row: max(item.get("score", 0) for item in row[1]) + min(18, len(row[1]) * 3),
+        reverse=True,
+    )
+    for cluster, related in cluster_rows:
+        topic = build_topic_candidate(cluster, related, family_counts)
+        category = topic.get("category") or "全球市場與宏觀"
+        family = source_family(topic.get("source", ""))
+        if category_counts.get(category, 0) >= CATEGORY_LIMIT:
+            continue
+        if family_counts.get(family, 0) >= SOURCE_FAMILY_LIMIT and len(grouped) >= 10:
+            continue
+        grouped.append(topic)
+        category_counts[category] = category_counts.get(category, 0) + 1
+        family_counts[family] = family_counts.get(family, 0) + 1
+        if len(grouped) >= 48:
+            break
+
+    if len(grouped) < 12:
+        used_keys = {title_dedupe_key(item.get("title", "")) for item in grouped}
+        for item in unique_candidates:
+            key = title_dedupe_key(item.get("title", ""))
+            if key in used_keys:
+                continue
+            grouped.append(build_topic_candidate(cluster_key(item.get("title", "")), [item], family_counts))
+            used_keys.add(key)
+            if len(grouped) >= 12:
+                break
+    grouped.sort(key=lambda item: item.get("score", 0), reverse=True)
+    return grouped, sources
 
 
 def keyword_headline(title: str, category: str) -> str:
     text = f"{title} {category}".lower()
-    company_match = re.search(r"\b(Nvidia|Apple|Microsoft|Google|Alphabet|Amazon|Meta|Tesla|Oracle|SpaceX|OpenAI|AMD|TSMC|Intel|Broadcom)\b", title, re.I)
+    company_match = re.search(r"\b(Nvidia|Apple|Microsoft|Google|Alphabet|Amazon|Meta|Tesla|Oracle|SpaceX|OpenAI|AMD|TSMC|Intel|Broadcom|GlobalFoundries|Arm Holdings|SanDisk|Seagate|Waymo|DigitalBridge|Equinix|QXO|Beacon|Rocket Lab|Circle|Warner Bros\.? Discovery|Warner)\b", title, re.I)
     company = company_match.group(1) if company_match else ""
+    if re.search(r"coffee|cocoa|wheat|corn|tariff", text):
+        return "農產品與關稅消息牽動商品價格，通脹預期再受關注"
+    if re.search(r"natural gas|gas falls|gas prices", text):
+        return "天然氣價格受天氣預報牽動，能源市場重新評估短線需求"
     if re.search(r"gold|silver|bullion", text):
         return "金價受壓，避險與通脹交易出現重新定價"
     if re.search(r"treasury|yield|fed|rates|inflation|cpi|producer prices|jobs", text):
         return "利率與通脹預期牽動美債和股市走向"
     if re.search(r"oil|crude|gas|commodity|dollar|yen|euro", text):
         return "能源、外匯與商品價格成為市場焦點"
+    if re.search(r"autonomous|robotaxi|self-driving|waymo", text):
+        return "Waymo 擴大自動駕駛服務，平台變現與城市營運能力受檢視"
     if re.search(r"\bai\b|artificial intelligence|chip|semiconductor|data center|cloud", text):
         prefix = f"{company} 帶動" if company else "AI 與半導體"
         return f"{prefix}投資熱潮延續，估值與供應鏈受關注"
-    if re.search(r"earnings|shares|stock|ipo|deal|merger|revenue|profit", text):
+    if re.search(r"earnings|shares|stock|ipo|deal|merger|revenue|profit|acquire|acquisition|hostile bid|\bbid\b", text):
         prefix = f"{company} 消息" if company else "企業消息"
         return f"{prefix}牽動投資者對盈利與估值的判斷"
     if re.search(r"china|asia|japan|hong kong|taiwan", text):
         return "中國及亞洲市場消息影響區內風險情緒"
+    entity = company or headline_entity(title)
+    if entity:
+        if category == "企業、財報與交易":
+            return f"{entity} 相關消息牽動投資者對盈利與估值的判斷"
+        if category == "科技、AI與平台":
+            return f"{entity} 相關科技消息牽動平台競爭與成長預期"
+        if category == "能源、外匯與商品":
+            return f"{entity} 相關價格變化牽動商品與外匯市場情緒"
+        return f"{entity} 相關市場消息牽動投資者風險判斷"
     return "重要財經與科技消息值得今日追蹤"
 
 
@@ -346,25 +542,50 @@ def themes_for(category: str, title: str) -> list[str]:
     return list(dict.fromkeys(themes))[:4]
 
 
-def editorial_summary(title_zh: str, original_title: str, category: str, source: str) -> str:
-    text = f"{title_zh} {original_title} {category}".lower()
+def source_phrase(sources: list[str]) -> str:
+    if len(sources) >= 3:
+        return f"{sources[0]}、{sources[1]}等 {len(sources)} 個來源"
+    if len(sources) == 2:
+        return f"{sources[0]}與{sources[1]}"
+    return sources[0] if sources else "主要來源"
+
+
+def editorial_summary(title_zh: str, original_title: str, category: str, sources: list[str], cluster: str = "") -> str:
+    text = f"{title_zh} {original_title} {category} {cluster}".lower()
+    source_text = source_phrase(sources)
+    if cluster == "spacex":
+        return f"{source_text}同時提到 SpaceX 上市、配售或估值相關消息，顯示市場不只在看單一 IPO 故事，也在評估私人科技巨頭上市後對風險偏好、財富效應和成長股估值的牽動。若後續定價或監管討論升溫，相關情緒可能外溢到太空、國防科技和高估值成長股。"
+    if cluster == "rates-inflation":
+        return f"{source_text}的報道集中在通脹、利率或美債收益率變化。這類消息會先影響美元和債市，再傳導到科技股估值、金融股利差和整體風險胃納，因此需要把數據本身與市場對 Fed 路徑的重新定價放在一起看。"
+    if cluster == "ai-platforms":
+        return f"{source_text}聚焦 AI 應用、雲端平台或算力投資。市場真正關心的是需求能否支撐資本開支，以及競爭壓力會否壓縮大型科技公司的利潤率；這會決定 AI 交易是繼續擴散，還是轉向挑選能兌現現金流的公司。"
+    if cluster == "semiconductors":
+        return f"{source_text}把焦點放在晶片、算力和供應鏈。半導體仍是 AI 基建的瓶頸與估值錨點，任何需求、產能或主要客戶採購節奏的變化，都可能快速反映到晶片股、設備商和資料中心概念股。"
+    if cluster == "iran-oil":
+        return f"{source_text}指向中東或原油供應風險。油價若因地緣消息重新定價，會同時影響通脹預期、航空與運輸成本、能源股表現和央行政策敘事，是宏觀與商品市場需要同步追蹤的變數。"
+    if cluster == "gold":
+        return f"{source_text}關注黃金或貴金屬價格變化。金價的訊號通常來自避險需求、美元和實質利率三方拉扯；若貴金屬走勢與通脹敘事背離，反而更能反映資金正在優先交易債息或美元。"
+    if cluster == "big-tech":
+        return f"{source_text}涉及大型科技公司的股價、盈利或策略消息。這類新聞的重點不只在單一公司，而是市場是否重新調整對平台型企業的成長、AI 投入回報和估值溢價的假設。"
+    if cluster == "china-asia":
+        return f"{source_text}提供中國或亞洲市場線索。區內政策、需求和供應鏈變化會透過股匯市場、科技硬件訂單和資金流傳導，適合與全球風險情緒一併觀察。"
     if category == "全球市場與宏觀":
-        return "這則消息反映宏觀數據、利率預期和資金流向仍是今日市場主線。投資者需要留意美債收益率、美元和股市估值如何回應，因為同一組數據可能同時改變風險胃納和科技股定價。"
+        return f"{source_text}的報道反映宏觀數據、利率預期和資金流向仍是今日市場主線。投資者需要留意美債收益率、美元和股市估值如何回應，因為同一組數據可能同時改變風險胃納和科技股定價。"
     if category == "科技、AI與平台":
-        return "科技板塊的焦點仍集中在 AI 應用、雲端平台和算力投入。相關消息不只影響單一公司股價，也會牽動投資者對軟件、基建和資料中心需求的中期判斷。"
+        return f"{source_text}顯示科技板塊的焦點仍集中在 AI 應用、雲端平台和算力投入。相關消息不只影響單一公司股價，也會牽動投資者對軟件、基建和資料中心需求的中期判斷。"
     if category == "半導體與供應鏈":
-        return "半導體消息繼續是 AI 產業鏈的關鍵觀察點。晶片需求、供應鏈交付和資本開支預期，會直接影響市場對硬件公司和上游供應商的估值。"
+        return f"{source_text}的半導體消息是 AI 產業鏈的關鍵觀察點。晶片需求、供應鏈交付和資本開支預期，會直接影響市場對硬件公司和上游供應商的估值。"
     if category == "企業、財報與交易":
-        return "企業消息反映投資者正在重新衡量盈利能見度、現金流和估值水平。若事件涉及融資、併購或上市預期，後續仍要觀察市場是否把個別消息擴散到同業板塊。"
+        return f"{source_text}的企業消息反映投資者正在重新衡量盈利能見度、現金流和估值水平。若事件涉及融資、併購或上市預期，後續仍要觀察市場是否把個別消息擴散到同業板塊。"
     if category == "能源、外匯與商品":
         if re.search(r"gold|黃金|金價", text):
-            return "金價走勢顯示避險需求與實質利率之間出現拉扯。即使通脹憂慮存在，若美元或債息偏強，黃金仍可能面對資金流出和短線拋壓。"
+            return f"{source_text}指向金價走勢與避險需求、實質利率之間的拉扯。即使通脹憂慮存在，若美元或債息偏強，黃金仍可能面對資金流出和短線拋壓。"
         if re.search(r"oil|crude|原油|能源", text):
-            return "能源價格變化會影響通脹預期、企業成本和地緣風險定價。市場接下來會關注供應消息是否轉化為更廣泛的商品價格壓力。"
-        return "商品和外匯市場正在重新反映通脹、利率和避險需求。這類價格變化往往會快速傳導到股市板塊輪動和企業成本預期。"
+            return f"{source_text}的能源消息會影響通脹預期、企業成本和地緣風險定價。市場接下來會關注供應消息是否轉化為更廣泛的商品價格壓力。"
+        return f"{source_text}顯示商品和外匯市場正在重新反映通脹、利率和避險需求。這類價格變化往往會快速傳導到股市板塊輪動和企業成本預期。"
     if category == "中國與亞洲觀察":
-        return "亞洲市場消息反映區內政策、需求和供應鏈仍有變化。這類新聞需要與全球資金流和科技產業鏈一併觀察，才能判斷影響是否只限本地市場。"
-    return "這則新聞涉及今日國際財經與科技市場的重要變化。投資者可先掌握事件方向，再透過原文連結核對細節和後續發展。"
+        return f"{source_text}的亞洲市場消息反映區內政策、需求和供應鏈仍有變化。這類新聞需要與全球資金流和科技產業鏈一併觀察，才能判斷影響是否只限本地市場。"
+    return f"{source_text}指出今日國際財經與科技市場出現值得留意的變化。投資者可先掌握事件方向，再透過原文連結核對細節和後續發展。"
 
 
 def market_impact(category: str) -> str:
@@ -394,9 +615,22 @@ def tracking_value(category: str) -> str:
 def build_item(candidate: dict, idx: int) -> dict:
     original_title = clean_text(candidate.get("title") or "")
     category = candidate.get("category") or infer_category(original_title)
-    title_zh = headline_to_zh(original_title, category)
+    primary_title_zh = headline_to_zh(original_title, category)
+    related = as_list(candidate.get("related_candidates")) or [candidate]
+    cluster = candidate.get("cluster_key") or cluster_key(original_title)
+    title_zh = topic_title_from_cluster(cluster, primary_title_zh, related, category)
     source = source_label(candidate.get("source", ""))
+    same_topic_sources = as_list(candidate.get("sources_reporting_same_topic")) or [source]
+    source_count = max(1, int(candidate.get("source_count") or len(same_topic_sources) or 1))
     heat_score = max(52, min(94, int(candidate.get("score", 70)) - idx))
+    related_titles = [clean_text(title) for title in as_list(candidate.get("related_titles")) if clean_text(title)]
+    key_facts = [
+        f"主要來源：{source}",
+        f"同題材來源數：{source_count}",
+        f"同題材來源：{'、'.join(same_topic_sources[:4])}",
+    ]
+    if related_titles:
+        key_facts.append("代表性原始標題：" + "；".join(related_titles[:2]))
     return {
         "id": f"{TODAY}-headline-{idx:03d}",
         "date": TODAY,
@@ -407,21 +641,18 @@ def build_item(candidate: dict, idx: int) -> dict:
         "published_at": candidate.get("published_at_hint") or GENERATED_AT,
         "category": category,
         "themes": themes_for(category, original_title),
-        "summary_zh": editorial_summary(title_zh, original_title, category, source),
-        "key_facts": [
-            f"原文來源：{source}",
-            f"題材分類：{category}",
-            "網站保留原文連結，方便進一步核對細節。",
-        ],
+        "summary_zh": editorial_summary(title_zh, " ".join(related_titles or [original_title]), category, same_topic_sources, cluster),
+        "key_facts": key_facts[:4],
         "market_impact": market_impact(category),
         "reporter_angle": tracking_value(category),
         "importance_score": max(5, min(10, 11 - idx // 2)),
         "heat_score": heat_score,
-        "source_count": 1,
-        "sources_reporting_same_topic": [source],
-        "position_signal": "ranked headline",
+        "source_count": source_count,
+        "sources_reporting_same_topic": same_topic_sources,
+        "position_signal": "merged_topic" if source_count > 1 or len(related) > 1 else "ranked_headline",
         "time_horizon": "short_term",
         "tracking_value": tracking_value(category),
+        "topic_key": cluster,
     }
 
 
@@ -445,7 +676,7 @@ def hot_topic_reason(item: dict) -> str:
 def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
     usable = candidates[:12]
     if not usable:
-        usable = [{"source": source["name"], "title": source["name"], "url": source["url"], "category": "全球市場與宏觀", "score": 60} for source in sources]
+        fail("No usable news candidates were collected from accessible sources.")
     while len(usable) < 12:
         usable.append(usable[len(usable) % max(1, len(usable))])
 
@@ -464,14 +695,20 @@ def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
             "heat_score": item["heat_score"],
             "heat_label": "High" if item["heat_score"] >= 75 else "Medium",
             "source_count": item["source_count"],
-            "main_sources": [item["source"]],
+            "main_sources": as_list(item.get("sources_reporting_same_topic"))[:4] or [item["source"]],
             "item_ids": [item["id"]],
             "one_line_reason": hot_topic_reason(item),
             "reporter_angle": item["reporter_angle"],
         })
 
     top_categories = list(dict.fromkeys(item["category"] for item in items[:8]))[:4]
-    daily_summary = "今日國際財經與科技新聞以" + "、".join(top_categories) + "為主線。市場焦點集中於利率與通脹預期、AI 和半導體投資熱度、主要企業消息，以及能源與外匯價格變化。讀者可先掌握焦點主題，再按分類打開原文深入閱讀。"
+    top_topics = "、".join(item["title_zh"] for item in items[:3])
+    merged_count = sum(1 for item in items if item.get("source_count", 1) > 1)
+    daily_summary = (
+        "今日國際財經與科技新聞以" + "、".join(top_categories) +
+        "為主線。頭版焦點包括" + top_topics +
+        f"。本期共有 {merged_count} 個主題整合同題材來源，重點不只在單一標題，而是觀察新聞是否正在形成可持續的市場敘事；讀者可先讀焦點主題，再按分類核對原文和後續變化。"
+    )
 
     return {
         "date": TODAY,
@@ -505,6 +742,8 @@ def validate_brief(brief: dict) -> None:
         fail("items must contain at least 10 entries.")
     item_ids = set()
     title_counts = {}
+    summary_counts = {}
+    source_family_counts = {}
     for item in items:
         for field in REQUIRED_ITEM_FIELDS:
             if field not in item:
@@ -513,13 +752,27 @@ def validate_brief(brief: dict) -> None:
             fail(f"Duplicate item id: {item['id']}")
         item_ids.add(item["id"])
         title_counts[item["title_zh"]] = title_counts.get(item["title_zh"], 0) + 1
+        summary_counts[item["summary_zh"]] = summary_counts.get(item["summary_zh"], 0) + 1
+        source_family_counts[source_family(item.get("source", ""))] = source_family_counts.get(source_family(item.get("source", "")), 0) + 1
+        if item["title_zh"] in BAD_GENERIC_TITLES:
+            fail(f"title_zh is too generic: {item['title_zh']}")
         if not has_cjk(item["title_zh"]) or looks_mostly_english(item["title_zh"]):
             fail(f"title_zh is not acceptable Traditional Chinese: {item['title_zh']}")
         if any(phrase in item["summary_zh"] for phrase in BAD_READER_PHRASES):
             fail(f"summary_zh contains bad phrase: {item['id']}")
+        if not isinstance(item.get("source_count"), int) or item["source_count"] < 1:
+            fail(f"source_count must be a positive integer: {item['id']}")
     duplicate_titles = [title for title, count in title_counts.items() if count > 1]
     if duplicate_titles:
         fail(f"Duplicate title_zh values: {duplicate_titles}")
+    repeated_summaries = [summary for summary, count in summary_counts.items() if count > 2]
+    if repeated_summaries:
+        fail("Too many repeated summary_zh values.")
+    accessible_families = {source_family(source.get("name", "")) for source in brief.get("sources", []) if source.get("access") == "Full"}
+    if len(accessible_families) >= 3 and source_family_counts:
+        dominant_family, dominant_count = max(source_family_counts.items(), key=lambda pair: pair[1])
+        if dominant_count > 6:
+            fail(f"Source concentration too high: {dominant_family} has {dominant_count} of {len(items)} items.")
 
     hot_topics = brief.get("hot_topics")
     if not isinstance(hot_topics, list) or not (3 <= len(hot_topics) <= 5):
