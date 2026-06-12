@@ -131,6 +131,7 @@ def clean_text(value: str) -> str:
 
 SIMPLIFIED_TO_TRADITIONAL_PHRASES = [
     ("首席执行员", "行政總裁"),
+    ("首席執行長", "行政總裁"),
     ("执行员", "執行員"),
     ("执行", "執行"),
     ("报道", "報道"),
@@ -158,6 +159,14 @@ SIMPLIFIED_TO_TRADITIONAL_PHRASES = [
     ("举办", "舉辦"),
     ("决定", "決定"),
     ("计划", "計劃"),
+    ("巡回上诉法院", "巡迴上訴法院"),
+    ("巡回", "巡迴"),
+    ("上诉", "上訴"),
+    ("外國部", "外交部"),
+    ("新加坡基於的", "新加坡的"),
+    ("窺盜", "盜用"),
+    ("做出", "作出"),
+    ("最后", "最後"),
     ("发言人", "發言人"),
     ("领导层", "領導層"),
     ("领导", "領導"),
@@ -200,7 +209,7 @@ def to_traditional_zh(value: str) -> str:
 
 
 def contains_common_simplified_zh(value: str) -> bool:
-    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国"
+    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉"
     return any(char in (value or "") for char in simplified_chars)
 
 
