@@ -63,7 +63,7 @@ function keywordHeadline(title = "", category = "") {
   if (/gold|silver|bullion/.test(text)) return "金價受壓，避險與通脹交易出現重新定價";
   if (/treasury|yield|fed|rates|inflation|cpi|producer prices|jobs/.test(text)) return "利率與通脹預期牽動美債和股市走向";
   if (/oil|crude|gas|commodity|dollar|yen|euro/.test(text)) return "能源、外匯與商品價格成為市場焦點";
-  if (/ai|artificial intelligence|chip|semiconductor|data center|cloud/.test(text)) return `${company ? `${company} 帶動` : "AI 與半導體"}投資熱潮延續，估值與供應鏈受關注`;
+  if (/\bai\b|artificial intelligence|chip|semiconductor|data center|cloud/.test(text)) return `${company ? `${company} 帶動` : "AI 與半導體"}投資熱潮延續，估值與供應鏈受關注`;
   if (/earnings|shares|stock|ipo|deal|merger|revenue|profit/.test(text)) return `${company ? `${company} 消息` : "企業消息"}牽動投資者對盈利與估值的判斷`;
   if (/china|asia|japan|hong kong/.test(text)) return "中國及亞洲市場消息影響區內風險情緒";
   return "重要財經與科技消息值得今日追蹤";
