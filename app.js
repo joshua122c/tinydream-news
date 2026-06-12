@@ -89,19 +89,19 @@ function isWeakSummary(value = "") {
 
 function displaySummary(item) {
   if (!isWeakSummary(item?.summary_zh)) return item.summary_zh;
-  const title = displayTitle(item);
-  const category = item?.category || "國際財經與科技";
-  const source = item?.source || "主要來源";
-  if (/利率|通脹|美債|Fed|宏觀|市場/.test(title + category)) {
-    return `${source} 的消息顯示，投資者正重新評估利率、通脹和資金流向。這類宏觀變化會直接影響股債匯商品的短線定價，也會改變科技股和高估值資產的風險胃納。`;
-  }
-  if (/AI|半導體|晶片|科技|雲端|資料中心/.test(title + category)) {
-    return `${source} 的報道反映，AI 投資、算力需求和平台競爭仍是科技板塊的主要推動力。市場需要追蹤相關公司資本開支、供應鏈訂單和估值變化。`;
-  }
-  if (/金|油|能源|外匯|商品|美元/.test(title + category)) {
-    return `${source} 的消息指向商品和外匯市場重新定價。能源、黃金和美元走勢會影響通脹預期、企業成本和避險資金流向。`;
-  }
-  return `${source} 的報道涉及${category}的重要變化。這條新聞值得留意，因為它可能影響投資者對市場風險、企業盈利或產業趨勢的判斷。`;
+  return "";
+}
+
+function summaryBlock(item) {
+  const summary = displaySummary(item);
+  return summary ? `<p>${escapeHtml(summary)}</p>` : "";
+}
+
+function detailBoxes(item) {
+  const impact = item?.market_impact || "";
+  const tracking = item?.tracking_value || "";
+  if (!impact && !tracking) return "";
+  return `<div class="two-col">${impact ? `<div class="detail-box"><strong>${UI.marketImpact}</strong>${escapeHtml(impact)}</div>` : ""}${tracking ? `<div class="detail-box"><strong>${UI.trackingValue}</strong>${escapeHtml(tracking)}</div>` : ""}</div>`;
 }
 
 function sourceSignal(item) {
@@ -326,7 +326,7 @@ function renderLeadStory(item, topic) {
   return `<article class="lead-story" id="item-${escapeHtml(item.id)}">
     <div class="item-top"><div class="item-meta"><span class="rank">#${escapeHtml(topic?.rank || 1)}</span>${sourceSignal(item)}<span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span></div>
     <h3>${escapeHtml(displayTitle(item))}</h3>
-    <p>${escapeHtml(displaySummary(item))}</p>
+    ${summaryBlock(item)}
     <div class="focus-list">${asList(item.themes).slice(0, 4).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div>
     <div class="story-actions"><a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></div>
   </article>`;
@@ -337,7 +337,7 @@ function renderCompactStory(item, index) {
   return `<article class="compact-story" id="item-${escapeHtml(item.id)}">
     <div class="item-meta">${sourceSignal(item)}<span>${escapeHtml(item.category)}</span></div>
     <h3>${escapeHtml(displayTitle(item))}</h3>
-    <p>${escapeHtml(displaySummary(item))}</p>
+    ${summaryBlock(item)}
     <div class="compact-bottom"><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></div>
   </article>`;
 }
@@ -402,10 +402,10 @@ function renderItem(item) {
   return `<article class="item-card" id="item-${escapeHtml(item.id)}">
     <div class="item-top"><div class="item-meta">${sourceSignal(item)}<span>${escapeHtml(item.category)}</span><span>${escapeHtml(item.time_horizon || "")}</span></div><span class="badge ${heatClass(label)}">${label} · ${escapeHtml(item.heat_score || 0)}</span></div>
     <h3>${escapeHtml(displayTitle(item))}</h3>
-    <p>${escapeHtml(displaySummary(item))}</p>
+    ${summaryBlock(item)}
     <div class="focus-list">${asList(item.themes).slice(0, 4).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div>
     ${asList(item.key_facts).length ? `<ul class="facts">${asList(item.key_facts).slice(0, 3).map((fact) => `<li>${escapeHtml(fact)}</li>`).join("")}</ul>` : ""}
-    <div class="two-col"><div class="detail-box"><strong>${UI.marketImpact}</strong>${escapeHtml(item.market_impact || "")}</div><div class="detail-box"><strong>${UI.trackingValue}</strong>${escapeHtml(item.tracking_value || "")}</div></div>
+    ${detailBoxes(item)}
     <p><a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p>
   </article>`;
 }
@@ -460,7 +460,7 @@ async function renderSearch(query) {
 function renderSearchResult(result) {
   const item = result.item;
   const briefId = result.update_id || result.date;
-  return `<article class="item-card"><div class="item-top"><div class="item-meta"><span>${escapeHtml(result.date)}</span>${sourceSignal(item)}<span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(heatLabel(item.heat_score))}">${heatLabel(item.heat_score)} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(displayTitle(item))}</h3><p>${escapeHtml(displaySummary(item))}</p><div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div><p><a class="action" href="${linkFor(`/briefs/${briefId}`)}" data-link>${UI.viewDailyBrief}</a> <a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p></article>`;
+  return `<article class="item-card"><div class="item-top"><div class="item-meta"><span>${escapeHtml(result.date)}</span>${sourceSignal(item)}<span>${escapeHtml(item.category)}</span></div><span class="badge ${heatClass(heatLabel(item.heat_score))}">${heatLabel(item.heat_score)} · ${escapeHtml(item.heat_score || 0)}</span></div><h3>${escapeHtml(displayTitle(item))}</h3>${summaryBlock(item)}<div class="focus-list">${asList(item.themes).map((theme) => `<a class="pill" href="${linkFor(`/topics/${slugify(theme)}`)}" data-link>${escapeHtml(theme)}</a>`).join("")}</div><p><a class="action" href="${linkFor(`/briefs/${briefId}`)}" data-link>${UI.viewDailyBrief}</a> <a class="action" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p></article>`;
 }
 
 function renderTopics() {
