@@ -78,6 +78,9 @@ BAD_READER_PHRASES = [
     "此舉反映",
     "這反映",
     "意味著",
+    "enumerator",
+    "基於公司",
+    "這一事態",
 ]
 
 BAD_GENERIC_TITLES = {
@@ -205,6 +208,11 @@ def to_traditional_zh(value: str) -> str:
     text = value or ""
     for simplified, traditional in SIMPLIFIED_TO_TRADITIONAL_PHRASES:
         text = text.replace(simplified, traditional)
+    text = re.sub(r"高華[A-Za-z]+", "Gwynne Shotwell", text)
+    text = text.replace("首席執行員高級副總裁", "總裁兼營運總監")
+    text = text.replace("新加坡基於公司的", "新加坡的")
+    text = text.replace("新加坡基於公司", "新加坡公司")
+    text = text.replace("零散投資者", "散戶投資者")
     return clean_text(text)
 
 
