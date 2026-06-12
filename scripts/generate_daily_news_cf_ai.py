@@ -259,22 +259,24 @@ def extract_article_body_text(body: str) -> str:
 def article_context(candidate: dict) -> dict:
     title = clean_text(candidate.get("title", ""))
     hint = clean_text(candidate.get("summary_hint", ""))
-    context = {"basis": "", "text": "", "url_status": 0}
+    fallbacks = []
+    if text_is_useful_summary(hint, title):
+        fallbacks.append({"basis": candidate.get("summary_hint_basis") or "rss_description", "text": hint[:1600]})
     status, body = fetch_url(candidate.get("url", ""))
-    context["url_status"] = status
     if status == 200:
         article_text = extract_article_body_text(body)
-        if text_is_useful_summary(article_text, title) and len(article_text) >= 350:
-            return {"basis": "article_body", "text": article_text[:3600], "url_status": status}
         jsonld_text = extract_jsonld_article_text(body)
-        if text_is_useful_summary(jsonld_text, title):
-            return {"basis": "jsonld_article", "text": jsonld_text[:3000], "url_status": status}
         meta = extract_meta_description(body)
         if text_is_useful_summary(meta, title):
-            return {"basis": "meta_description", "text": meta[:1200], "url_status": status}
-    if text_is_useful_summary(hint, title):
-        return {"basis": candidate.get("summary_hint_basis") or "rss_description", "text": hint[:1600], "url_status": status}
-    return context
+            fallbacks.append({"basis": "meta_description", "text": meta[:1200]})
+        if text_is_useful_summary(jsonld_text, title):
+            fallbacks.append({"basis": "jsonld_article", "text": jsonld_text[:3000]})
+        if text_is_useful_summary(article_text, title) and len(article_text) >= 350:
+            return {"basis": "article_body", "text": article_text[:3600], "url_status": status, "fallback_contexts": fallbacks}
+    if fallbacks:
+        first = fallbacks[0]
+        return {"basis": first["basis"], "text": first["text"], "url_status": status, "fallback_contexts": fallbacks[1:]}
+    return {"basis": "", "text": "", "url_status": status, "fallback_contexts": []}
 
 
 def call_cloudflare_ai(prompt: str) -> str:
@@ -324,28 +326,33 @@ def summary_supported_by_text(summary: str, context_text: str, title: str) -> bo
 
 
 def summarize_from_context(title_zh: str, original_title: str, source: str, context: dict) -> tuple[str, str, str]:
-    text = clean_text(context.get("text", ""))
-    basis = context.get("basis", "")
-    if not text:
-        return "", "", "no_verifiable_source_text"
-    if has_cjk(text):
-        sentences = re.split(r"(?<=[。！？])", text)
-        summary = clean_text("".join(sentences[:3]))[:360]
+    contexts = [context] + as_list(context.get("fallback_contexts"))
+    first_basis = ""
+    for candidate_context in contexts:
+        text = clean_text(candidate_context.get("text", ""))
+        basis = candidate_context.get("basis", "")
+        if basis and not first_basis:
+            first_basis = basis
+        if not text:
+            continue
+        if has_cjk(text):
+            sentences = re.split(r"(?<=[。！？])", text)
+            summary = clean_text("".join(sentences[:3]))[:360]
+            if summary_supported_by_text(summary, text, original_title):
+                return summary, basis, "verified_from_source_text"
+        prompt = (
+            "你是香港繁體中文財經新聞編輯。只根據下面提供的原文內容寫新聞摘要，不可以加入推測、評論、投資建議或原文沒有的背景。\n"
+            "請輸出 2 至 3 句香港繁體中文，不要使用簡體字，必須包含原文中的具體公司/人物/數字/事件。"
+            "如果原文內容不足以摘要，請只輸出 NO_VERIFIABLE_SUMMARY。\n\n"
+            f"中文題目：{title_zh}\n"
+            f"原文題目：{original_title}\n"
+            f"來源：{source}\n"
+            f"可讀原文內容：{text[:3200]}"
+        )
+        summary = call_cloudflare_ai(prompt)
         if summary_supported_by_text(summary, text, original_title):
             return summary, basis, "verified_from_source_text"
-    prompt = (
-        "你是香港繁體中文財經新聞編輯。只根據下面提供的原文內容寫新聞摘要，不可以加入推測、評論、投資建議或原文沒有的背景。\n"
-        "請輸出 2 至 3 句香港繁體中文，不要使用簡體字，必須包含原文中的具體公司/人物/數字/事件。"
-        "如果原文內容不足以摘要，請只輸出 NO_VERIFIABLE_SUMMARY。\n\n"
-        f"中文題目：{title_zh}\n"
-        f"原文題目：{original_title}\n"
-        f"來源：{source}\n"
-        f"可讀原文內容：{text[:3200]}"
-    )
-    summary = call_cloudflare_ai(prompt)
-    if summary_supported_by_text(summary, text, original_title):
-        return summary, basis, "verified_from_source_text"
-    return "", basis, "summary_unavailable_after_source_check"
+    return "", first_basis, "summary_unavailable_after_source_check" if first_basis else "no_verifiable_source_text"
 
 
 def source_label(source_name: str) -> str:
@@ -408,10 +415,11 @@ def candidate_allowed(source_name: str, link: str, title: str) -> bool:
         "price target", "buy rating", "sell rating", "neutral rating",
         "remains positive on", "raises pt", "analysts bullish",
         "is this", "best stock",
+        "massive gap-up", "gap-up", "propels", "diane keaton", "annie hall", "bonhams", "auction",
     ]
     if any(term in lower_title for term in skip_terms):
         return False
-    if re.search(r"^(i|my|we)\b|what should i|what do i", lower_title):
+    if re.search(r"^(i|my|we|our)\b|what should i|what do i", lower_title):
         return False
     generic_nav_titles = {
         "media & entertainment", "banking & finance", "business", "markets",
