@@ -118,7 +118,7 @@ def headline_entity(title: str) -> str:
     stop_phrases = {
         "Wall Street", "BofA", "Citi", "Mizuho", "Analyst Report", "The", "A", "An",
         "Here", "What", "I", "My", "We", "Is This", "US", "U.S", "New", "Friday", "Monday", "Tuesday", "Wednesday", "Thursday",
-        "Says", "Say", "Said", "Launches", "Raises",
+        "Says", "Say", "Said", "Launches", "Raises", "Our", "These",
     }
     for phrase in re.findall(r"\b[A-Z][A-Za-z0-9&.-]*(?:\s+[A-Z][A-Za-z0-9&.-]*){0,2}\b", title or ""):
         cleaned = phrase.strip(" ,:;.-")
@@ -416,10 +416,14 @@ def candidate_allowed(source_name: str, link: str, title: str) -> bool:
         "remains positive on", "raises pt", "analysts bullish",
         "is this", "best stock",
         "massive gap-up", "gap-up", "propels", "diane keaton", "annie hall", "bonhams", "auction",
+        "adviser", "advisor", "annuities", "fire him", "fire her", "undervalued",
+        "assets investors should buy", "investors should buy", "should buy if",
     ]
     if any(term in lower_title for term in skip_terms):
         return False
-    if re.search(r"^(i|my|we|our)\b|what should i|what do i", lower_title):
+    if re.search(r"^(i|my|we|our|these)\b|what should i|what do i", lower_title):
+        return False
+    if re.search(r"\b(should|could)\s+(i|we|investors)\s+(buy|sell|fire|do)\b|do we fire|should we fire|still undervalued", lower_title):
         return False
     generic_nav_titles = {
         "media & entertainment", "banking & finance", "business", "markets",
