@@ -145,6 +145,10 @@ SIMPLIFIED_TO_TRADITIONAL_PHRASES = [
     ("苹果", "蘋果"),
     ("纳斯达克", "納斯達克"),
     ("募资", "集資"),
+    ("筹资", "籌資"),
+    ("实现", "實現"),
+    ("互联网", "互聯網"),
+    ("卫星", "衛星"),
     ("几十", "幾十"),
     ("年来", "年來"),
     ("一笔", "一筆"),
@@ -247,7 +251,7 @@ def to_traditional_zh(value: str) -> str:
 
 
 def contains_common_simplified_zh(value: str) -> bool:
-    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉岁苹纳达募几笔书写绍设开发制销脑黄勋种该朴图芯来处们"
+    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉岁苹纳达募筹几笔书写绍设开发制销脑黄勋种该朴图芯来处们现实联网卫"
     return any(char in (value or "") for char in simplified_chars)
 
 
