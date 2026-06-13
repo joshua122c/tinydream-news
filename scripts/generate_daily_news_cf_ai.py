@@ -455,16 +455,40 @@ def call_cloudflare_ai(prompt: str) -> str:
                 data = json.loads(response.read().decode("utf-8", errors="replace"))
             break
         except urllib.error.HTTPError as exc:
+            error_body = ""
+            try:
+                error_body = exc.read().decode("utf-8", errors="replace")
+            except Exception:
+                error_body = ""
+            error_code = ""
+            error_message = ""
+            if error_body:
+                try:
+                    error_data = json.loads(error_body)
+                    errors = error_data.get("errors") if isinstance(error_data, dict) else []
+                    if isinstance(errors, list) and errors:
+                        first_error = errors[0] if isinstance(errors[0], dict) else {}
+                        error_code = str(first_error.get("code") or "")
+                        error_message = clean_text(str(first_error.get("message") or ""))
+                except Exception:
+                    error_message = clean_text(error_body[:300])
+            if exc.code == 429 and error_code == "3036":
+                print("Cloudflare AI daily free allocation exhausted: code 3036. Skipping retries.")
+                return ""
             if exc.code == 429 and attempt < 3:
                 retry_after = exc.headers.get("Retry-After")
                 try:
                     wait_seconds = max(5, int(retry_after)) if retry_after else 6 + attempt * 4
                 except ValueError:
                     wait_seconds = 6 + attempt * 4
-                print(f"Cloudflare AI rate limited; retrying in {wait_seconds}s.")
+                detail = f" code {error_code}" if error_code else ""
+                message = f": {error_message}" if error_message else ""
+                print(f"Cloudflare AI rate limited{detail}{message}; retrying in {wait_seconds}s.")
                 time.sleep(wait_seconds)
                 continue
-            print(f"Cloudflare AI summary failed: {exc}")
+            detail = f" code {error_code}" if error_code else ""
+            message = f": {error_message}" if error_message else ""
+            print(f"Cloudflare AI summary failed: HTTP {exc.code}{detail}{message}")
             return ""
         except Exception as exc:
             print(f"Cloudflare AI summary failed: {exc}")
