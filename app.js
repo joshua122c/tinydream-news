@@ -255,9 +255,9 @@ async function renderBrief(id, isHome = false) {
   }
   state.brief = brief;
   app.innerHTML = isHome
-    ? `${hero(brief, true)}${latestTicker(brief)}${frontPageSection(brief)}${topicSections(brief)}<div class="edition-layout"><main>${summarySection(brief)}${categoriesSection(brief)}${sourcesSection(brief)}</main>${tagsSidebar(brief)}</div>`
+    ? homePage(brief)
     : `${hero(brief, false)}${latestTicker(brief)}<div class="edition-layout"><main>${summarySection(brief)}${frontPageSection(brief)}${topicSections(brief)}${categoriesSection(brief)}${sourcesSection(brief)}</main>${tagsSidebar(brief)}</div>`;
-  bindCategoryControls(brief);
+  if (document.querySelector("#category-panel")) bindCategoryControls(brief);
   bindItemJumpControls();
 }
 
@@ -270,6 +270,192 @@ function formatTime(value) {
     minute: "2-digit",
     hour12: false,
   });
+}
+
+function sortedNewsItems(brief) {
+  return asList(brief.items).slice().sort((a, b) => (b.heat_score || 0) - (a.heat_score || 0));
+}
+
+function storyTime(item, brief) {
+  const date = new Date(item?.published_at || brief?.generated_at || "");
+  if (!Number.isNaN(date.getTime())) return formatTime(date.toISOString());
+  return brief?.date || "今日";
+}
+
+function primaryTopic(item) {
+  return asList(item?.themes)[0] || item?.category || "News";
+}
+
+function storyMeta(item, brief) {
+  return `<div class="story-meta"><span>${escapeHtml(item.source || "Source")}</span><span>${escapeHtml(storyTime(item, brief))}</span><span>${escapeHtml(primaryTopic(item))}</span></div>`;
+}
+
+function morningBullets(brief) {
+  const summary = String(brief.daily_summary_zh || brief.deck || "").trim();
+  const sentences = summary
+    .split(/(?<=[。！？；;])\s*/)
+    .map((item) => item.trim())
+    .filter((item) => item.length >= 14)
+    .slice(0, 4);
+  if (sentences.length >= 3) return sentences;
+  return sortedNewsItems(brief).slice(0, 4).map((item) => displaySummary(item) || displayTitle(item));
+}
+
+function homePage(brief) {
+  const items = sortedNewsItems(brief);
+  const lead = items[0];
+  const topStories = items.filter((item) => item.id !== lead?.id).slice(0, 4);
+  return `<section class="home-front">
+    ${homeLeadSection(brief, lead)}
+    ${morningBriefSection(brief)}
+    <div class="home-layout">
+      <main class="home-main">
+        ${topStoriesSection(brief, topStories)}
+        ${deskSection(brief, "Markets", "市場焦點", marketItems(brief), "利率、能源、外匯、商品與宏觀風險。")}
+        ${deskSection(brief, "Technology & AI", "科技與 AI", technologyItems(brief), "AI 平台、半導體、科技企業與資本開支。")}
+        ${archiveSearchAccess(brief)}
+      </main>
+      <aside class="home-sidebar">
+        ${latestUpdatesSection(brief, items.slice(1, 7))}
+        ${sourceTransparencyBlock(brief)}
+      </aside>
+    </div>
+  </section>`;
+}
+
+function homeLeadSection(brief, lead) {
+  if (!lead) return "";
+  const updateTime = brief.generated_at ? `${formatTime(brief.generated_at)} HKT` : brief.date;
+  return `<section class="today-lead" id="item-${escapeHtml(lead.id)}">
+    <div class="lead-label">
+      <p class="section-kicker">Today's Lead / 今日焦點</p>
+      <span>${escapeHtml(updateTime)}</span>
+    </div>
+    <div class="today-lead-grid">
+      <article class="lead-copy">
+        ${storyMeta(lead, brief)}
+        <h1>${headlineHtml(displayTitle(lead))}</h1>
+        ${summaryBlock(lead)}
+        <div class="lead-actions">
+          <a class="action primary-action" href="${escapeHtml(lead.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>
+          <a class="action" href="${linkFor(`/briefs/${brief.update_id || brief.date}`)}" data-link>${UI.readFullBrief}</a>
+        </div>
+      </article>
+      <aside class="edition-stats" aria-label="今日資料透明度">
+        <div><b>${asList(brief.hot_topics).length}</b><span>焦點主題</span></div>
+        <div><b>${asList(brief.items).length}</b><span>新聞項目</span></div>
+        <div><b>${asList(brief.sources).length}</b><span>來源</span></div>
+      </aside>
+    </div>
+  </section>`;
+}
+
+function morningBriefSection(brief) {
+  return `<section class="morning-brief-section">
+    <div>
+      <p class="section-kicker">Morning Brief / 今日摘要</p>
+      <h2>開市前需要知道的幾件事</h2>
+    </div>
+    <ul>${morningBullets(brief).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+  </section>`;
+}
+
+function topStoriesSection(brief, items) {
+  return `<section class="home-section top-stories">
+    <div class="home-section-head">
+      <p class="section-kicker">Top Stories</p>
+      <h2>今日重要新聞</h2>
+    </div>
+    <div class="top-story-grid">${items.map((item, index) => renderTopStoryCard(item, brief, index)).join("")}</div>
+  </section>`;
+}
+
+function renderTopStoryCard(item, brief, index) {
+  return `<article class="top-story-card" id="item-${escapeHtml(item.id)}">
+    <span class="story-rank">${String(index + 1).padStart(2, "0")}</span>
+    ${storyMeta(item, brief)}
+    <h3>${headlineHtml(displayTitle(item))}</h3>
+    ${summaryBlock(item)}
+    <a class="story-link-inline" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>
+  </article>`;
+}
+
+function latestUpdatesSection(brief, items) {
+  return `<section class="latest-updates">
+    <div class="rail-head"><span>Latest Updates</span><strong>${items.length} 條</strong></div>
+    ${items.map((item, index) => `<a class="latest-update" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">
+      <span>${String(index + 1).padStart(2, "0")}</span>
+      <strong>${headlineHtml(displayTitle(item))}</strong>
+      <em>${escapeHtml(item.source || "")} · ${escapeHtml(storyTime(item, brief))}</em>
+    </a>`).join("")}
+  </section>`;
+}
+
+function matchesDesk(item, patterns) {
+  const haystack = [item.category, item.title_original, item.title_zh, ...asList(item.themes)].join(" ").toLowerCase();
+  return patterns.some((pattern) => haystack.includes(pattern));
+}
+
+function marketItems(brief) {
+  const patterns = ["market", "markets", "能源", "外匯", "商品", "宏觀", "fed", "oil", "gold", "inflation", "rates", "債", "美元"];
+  return sortedNewsItems(brief).filter((item) => matchesDesk(item, patterns)).slice(0, 4);
+}
+
+function technologyItems(brief) {
+  const patterns = ["technology", "科技", "ai", "半導體", "平台", "nvidia", "spacex", "deepseek", "chip", "semiconductor"];
+  return sortedNewsItems(brief).filter((item) => matchesDesk(item, patterns)).slice(0, 4);
+}
+
+function deskSection(brief, label, title, items, note) {
+  if (!items.length) return "";
+  return `<section class="home-section desk-section">
+    <div class="home-section-head">
+      <p class="section-kicker">${escapeHtml(label)}</p>
+      <h2>${escapeHtml(title)}</h2>
+      <p>${escapeHtml(note)}</p>
+    </div>
+    <div class="desk-list">${items.map((item) => renderDeskStory(item, brief)).join("")}</div>
+  </section>`;
+}
+
+function renderDeskStory(item, brief) {
+  return `<article class="desk-story">
+    ${storyMeta(item, brief)}
+    <h3>${headlineHtml(displayTitle(item))}</h3>
+    ${summaryBlock(item)}
+    <a class="story-link-inline" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>
+  </article>`;
+}
+
+function archiveSearchAccess(brief) {
+  return `<section class="home-section utility-access">
+    <a href="${linkFor("/archive")}" data-link>
+      <span>Archive</span>
+      <strong>翻查過往每日摘要</strong>
+      <em>${escapeHtml(brief.date)} · ${escapeHtml(brief.update_id || "")}</em>
+    </a>
+    <a href="${linkFor("/search")}" data-link>
+      <span>Search</span>
+      <strong>搜尋公司、題材與來源</strong>
+      <em>Nvidia · Fed · AI · 半導體</em>
+    </a>
+  </section>`;
+}
+
+function sourceTransparencyBlock(brief) {
+  const sourceLinks = asList(brief.items).filter((item) => item.url && item.url !== "https://news.tinydreamlab.com/").length;
+  const sourceNames = asList(brief.sources).map((source) => source.name).filter(Boolean).slice(0, 8);
+  return `<section class="source-transparency">
+    <p class="section-kicker">Source Transparency</p>
+    <h2>來源透明度</h2>
+    <dl>
+      <div><dt>來源數</dt><dd>${asList(brief.sources).length}</dd></div>
+      <div><dt>原文入口</dt><dd>${sourceLinks}/${asList(brief.items).length}</dd></div>
+      <div><dt>核對方式</dt><dd>保留原文連結</dd></div>
+    </dl>
+    <p>每條新聞保留來源、時間、題材標籤和原文入口；摘要只使用可讀來源文字或可信 description。</p>
+    <div class="source-mini-list">${sourceNames.map((name) => `<span>${escapeHtml(name)}</span>`).join("")}</div>
+  </section>`;
 }
 
 function hero(brief, isHome) {
