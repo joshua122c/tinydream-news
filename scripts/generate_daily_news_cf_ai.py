@@ -181,6 +181,7 @@ SIMPLIFIED_TO_TRADITIONAL_PHRASES = [
     ("过去", "過去"),
     ("创下", "創下"),
     ("纪录", "紀錄"),
+    ("记录", "紀錄"),
     ("经济", "經濟"),
     ("业务", "業務"),
     ("数据", "數據"),
@@ -251,7 +252,7 @@ def to_traditional_zh(value: str) -> str:
 
 
 def contains_common_simplified_zh(value: str) -> bool:
-    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉岁苹纳达募筹几笔书写绍设开发制销脑黄勋种该朴图芯来处们现实联网卫"
+    simplified_chars = "执员报认为时让计进亿万约过创纪记录经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉岁苹纳达募筹几笔书写绍设开发制销脑黄勋种该朴图芯来处们现实联网卫"
     return any(char in (value or "") for char in simplified_chars)
 
 
@@ -889,8 +890,10 @@ def headline_to_zh(title: str, category: str) -> str:
         (r"Former Tesla board member says SpaceX needs to achieve.*moonshots.*valuation.*", "前 Tesla 董事稱 SpaceX 需兌現兩大目標才可支撐估值"),
         (r"Small investors scrambled to get in on the SpaceX IPO.*", "散戶搶購 SpaceX IPO，部分投資者仍質疑估值過高"),
         (r"How Elon Musk nailed the SpaceX IPO.*", "馬斯克操盤 SpaceX IPO 獲市場追捧，上市定價策略受關注"),
+        (r"SpaceX surges past \$2 trillion in Nasdaq debut.*", "SpaceX 納斯達克首日市值突破 2 萬億美元，逼近 Amazon"),
         (r"After SpaceX.*huge IPO.*financial future.*AI.*", "SpaceX 大型 IPO 令美國投資組合更綁定 AI 資本周期"),
         (r"US stocks rise after oil prices ease and SpaceX soars.*", "美股上升，油價回落與 SpaceX 首日大漲提振市場情緒"),
+        (r"BlackRock says oil, FX risks loom over India's bond inflow push.*", "BlackRock 警告油價與匯率風險或影響印度債券資金流入"),
         (r"Trump claims Iran war settled.*", "特朗普稱伊朗衝突接近落實協議，市場觀察地緣風險降溫"),
         (r"Trump picks former SEC Chairman.*", "特朗普提名前 SEC 主席出任國家情報總監，監管與政策人事受關注"),
         (r"What energy insiders.*oil prices.*Iran deal.*", "華府能源人士評估油價與伊朗協議前景"),
