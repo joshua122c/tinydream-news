@@ -64,7 +64,7 @@ CATEGORY_TAXONOMY = [
 
 REQUIRED_BRIEF_FIELDS = ["date", "title", "deck", "daily_summary_zh", "market_focus", "hot_topics", "categories", "items", "sources", "generated_at"]
 REQUIRED_HOT_TOPIC_FIELDS = ["rank", "topic", "heat_score", "heat_label", "source_count", "main_sources", "item_ids", "one_line_reason", "reporter_angle"]
-REQUIRED_ITEM_FIELDS = ["id", "date", "title_original", "title_zh", "source", "url", "published_at", "category", "themes", "summary_zh", "summary_basis", "summary_status", "key_facts", "market_impact", "reporter_angle", "importance_score", "heat_score", "source_count", "sources_reporting_same_topic", "position_signal", "time_horizon", "tracking_value"]
+REQUIRED_ITEM_FIELDS = ["id", "date", "title_original", "title_zh", "source", "url", "published_at", "category", "themes", "summary", "summary_zh", "summary_basis", "summary_status", "key_facts", "market_impact", "reporter_angle", "importance_score", "heat_score", "source_count", "sources_reporting_same_topic", "position_signal", "time_horizon", "tracking_value"]
 
 BAD_READER_PHRASES = [
     "這條消息被列入",
@@ -1140,6 +1140,7 @@ def build_item(candidate: dict, idx: int) -> dict:
         "published_at": candidate.get("published_at_hint") or GENERATED_AT,
         "category": category,
         "themes": themes_for(category, original_title),
+        "summary": summary_zh,
         "summary_zh": summary_zh,
         "summary_basis": summary_basis,
         "summary_status": summary_status,
