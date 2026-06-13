@@ -119,6 +119,7 @@ def looks_like_generic_editorial_title(value: str) -> bool:
         "市場消息牽動投資者",
         "重要財經與科技消息",
         "相關價格變化牽動",
+        "價格變化牽動商品與外匯",
     ]
     if any(fragment in text for fragment in generic_fragments):
         return True
@@ -469,7 +470,22 @@ def summary_supported_by_text(summary: str, context_text: str, title: str) -> bo
         return False
     if any(phrase in summary for phrase in BAD_READER_PHRASES):
         return False
-    return len(summary) >= 45
+    return len(summary) >= 35
+
+
+def source_excerpt_summary(text: str) -> str:
+    text = clean_text(text)
+    if not text:
+        return ""
+    if has_cjk(text):
+        sentences = re.split(r"(?<=[。！？])", text)
+        return to_traditional_zh("".join(sentences[:2]))[:360]
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    excerpt = " ".join(sentence.strip() for sentence in sentences[:2] if sentence.strip())
+    excerpt = clean_text(excerpt)[:360]
+    if not excerpt:
+        return ""
+    return f"原文描述：{excerpt}"
 
 
 def summarize_from_context(title_zh: str, original_title: str, source: str, context: dict) -> tuple[str, str, str]:
@@ -490,7 +506,7 @@ def summarize_from_context(title_zh: str, original_title: str, source: str, cont
         prompt = (
             "你是香港繁體中文財經新聞編輯。只根據下面提供的原文內容寫新聞摘要，不可以加入推測、評論、投資建議或原文沒有的背景。\n"
             "請輸出 2 至 3 句香港繁體中文，不要使用簡體字；公司名和人名可以保留英文，不要自行音譯。必須包含原文中的具體公司/人物/數字/事件。"
-            "如果原文內容不足以摘要，請只輸出 NO_VERIFIABLE_SUMMARY。\n\n"
+            "如果可讀內容只有一兩句 description，也要把 description 翻譯和整理成摘要；只有內容空白、廣告、導覽或與題目無關時，才輸出 NO_VERIFIABLE_SUMMARY。\n\n"
             f"中文題目：{title_zh}\n"
             f"原文題目：{original_title}\n"
             f"來源：{source}\n"
@@ -499,6 +515,9 @@ def summarize_from_context(title_zh: str, original_title: str, source: str, cont
         summary = to_traditional_zh(call_cloudflare_ai(prompt))
         if summary_supported_by_text(summary, text, original_title):
             return summary, basis, "verified_from_source_text"
+        fallback = source_excerpt_summary(text)
+        if summary_supported_by_text(fallback, text, original_title):
+            return fallback, basis, "verified_from_source_text"
     return "", first_basis, "summary_unavailable_after_source_check" if first_basis else "no_verifiable_source_text"
 
 
@@ -894,6 +913,7 @@ def headline_to_zh(title: str, category: str) -> str:
         (r"After SpaceX.*huge IPO.*financial future.*AI.*", "SpaceX 大型 IPO 令美國投資組合更綁定 AI 資本周期"),
         (r"US stocks rise after oil prices ease and SpaceX soars.*", "美股上升，油價回落與 SpaceX 首日大漲提振市場情緒"),
         (r"BlackRock says oil, FX risks loom over India's bond inflow push.*", "BlackRock 警告油價與匯率風險或影響印度債券資金流入"),
+        (r"UAE denies.*fund transfer to Iran.*|UAE denies.*frozen funds.*Iran.*|.*UAE.*release billions.*frozen funds.*Iran.*", "阿聯酋否認同意向伊朗轉移或釋放凍結資金"),
         (r"Trump claims Iran war settled.*", "特朗普稱伊朗衝突接近落實協議，市場觀察地緣風險降溫"),
         (r"Trump picks former SEC Chairman.*", "特朗普提名前 SEC 主席出任國家情報總監，監管與政策人事受關注"),
         (r"What energy insiders.*oil prices.*Iran deal.*", "華府能源人士評估油價與伊朗協議前景"),
@@ -914,6 +934,7 @@ def headline_to_zh(title: str, category: str) -> str:
         (r"UK economy shrank by 0\.1% in April.*", "英國 4 月經濟收縮 0.1%，地緣風險拖累增長"),
         (r"Barclays to buy GoHenry.*", "Barclays 收購兒童扣帳卡應用 GoHenry，擴大年輕客群布局"),
         (r"Paddy Power owner Flutter to scrap listing.*London Stock Exchange.*", "Flutter 擬撤銷倫敦上市地位，重心進一步轉向美國市場"),
+        (r"Flutter Entertainment to Delist From London.*Trade Solely in New York.*", "Flutter 擬退出倫敦上市，股份將只在紐約交易"),
         (r"Charles Cole indicted for defrauding Napster.*239M shares.*", "Charles Cole 被控欺詐 Napster 2.39 億股，涉案股份交易受關注"),
         (r"Treasury yields are steady after hot producer prices reading.*", "美債收益率在生產者價格數據偏熱後靠穩，市場重新評估利率路徑"),
         (r"Gold slumps to 6-month low.*", "通脹憂慮升溫但金價跌至六個月低位，避險需求未有承接"),
