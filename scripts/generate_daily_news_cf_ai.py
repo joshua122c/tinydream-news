@@ -252,7 +252,7 @@ def to_traditional_zh(value: str) -> str:
 
 
 def contains_common_simplified_zh(value: str) -> bool:
-    simplified_chars = "执员报认为时让计进亿万约过创纪记录经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉岁苹纳达募筹几笔书写绍设开发制销脑黄勋种该朴图芯来处们现实联网卫"
+    simplified_chars = "执员报认为时让计进亿万约过创纪记录经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉岁苹纳达募筹几笔书写绍设开发销脑黄勋种该朴图芯来处们现实联网卫"
     return any(char in (value or "") for char in simplified_chars)
 
 
