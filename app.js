@@ -339,7 +339,6 @@ function frontPageSection(brief) {
         ${latestItems.map(renderLatestRailItem).join("")}
       </aside>
     </div>
-    <div class="topic-strip">${topics.slice(0, 5).map(renderTopicChip).join("")}</div>
   </section>`;
 }
 
@@ -372,15 +371,6 @@ function renderLatestRailItem(item, index) {
   </a>`;
 }
 
-function renderTopicChip(topic) {
-  const label = heatLabel(topic.heat_score, topic.heat_label);
-  return `<a class="topic-chip" href="#item-${escapeHtml(asList(topic.item_ids)[0] || "")}" data-item-jump="${escapeHtml(asList(topic.item_ids)[0] || "")}">
-    <span>#${escapeHtml(topic.rank || "")} · ${escapeHtml(topic.source_count || 1)} 來源</span>
-    <strong>${headlineHtml(topic.topic || "")}</strong>
-    <em class="${heatClass(label)}">${escapeHtml(topic.heat_score || 0)}</em>
-  </a>`;
-}
-
 function topicSections(brief) {
   const byId = new Map(asList(brief.items).map((item) => [item.id, item]));
   const sections = asList(brief.categories).slice(0, 5).map((category) => {
@@ -410,6 +400,7 @@ function renderTopicSectionItem(item) {
     <div class="item-meta">${sourceSignal(item)}<span>${escapeHtml(item.heat_score || 0)}</span></div>
     <h4>${headlineHtml(displayTitle(item))}</h4>
     ${summaryBlock(item)}
+    <p class="story-link"><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a></p>
   </article>`;
 }
 
