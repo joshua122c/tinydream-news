@@ -89,6 +89,7 @@ function isWeakSummary(value = "") {
 
 function displaySummary(item) {
   if (!isWeakSummary(item?.summary_zh)) return item.summary_zh;
+  if (!isWeakSummary(item?.summary)) return item.summary;
   return "";
 }
 
