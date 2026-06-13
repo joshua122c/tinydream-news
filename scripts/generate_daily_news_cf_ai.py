@@ -142,6 +142,31 @@ SIMPLIFIED_TO_TRADITIONAL_PHRASES = [
     ("报道", "報道"),
     ("中国", "中國"),
     ("美国", "美國"),
+    ("苹果", "蘋果"),
+    ("纳斯达克", "納斯達克"),
+    ("募资", "集資"),
+    ("几十", "幾十"),
+    ("年来", "年來"),
+    ("一笔", "一筆"),
+    ("招股书", "招股書"),
+    ("写", "寫"),
+    ("介绍", "介紹"),
+    ("设计", "設計"),
+    ("开发", "開發"),
+    ("制造", "製造"),
+    ("销售", "銷售"),
+    ("基于", "基於"),
+    ("微处理器", "微處理器"),
+    ("电脑", "電腦"),
+    ("黄仁勋", "黃仁勳"),
+    ("这种", "這種"),
+    ("这家公司", "這家公司"),
+    ("我们", "我們"),
+    ("朴素", "樸素"),
+    ("图形", "圖形"),
+    ("芯片", "晶片"),
+    ("晚点", "晚點"),
+    ("四岁", "四歲"),
     ("称", "稱"),
     ("认为", "認為"),
     ("时候", "時候"),
@@ -221,7 +246,7 @@ def to_traditional_zh(value: str) -> str:
 
 
 def contains_common_simplified_zh(value: str) -> bool:
-    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉"
+    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉岁苹纳达募几笔书写绍设开发制销脑黄勋种朴图芯来处们"
     return any(char in (value or "") for char in simplified_chars)
 
 
@@ -540,6 +565,7 @@ def candidate_allowed(source_name: str, link: str, title: str) -> bool:
         "plumber", "toilet", "cistern", "do i pay again", "should i pay",
         "cramer's top 10", "best deep value stock", "invest in now", "top stocks to buy",
         "focus list", "analyst picks", "analyst report:",
+        "analyst upgrade", "analysts upgrade", "analysts upgrades", "analyst upgrades",
         "inherited", "no experience with investing", "what should i do with this money",
         " i ", " my ", " what should ", "what do i",
         "price target", "buy rating", "sell rating", "neutral rating",
@@ -584,6 +610,8 @@ def candidate_allowed(source_name: str, link: str, title: str) -> bool:
 
 def infer_category(title: str) -> str:
     text = title.lower()
+    if re.search(r"iran|hormuz|middle east|peace deal|peace agreement|tehran|伊朗|霍爾木茲|中東", text):
+        return "能源、外匯與商品"
     if re.search(r"nvidia|amd|tsmc|intel|broadcom|globalfoundries|arm holdings|sandisk|seagate|semiconductor|chip|chips|晶片|半導體", text):
         return "半導體與供應鏈"
     if re.search(r"\bai\b|artificial intelligence|openai|cloud|data center|datacenter|software|平台|人工智能|雲端", text):
@@ -619,7 +647,8 @@ def cluster_key(title: str) -> str:
     text = (title or "").lower()
     clusters = [
         ("spacex", r"spacex"),
-        ("iran-oil", r"(iran|kharg).*(oil|crude)|oil.*iran|crude.*iran"),
+        ("paramount-wbd", r"paramount|warner bros|wbd"),
+        ("iran-oil", r"(iran|kharg|tehran|hormuz).*(oil|crude|deal|peace|agreement)|oil.*iran|crude.*iran|u\.s\.-iran|us and iran"),
         ("gold", r"gold|bullion|silver"),
         ("rates-inflation", r"fed|fomc|inflation|cpi|pce|treasury|yield|producer prices|jobs"),
         ("ai-platforms", r"\bai\b|artificial intelligence|openai|cloud|data center|datacenter"),
@@ -643,6 +672,8 @@ def topic_title_from_cluster(cluster: str, primary_title_zh: str, related: list[
         return primary_title_zh
     if cluster == "spacex":
         return "SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應"
+    if cluster == "paramount-wbd":
+        return "派拉蒙與華納兄弟探索合併獲批，媒體業整合再升溫"
     if cluster == "rates-inflation":
         return "利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價"
     if cluster == "ai-platforms":
@@ -839,6 +870,8 @@ def headline_to_zh(title: str, category: str) -> str:
     if has_cjk(title) and not looks_mostly_english(title):
         if re.search(r"史上最大的 IPO.*最贵的盲盒", title):
             return "史上最大 IPO：SpaceX 估值成為市場最貴盲盒"
+        if re.search(r"50 年科技 IPO.*晚点小数据", title):
+            return "50 年科技 IPO 回顧：從蘋果、Nvidia 到 SpaceX 的上市週期"
         return to_traditional_zh(title)
 
     patterns = [
@@ -848,6 +881,11 @@ def headline_to_zh(title: str, category: str) -> str:
         (r"SpaceX IPO won.*bull market.*", "SpaceX IPO 未必終結牛市，但投資者憂慮上市後估值壓力"),
         (r"SpaceX soon-to-be millionaires.*", "SpaceX 上市或製造新一批富豪，財富效應帶動高端消費想像"),
         (r"Jim Cramer warns SpaceX.*", "市場名嘴警告 SpaceX 上市後估值可能升至難以持續水平"),
+        (r"Former Tesla board member says SpaceX needs to achieve.*moonshots.*valuation.*", "前 Tesla 董事稱 SpaceX 需兌現兩大目標才可支撐估值"),
+        (r"Small investors scrambled to get in on the SpaceX IPO.*", "散戶搶購 SpaceX IPO，部分投資者仍質疑估值過高"),
+        (r"How Elon Musk nailed the SpaceX IPO.*", "馬斯克操盤 SpaceX IPO 獲市場追捧，上市定價策略受關注"),
+        (r"After SpaceX.*huge IPO.*financial future.*AI.*", "SpaceX 大型 IPO 令美國投資組合更綁定 AI 資本周期"),
+        (r"US stocks rise after oil prices ease and SpaceX soars.*", "美股上升，油價回落與 SpaceX 首日大漲提振市場情緒"),
         (r"Trump claims Iran war settled.*", "特朗普稱伊朗衝突接近落實協議，市場觀察地緣風險降溫"),
         (r"Trump picks former SEC Chairman.*", "特朗普提名前 SEC 主席出任國家情報總監，監管與政策人事受關注"),
         (r"What energy insiders.*oil prices.*Iran deal.*", "華府能源人士評估油價與伊朗協議前景"),
@@ -860,7 +898,10 @@ def headline_to_zh(title: str, category: str) -> str:
         (r"Proposed Iran-U\.S\. deal would reopen Hormuz.*", "伊朗官媒稱美伊協議或重開霍爾木茲海峽並解除石油制裁"),
         (r"Trump claims US and Iran on verge of signing peace agreement.*", "特朗普稱美伊接近簽署和平協議，德黑蘭稱尚未作最終決定"),
         (r"Trump denies Iran's account of deal terms.*", "特朗普否認伊朗對協議條款的說法，並譴責新一輪無人機攻擊"),
+        (r"Trump administration: Iran deal signing likely in coming days.*not '?100%'? certain.*", "特朗普政府稱伊朗協議或數日內簽署，但仍未完全確定"),
         (r"Meta reportedly begins dismantling.*Manus deal.*", "Meta 據報按北京要求拆解 Manus 交易，AI 併購監管風險升溫"),
+        (r"Paramount-WBD merger wins approval from DOJ.*", "派拉蒙與華納兄弟探索合併獲美國司法部批准"),
+        (r"US justice department approves.*merger of Paramount and Warner Bros Discovery.*", "美國司法部批准派拉蒙與華納兄弟探索 1,110 億美元合併"),
         (r"Sam Bankman-Fried loses bid to appeal.*FTX.*", "FTX 創辦人上訴失敗，欺詐定罪維持不變"),
         (r"UK economy shrank by 0\.1% in April.*", "英國 4 月經濟收縮 0.1%，地緣風險拖累增長"),
         (r"Barclays to buy GoHenry.*", "Barclays 收購兒童扣帳卡應用 GoHenry，擴大年輕客群布局"),
