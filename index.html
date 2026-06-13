@@ -9,21 +9,29 @@
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="/" data-link>
-        <span class="brand-mark">TD</span>
-        <span>
-          <strong>Tiny Dream News</strong>
-          <small>每日國際財經與科技新聞摘要</small>
-        </span>
-      </a>
+      <div class="masthead-top">
+        <span>Finance · Technology · Markets</span>
+        <span>Hong Kong Edition</span>
+      </div>
+      <div class="masthead-main">
+        <a class="brand" href="/" data-link>
+          <span class="brand-mark">TDN</span>
+          <span>
+            <strong>Tiny Dream News</strong>
+            <small>每日國際財經與科技新聞摘要</small>
+          </span>
+        </a>
+        <form class="global-search" id="global-search-form" role="search">
+          <input id="global-search-input" type="search" placeholder="搜尋 Nvidia、Fed、AI、半導體..." />
+          <button type="submit">搜尋</button>
+        </form>
+      </div>
       <nav class="nav" aria-label="主要導覽">
-        <a href="/archive" data-link>歸檔</a>
+        <a href="/" data-link>頭版</a>
         <a href="/topics" data-link>題材</a>
+        <a href="/archive" data-link>Archive</a>
+        <a href="/search" data-link>Search</a>
       </nav>
-      <form class="global-search" id="global-search-form" role="search">
-        <input id="global-search-input" type="search" placeholder="搜尋 Nvidia、Fed、AI、半導體..." />
-        <button type="submit">搜尋</button>
-      </form>
     </header>
 
     <main id="app" class="app-shell" aria-live="polite">
