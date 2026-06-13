@@ -515,6 +515,7 @@ def source_excerpt_summary(text: str) -> str:
 def summarize_from_context(title_zh: str, original_title: str, source: str, context: dict) -> tuple[str, str, str]:
     contexts = [context] + as_list(context.get("fallback_contexts"))
     first_basis = ""
+    first_fallback = ""
     for candidate_context in contexts:
         text = clean_text(candidate_context.get("text", ""))
         basis = candidate_context.get("basis", "")
@@ -527,22 +528,64 @@ def summarize_from_context(title_zh: str, original_title: str, source: str, cont
             summary = to_traditional_zh("".join(sentences[:3]))[:360]
             if summary_supported_by_text(summary, text, original_title):
                 return summary, basis, "verified_from_source_text"
-        prompt = (
-            "你是香港繁體中文財經新聞編輯。只根據下面提供的原文內容寫新聞摘要，不可以加入推測、評論、投資建議或原文沒有的背景。\n"
-            "請輸出 2 至 3 句香港繁體中文，不要使用簡體字；公司名和人名可以保留英文，不要自行音譯。必須包含原文中的具體公司/人物/數字/事件。"
-            "如果可讀內容只有一兩句 description，也要把 description 翻譯和整理成摘要；只有內容空白、廣告、導覽或與題目無關時，才輸出 NO_VERIFIABLE_SUMMARY。\n\n"
-            f"中文題目：{title_zh}\n"
-            f"原文題目：{original_title}\n"
-            f"來源：{source}\n"
-            f"可讀原文內容：{text[:3200]}"
-        )
-        summary = to_traditional_zh(call_cloudflare_ai(prompt))
-        if summary_supported_by_text(summary, text, original_title):
-            return summary, basis, "verified_from_source_text"
         fallback = source_excerpt_summary(text)
         if summary_supported_by_text(fallback, text, original_title):
-            return fallback, basis, "verified_from_source_text"
+            first_fallback = first_fallback or fallback
+            first_basis = first_basis or basis
+    if first_fallback:
+        return first_fallback, first_basis, "verified_from_source_text"
     return "", first_basis, "summary_unavailable_after_source_check" if first_basis else "no_verifiable_source_text"
+
+
+def parse_ai_json_object(value: str) -> dict:
+    text = clean_text(value)
+    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.I)
+    match = re.search(r"\{.*\}", text, flags=re.S)
+    if not match:
+        return {}
+    try:
+        data = json.loads(match.group(0))
+    except Exception:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def apply_batch_ai_summaries(items: list[dict]) -> None:
+    payload = []
+    context_by_id = {}
+    for item in items:
+        context_text = clean_text(item.get("_summary_context_text", ""))
+        if not context_text:
+            continue
+        context_by_id[item["id"]] = context_text
+        payload.append({
+            "id": item["id"],
+            "title_zh": item["title_zh"],
+            "title_original": item["title_original"],
+            "source": item["source"],
+            "source_text": context_text[:900],
+        })
+    if not payload:
+        return
+    prompt = (
+        "你是香港繁體中文財經新聞編輯。以下是多條新聞的可信來源文字，可能是正文、RSS description 或 meta description。\n"
+        "請只根據 source_text 寫每條新聞的撮要，不可以加入推測、評論、投資建議或 source_text 沒有的背景。\n"
+        "每條輸出 1 至 2 句香港繁體中文；公司名可保留英文，人名不要亂音譯；要保留 source_text 中的重要數字、人物、公司或事件。\n"
+        "即使 source_text 只有一句 description，也要翻譯整理成撮要。不要輸出 Markdown。\n"
+        "只輸出 JSON，格式為 {\"summaries\":{\"id\":\"中文撮要\"}}。\n\n"
+        + json.dumps(payload, ensure_ascii=False)
+    )
+    response = call_cloudflare_ai(prompt)
+    data = parse_ai_json_object(response)
+    summaries = data.get("summaries") if isinstance(data, dict) else {}
+    if not isinstance(summaries, dict):
+        return
+    for item in items:
+        summary = to_traditional_zh(str(summaries.get(item["id"], "")).strip())
+        context_text = context_by_id.get(item["id"], "")
+        if summary_supported_by_text(summary, context_text, item.get("title_original", "")) and not contains_common_simplified_zh(summary):
+            item["summary_zh"] = summary[:420]
+            item["summary_status"] = "verified_from_source_text"
 
 
 def source_label(source_name: str) -> str:
@@ -1074,6 +1117,8 @@ def build_item(candidate: dict, idx: int) -> dict:
         "time_horizon": "short_term",
         "tracking_value": "",
         "topic_key": cluster,
+        "_summary_context_text": clean_text(context.get("text", "")),
+        "_summary_context_basis": context.get("basis", ""),
     }
 
 
@@ -1102,6 +1147,10 @@ def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
         fail(f"Only {len(usable)} usable news candidates were collected after quality filters.")
 
     items = [build_item(candidate, idx) for idx, candidate in enumerate(usable, start=1)]
+    apply_batch_ai_summaries(items)
+    for item in items:
+        item.pop("_summary_context_text", None)
+        item.pop("_summary_context_basis", None)
     categories = []
     for name, slug in CATEGORY_TAXONOMY:
         refs = [item["id"] for item in items if item["category"] == name]
