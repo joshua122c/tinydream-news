@@ -1,0 +1,653 @@
+{
+  "date": "2026-06-13",
+  "update_id": "2026-06-13-1725",
+  "update_file": "data/briefs/2026-06-13-1725.json",
+  "title": "每日國際財經與科技新聞摘要",
+  "deck": "整理全球市場、科技產業和主要企業消息，協助快速掌握今日值得追蹤的新聞主線。",
+  "daily_summary_zh": "今日國際財經與科技新聞以企業、財報與交易、科技、AI與平台、能源、外匯與商品為主線。頭版焦點包括SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應、AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視、黃金與貴金屬走勢承壓，避險需求和實質利率出現拉扯。本期共有 4 個主題整合同題材來源，重點不只在單一標題，而是觀察新聞是否正在形成可持續的市場敘事；讀者可先讀焦點主題，再按分類核對原文和後續變化。",
+  "market_focus": [
+    "企業、財報與交易",
+    "科技、AI與平台",
+    "能源、外匯與商品"
+  ],
+  "hot_topics": [
+    {
+      "rank": 1,
+      "topic": "SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應",
+      "heat_score": 94,
+      "heat_label": "High",
+      "source_count": 4,
+      "main_sources": [
+        "CNBC",
+        "MarketWatch",
+        "The Guardian",
+        "Yahoo Finance"
+      ],
+      "item_ids": [
+        "2026-06-13-headline-001"
+      ],
+      "one_line_reason": "企業融資、財報或交易消息會直接影響個股估值，並可能擴散至同業。",
+      "reporter_angle": ""
+    },
+    {
+      "rank": 2,
+      "topic": "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視",
+      "heat_score": 94,
+      "heat_label": "High",
+      "source_count": 2,
+      "main_sources": [
+        "WSJ Markets",
+        "WSJ Technology"
+      ],
+      "item_ids": [
+        "2026-06-13-headline-002"
+      ],
+      "one_line_reason": "AI 應用與雲端平台消息可能改變市場對大型科技股增長和資本開支的判斷。",
+      "reporter_angle": ""
+    },
+    {
+      "rank": 3,
+      "topic": "黃金與貴金屬走勢承壓，避險需求和實質利率出現拉扯",
+      "heat_score": 94,
+      "heat_label": "High",
+      "source_count": 2,
+      "main_sources": [
+        "Yahoo Finance",
+        "WSJ Markets"
+      ],
+      "item_ids": [
+        "2026-06-13-headline-003"
+      ],
+      "one_line_reason": "商品和外匯價格會影響通脹預期、企業成本和避險資金流向。",
+      "reporter_angle": ""
+    },
+    {
+      "rank": 4,
+      "topic": "中東與原油供應風險再受關注，能源價格牽動通脹與避險定價",
+      "heat_score": 94,
+      "heat_label": "High",
+      "source_count": 2,
+      "main_sources": [
+        "CNBC",
+        "The Guardian"
+      ],
+      "item_ids": [
+        "2026-06-13-headline-004"
+      ],
+      "one_line_reason": "商品和外匯價格會影響通脹預期、企業成本和避險資金流向。",
+      "reporter_angle": ""
+    },
+    {
+      "rank": 5,
+      "topic": "散戶搶購 SpaceX IPO，部分投資者仍質疑估值過高",
+      "heat_score": 94,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC"
+      ],
+      "item_ids": [
+        "2026-06-13-headline-005"
+      ],
+      "one_line_reason": "企業融資、財報或交易消息會直接影響個股估值，並可能擴散至同業。",
+      "reporter_angle": ""
+    }
+  ],
+  "categories": [
+    {
+      "name": "科技、AI與平台",
+      "slug": "technology-ai-platforms",
+      "item_ids": [
+        "2026-06-13-headline-002",
+        "2026-06-13-headline-007"
+      ]
+    },
+    {
+      "name": "企業、財報與交易",
+      "slug": "companies-earnings-deals",
+      "item_ids": [
+        "2026-06-13-headline-001",
+        "2026-06-13-headline-005",
+        "2026-06-13-headline-008",
+        "2026-06-13-headline-011",
+        "2026-06-13-headline-012"
+      ]
+    },
+    {
+      "name": "能源、外匯與商品",
+      "slug": "energy-fx-commodities",
+      "item_ids": [
+        "2026-06-13-headline-003",
+        "2026-06-13-headline-004",
+        "2026-06-13-headline-006",
+        "2026-06-13-headline-009",
+        "2026-06-13-headline-010"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "2026-06-13-headline-001",
+      "date": "2026-06-13",
+      "title_original": "Former Tesla board member says SpaceX needs to achieve 2 of its 3 moonshots to keep its valuation",
+      "title_zh": "SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/12/spacex-moonshots-valuation-westly-tesla.html",
+      "published_at": "Sat, 13 Jun 2026 07:22:10 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易"
+      ],
+      "summary_zh": "",
+      "summary_basis": "article_body",
+      "summary_status": "summary_unavailable_after_source_check",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：4",
+        "同題材來源：CNBC、MarketWatch、The Guardian、Yahoo Finance",
+        "代表性原始標題：Former Tesla board member says SpaceX needs to achieve 2 of its 3 moonshots to keep its valuation；Small investors scrambled to get in on the SpaceX IPO, even as some believe the valuation is 'stupid'"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 4,
+      "sources_reporting_same_topic": [
+        "CNBC",
+        "MarketWatch",
+        "The Guardian",
+        "Yahoo Finance"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "spacex"
+    },
+    {
+      "id": "2026-06-13-headline-002",
+      "date": "2026-06-13",
+      "title_original": "Stocks Sink in Broad AI Rout Sparked by China's DeepSeek",
+      "title_zh": "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/nikkei-may-rise-as-weak-yen-raises-earnings-hopes-776a8056?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 14:26:00 -0500",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "AI投資熱潮",
+        "企業與資本市場"
+      ],
+      "summary_zh": "",
+      "summary_basis": "rss_description",
+      "summary_status": "summary_unavailable_after_source_check",
+      "key_facts": [
+        "主要來源：WSJ Markets",
+        "同題材來源數：2",
+        "同題材來源：WSJ Markets、WSJ Technology",
+        "代表性原始標題：Stocks Sink in Broad AI Rout Sparked by China's DeepSeek；DeepSeek Won't Sink U.S. AI Titans"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 2,
+      "sources_reporting_same_topic": [
+        "WSJ Markets",
+        "WSJ Technology"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "ai-platforms"
+    },
+    {
+      "id": "2026-06-13-headline-003",
+      "date": "2026-06-13",
+      "title_original": "Goldman Sachs Cuts 2027 Oil Price Estimate on Demand Uncertainty",
+      "title_zh": "黃金與貴金屬走勢承壓，避險需求和實質利率出現拉扯",
+      "source": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/sectors/energy/articles/goldman-sachs-cuts-2027-oil-053000888.html",
+      "published_at": "2026-06-12T05:30:00Z",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "商品與外匯"
+      ],
+      "summary_zh": "",
+      "summary_basis": "article_body",
+      "summary_status": "summary_unavailable_after_source_check",
+      "key_facts": [
+        "主要來源：Yahoo Finance",
+        "同題材來源數：2",
+        "同題材來源：Yahoo Finance、WSJ Markets",
+        "代表性原始標題：Goldman Sachs Cuts 2027 Oil Price Estimate on Demand Uncertainty；Comex Gold, Silver Settle Lower"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 2,
+      "sources_reporting_same_topic": [
+        "Yahoo Finance",
+        "WSJ Markets"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "gold"
+    },
+    {
+      "id": "2026-06-13-headline-004",
+      "date": "2026-06-13",
+      "title_original": "Trump administration: Iran deal signing likely in coming days, but not '100%' certain",
+      "title_zh": "中東與原油供應風險再受關注，能源價格牽動通脹與避險定價",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/12/iran-deal-trump-pakistan-sharif.html",
+      "published_at": "Fri, 12 Jun 2026 20:21:14 GMT",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "企業與資本市場"
+      ],
+      "summary_zh": "",
+      "summary_basis": "article_body",
+      "summary_status": "summary_unavailable_after_source_check",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：2",
+        "同題材來源：CNBC、The Guardian",
+        "代表性原始標題：Trump administration: Iran deal signing likely in coming days, but not '100%' certain；Trump claims US and Iran on verge of signing peace agreement, but Tehran says no final decision made"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 9,
+      "heat_score": 94,
+      "source_count": 2,
+      "sources_reporting_same_topic": [
+        "CNBC",
+        "The Guardian"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "iran-oil"
+    },
+    {
+      "id": "2026-06-13-headline-005",
+      "date": "2026-06-13",
+      "title_original": "Small investors scrambled to get in on the SpaceX IPO, even as some believe the valuation is 'stupid'",
+      "title_zh": "散戶搶購 SpaceX IPO，部分投資者仍質疑估值過高",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/12/small-investors-scrambled-to-get-in-on-the-spacex-ipo-even-as-some-believe-the-valuation-is-stupid.html",
+      "published_at": "Fri, 12 Jun 2026 21:48:59 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易",
+        "企業與資本市場"
+      ],
+      "summary_zh": "",
+      "summary_basis": "article_body",
+      "summary_status": "summary_unavailable_after_source_check",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：1",
+        "同題材來源：CNBC",
+        "代表性原始標題：Small investors scrambled to get in on the SpaceX IPO, even as some believe the valuation is 'stupid'"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 9,
+      "heat_score": 94,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "spacex"
+    },
+    {
+      "id": "2026-06-13-headline-006",
+      "date": "2026-06-13",
+      "title_original": "Comex Gold, Silver Settle Lower",
+      "title_zh": "金價受壓，避險與通脹交易出現重新定價",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/gold-edges-lower-feds-rate-decision-in-focus-09dbfceb?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 14:01:00 -0500",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "商品與外匯"
+      ],
+      "summary_zh": "",
+      "summary_basis": "rss_description",
+      "summary_status": "summary_unavailable_after_source_check",
+      "key_facts": [
+        "主要來源：WSJ Markets",
+        "同題材來源數：1",
+        "同題材來源：WSJ Markets",
+        "代表性原始標題：Comex Gold, Silver Settle Lower"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 8,
+      "heat_score": 94,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Markets"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "gold"
+    },
+    {
+      "id": "2026-06-13-headline-007",
+      "date": "2026-06-13",
+      "title_original": "DeepSeek Won't Sink U.S. AI Titans",
+      "title_zh": "DeepSeek 未必拖垮美國 AI 巨頭，競爭壓力仍需重估",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/deepseek-us-ai-stocks-nvidia-broadcom-6cdfae81?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 13:12:00 -0500",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "AI投資熱潮"
+      ],
+      "summary_zh": "",
+      "summary_basis": "rss_description",
+      "summary_status": "summary_unavailable_after_source_check",
+      "key_facts": [
+        "主要來源：WSJ Markets",
+        "同題材來源數：1",
+        "同題材來源：WSJ Markets",
+        "代表性原始標題：DeepSeek Won't Sink U.S. AI Titans"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 8,
+      "heat_score": 94,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Markets"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "ai-platforms"
+    },
+    {
+      "id": "2026-06-13-headline-008",
+      "date": "2026-06-13",
+      "title_original": "Paramount-WBD merger wins approval from DOJ",
+      "title_zh": "派拉蒙與華納兄弟探索合併獲美國司法部批准",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/12/paramount-wbd-merger-approval-doj.html",
+      "published_at": "Fri, 12 Jun 2026 22:54:06 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易"
+      ],
+      "summary_zh": "",
+      "summary_basis": "article_body",
+      "summary_status": "summary_unavailable_after_source_check",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：1",
+        "同題材來源：CNBC",
+        "代表性原始標題：Paramount-WBD merger wins approval from DOJ"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 7,
+      "heat_score": 87,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "paramount-wbd"
+    },
+    {
+      "id": "2026-06-13-headline-009",
+      "date": "2026-06-13",
+      "title_original": "Arabica Coffee Prices Hit Record on U.S., Colombia Tariff Spat",
+      "title_zh": "農產品與關稅消息牽動商品價格，通脹預期再受關注",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/arabica-coffee-prices-hit-new-high-on-u-s-colombia-tariff-spat-582446fe?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 12:20:00 -0500",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品"
+      ],
+      "summary_zh": "",
+      "summary_basis": "rss_description",
+      "summary_status": "summary_unavailable_after_source_check",
+      "key_facts": [
+        "主要來源：WSJ Markets",
+        "同題材來源數：1",
+        "同題材來源：WSJ Markets",
+        "代表性原始標題：Arabica Coffee Prices Hit Record on U.S., Colombia Tariff Spat"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 7,
+      "heat_score": 86,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Markets"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "arabica-coffee-prices"
+    },
+    {
+      "id": "2026-06-13-headline-010",
+      "date": "2026-06-13",
+      "title_original": "BlackRock says oil, FX risks loom over India's bond inflow push",
+      "title_zh": "BlackRock 警告油價與匯率風險或影響印度債券資金流入",
+      "source": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/news/blackrock-says-oil-fx-risks-080545617.html",
+      "published_at": "2026-06-12T08:05:45Z",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "商品與外匯"
+      ],
+      "summary_zh": "",
+      "summary_basis": "article_body",
+      "summary_status": "summary_unavailable_after_source_check",
+      "key_facts": [
+        "主要來源：Yahoo Finance",
+        "同題材來源數：1",
+        "同題材來源：Yahoo Finance",
+        "代表性原始標題：BlackRock says oil, FX risks loom over India's bond inflow push"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 6,
+      "heat_score": 82,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "Yahoo Finance"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "blackrock-says-risks"
+    },
+    {
+      "id": "2026-06-13-headline-011",
+      "date": "2026-06-13",
+      "title_original": "Sam Bankman-Fried loses bid to appeal against fraud conviction in FTX case",
+      "title_zh": "FTX 創辦人上訴失敗，欺詐定罪維持不變",
+      "source": "The Guardian",
+      "url": "https://www.theguardian.com/business/2026/jun/12/sam-bankman-fried-loses-appeal",
+      "published_at": "Fri, 12 Jun 2026 13:52:59 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易"
+      ],
+      "summary_zh": "",
+      "summary_basis": "article_body",
+      "summary_status": "summary_unavailable_after_source_check",
+      "key_facts": [
+        "主要來源：The Guardian",
+        "同題材來源數：1",
+        "同題材來源：The Guardian",
+        "代表性原始標題：Sam Bankman-Fried loses bid to appeal against fraud conviction in FTX case"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 6,
+      "heat_score": 81,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "The Guardian"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "bankman-fried-loses"
+    },
+    {
+      "id": "2026-06-13-headline-012",
+      "date": "2026-06-13",
+      "title_original": "50 年科技 IPO丨晚点小数据 昨天",
+      "title_zh": "50 年科技 IPO 回顧：從蘋果、Nvidia 到 SpaceX 的上市週期",
+      "source": "晚點",
+      "url": "https://www.latepost.com/news/dj_detail?id=3595",
+      "published_at": "2026-06-13T17:25:14+08:00",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易",
+        "企業與資本市場"
+      ],
+      "summary_zh": "1980 年，四歲的蘋果在納斯達克上市，集資 1 億美元，已是幾十年來最大的一筆。招股書寫的介紹是：“這家公司設計、開發、製造、銷售基於微處理器的電腦系統，供個人使用。” 多年後，黃仁勳照搬了這種樸素：“我們設計、開發、銷售 3D 圖形加速晶片”。",
+      "summary_basis": "article_body",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：晚點",
+        "同題材來源數：1",
+        "同題材來源：晚點",
+        "代表性原始標題：50 年科技 IPO丨晚点小数据 昨天"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 5,
+      "heat_score": 65,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "晚點"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "50年科技ipo丨晚点小数据昨天"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Reuters Markets",
+      "url": "https://www.reuters.com/markets/",
+      "access": "Blocked",
+      "tier": 1
+    },
+    {
+      "name": "Reuters Technology",
+      "url": "https://www.reuters.com/technology/",
+      "access": "Blocked",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Top News",
+      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Markets",
+      "url": "https://www.cnbc.com/markets/",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Technology",
+      "url": "https://www.cnbc.com/technology/",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "WSJ Markets",
+      "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "WSJ Technology",
+      "url": "https://feeds.a.dj.com/rss/RSSWSJD.xml",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/news/rssindex",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "MarketWatch Top Stories",
+      "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "The Guardian Business",
+      "url": "https://www.theguardian.com/business/rss",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "Nikkei Asia Business",
+      "url": "https://asia.nikkei.com/Business",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "TechCrunch AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "TechCrunch Startups",
+      "url": "https://techcrunch.com/category/startups/",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "Wallstreetcn",
+      "url": "https://wallstreetcn.com/",
+      "access": "Full",
+      "tier": 3
+    },
+    {
+      "name": "Caixin",
+      "url": "https://www.caixin.com/",
+      "access": "Full",
+      "tier": 3
+    },
+    {
+      "name": "LatePost",
+      "url": "https://www.latepost.com/",
+      "access": "Full",
+      "tier": 3
+    }
+  ],
+  "generated_at": "2026-06-13T17:25:14+08:00",
+  "email_body_zh": "今日國際財經與科技新聞以企業、財報與交易、科技、AI與平台、能源、外匯與商品為主線。頭版焦點包括SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應、AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視、黃金與貴金屬走勢承壓，避險需求和實質利率出現拉扯。本期共有 4 個主題整合同題材來源，重點不只在單一標題，而是觀察新聞是否正在形成可持續的市場敘事；讀者可先讀焦點主題，再按分類核對原文和後續變化。\n\n網站：https://news.tinydreamlab.com/"
+}
