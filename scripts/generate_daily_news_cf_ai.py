@@ -162,6 +162,7 @@ SIMPLIFIED_TO_TRADITIONAL_PHRASES = [
     ("这种", "這種"),
     ("这家公司", "這家公司"),
     ("我们", "我們"),
+    ("该", "該"),
     ("朴素", "樸素"),
     ("图形", "圖形"),
     ("芯片", "晶片"),
@@ -246,7 +247,7 @@ def to_traditional_zh(value: str) -> str:
 
 
 def contains_common_simplified_zh(value: str) -> bool:
-    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉岁苹纳达募几笔书写绍设开发制销脑黄勋种朴图芯来处们"
+    simplified_chars = "执员报认为时让计进亿万约过创纪经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉岁苹纳达募几笔书写绍设开发制销脑黄勋种该朴图芯来处们"
     return any(char in (value or "") for char in simplified_chars)
 
 
