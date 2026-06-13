@@ -6,7 +6,9 @@ import re
 import smtplib
 import ssl
 import sys
+import time
 import urllib.parse
+import urllib.error
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
@@ -26,6 +28,7 @@ BRIEF_PATH = BRIEFS_DIR / f"{UPDATE_ID}.json"
 DAILY_LATEST_PATH = BRIEFS_DIR / f"{TODAY}.json"
 
 USER_AGENT = "Mozilla/5.0 (compatible; TinyDreamNewsRadar/2.0; +https://news.tinydreamlab.com/)"
+LAST_AI_CALL_AT = 0.0
 
 SOURCE_CONFIGS = [
     {"name": "Reuters Markets", "url": "https://www.reuters.com/markets/", "kind": "page", "tier": 1, "max_items": 12},
@@ -428,6 +431,7 @@ def article_context(candidate: dict) -> dict:
 
 
 def call_cloudflare_ai(prompt: str) -> str:
+    global LAST_AI_CALL_AT
     account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
     token = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
     model = os.environ.get("CF_AI_MODEL", "@cf/qwen/qwen2.5-coder-32b-instruct").strip()
@@ -441,11 +445,31 @@ def call_cloudflare_ai(prompt: str) -> str:
         headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json", "User-Agent": USER_AGENT},
         method="POST",
     )
-    try:
-        with urllib.request.urlopen(request, timeout=45) as response:
-            data = json.loads(response.read().decode("utf-8", errors="replace"))
-    except Exception as exc:
-        print(f"Cloudflare AI summary failed: {exc}")
+    for attempt in range(4):
+        elapsed = time.monotonic() - LAST_AI_CALL_AT
+        if elapsed < 2.5:
+            time.sleep(2.5 - elapsed)
+        try:
+            LAST_AI_CALL_AT = time.monotonic()
+            with urllib.request.urlopen(request, timeout=45) as response:
+                data = json.loads(response.read().decode("utf-8", errors="replace"))
+            break
+        except urllib.error.HTTPError as exc:
+            if exc.code == 429 and attempt < 3:
+                retry_after = exc.headers.get("Retry-After")
+                try:
+                    wait_seconds = max(5, int(retry_after)) if retry_after else 6 + attempt * 4
+                except ValueError:
+                    wait_seconds = 6 + attempt * 4
+                print(f"Cloudflare AI rate limited; retrying in {wait_seconds}s.")
+                time.sleep(wait_seconds)
+                continue
+            print(f"Cloudflare AI summary failed: {exc}")
+            return ""
+        except Exception as exc:
+            print(f"Cloudflare AI summary failed: {exc}")
+            return ""
+    else:
         return ""
     result = data.get("result") if isinstance(data, dict) else {}
     if isinstance(result, dict):
