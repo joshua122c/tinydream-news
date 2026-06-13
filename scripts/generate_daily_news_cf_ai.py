@@ -1038,7 +1038,7 @@ def headline_to_zh(title: str, category: str) -> str:
         (r"Barclays to buy GoHenry.*", "Barclays 收購兒童扣帳卡應用 GoHenry，擴大年輕客群布局"),
         (r"Paddy Power owner Flutter to scrap listing.*London Stock Exchange.*", "Flutter 擬撤銷倫敦上市地位，重心進一步轉向美國市場"),
         (r"Flutter Entertainment to Delist From London.*Trade Solely in New York.*", "Flutter 擬退出倫敦上市，股份將只在紐約交易"),
-        (r"Origin Materials approves delisting to cut compliance costs.*", "Origin Materials 批准退市以降低合規成本"),
+        (r"Origin Materials approves delisting to cut compliance costs.*", "美國材料公司 Origin Materials 批准退市以降低合規成本"),
         (r"Charles Cole indicted for defrauding Napster.*239M shares.*", "Charles Cole 被控欺詐 Napster 2.39 億股，涉案股份交易受關注"),
         (r"Treasury yields are steady after hot producer prices reading.*", "美債收益率在生產者價格數據偏熱後靠穩，市場重新評估利率路徑"),
         (r"Gold slumps to 6-month low.*", "通脹憂慮升溫但金價跌至六個月低位，避險需求未有承接"),
