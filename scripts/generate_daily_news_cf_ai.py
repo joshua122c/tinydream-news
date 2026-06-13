@@ -434,7 +434,7 @@ def call_cloudflare_ai(prompt: str) -> str:
     global LAST_AI_CALL_AT
     account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
     token = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
-    model = os.environ.get("CF_AI_MODEL", "@cf/qwen/qwen2.5-coder-32b-instruct").strip()
+    model = os.environ.get("CF_AI_MODEL", "@cf/meta/llama-3.1-8b-instruct").strip()
     if not (account_id and token and model):
         return ""
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{urllib.parse.quote(model, safe='@/-')}"
