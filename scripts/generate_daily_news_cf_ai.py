@@ -1191,6 +1191,46 @@ def sanitize_items_for_publication(items: list[dict]) -> list[dict]:
     return publishable
 
 
+def build_hot_topics(items: list[dict]) -> list[dict]:
+    groups = {}
+    for item in items:
+        key = item.get("topic_key") or title_dedupe_key(item.get("title_zh", ""))
+        groups.setdefault(key, []).append(item)
+    topic_rows = []
+    for key, group_items in groups.items():
+        ranked = sorted(group_items, key=lambda item: item.get("heat_score", 0), reverse=True)
+        primary = ranked[0]
+        sources = []
+        for item in ranked:
+            for source in as_list(item.get("sources_reporting_same_topic")) or [item.get("source")]:
+                if source and source not in sources:
+                    sources.append(source)
+        topic_title = primary["title_zh"]
+        if len(ranked) > 1:
+            topic_title = topic_title_from_cluster(key, primary["title_zh"], [{} for _ in ranked], primary.get("category", ""))
+        heat_score = min(99, max(item.get("heat_score", 0) for item in ranked) + min(10, (len(ranked) - 1) * 3 + (len(sources) - 1) * 2))
+        reason = hot_topic_reason(primary)
+        if len(ranked) > 1:
+            reason = f"{len(ranked)} 條相關新聞集中在同一題材，反映它是今日主要新聞熱點之一；{reason}"
+        topic_rows.append({
+            "rank": 0,
+            "topic": topic_title,
+            "heat_score": heat_score,
+            "heat_label": "High" if heat_score >= 75 else "Medium",
+            "source_count": max(1, len(sources)),
+            "main_sources": sources[:4] or [primary["source"]],
+            "item_ids": [item["id"] for item in ranked],
+            "one_line_reason": reason,
+            "reporter_angle": primary.get("reporter_angle", ""),
+            "related_story_count": len(ranked),
+            "supporting_titles": [item.get("title_zh", "") for item in ranked[:4]],
+        })
+    topic_rows.sort(key=lambda row: (row["heat_score"], row["related_story_count"], row["source_count"]), reverse=True)
+    for rank, topic in enumerate(topic_rows[:5], start=1):
+        topic["rank"] = rank
+    return topic_rows[:5]
+
+
 def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
     usable = candidates[:12]
     if not usable:
@@ -1212,19 +1252,7 @@ def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
         if refs:
             categories.append({"name": name, "slug": slug, "item_ids": refs})
 
-    hot_topics = []
-    for rank, item in enumerate(items[:5], start=1):
-        hot_topics.append({
-            "rank": rank,
-            "topic": item["title_zh"],
-            "heat_score": item["heat_score"],
-            "heat_label": "High" if item["heat_score"] >= 75 else "Medium",
-            "source_count": item["source_count"],
-            "main_sources": as_list(item.get("sources_reporting_same_topic"))[:4] or [item["source"]],
-            "item_ids": [item["id"]],
-            "one_line_reason": hot_topic_reason(item),
-            "reporter_angle": item["reporter_angle"],
-        })
+    hot_topics = build_hot_topics(items)
 
     top_categories = list(dict.fromkeys(item["category"] for item in items[:8]))[:4]
     top_topics = "、".join(item["title_zh"] for item in items[:3])
