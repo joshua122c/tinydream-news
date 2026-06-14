@@ -655,6 +655,8 @@ def candidate_allowed(source_name: str, link: str, title: str) -> bool:
         return False
     if re.search(r"^is\s+.+\bthe\s+best\b.*\bstock\b", lower_title):
         return False
+    if re.search(r"\b(upgraded|downgraded|initiates?|reiterates?|raises?|cuts?)\b.*\bstock\b|\bstock\b.*\b(upgraded|downgraded|price target|rating)\b", lower_title):
+        return False
     generic_nav_titles = {
         "media & entertainment", "banking & finance", "business", "markets",
         "technology", "startups", "wealth", "personal finance",
