@@ -715,7 +715,10 @@ def normalize_ai_summaries(data: dict, response_text: str = "", known_ids: list[
         data = {}
     value = data.get("summaries")
     if isinstance(value, dict):
-        return {str(key): clean_ai_summary_output(text) for key, text in value.items() if clean_ai_summary_output(text)}
+        rows = {str(key): clean_ai_summary_output(text) for key, text in value.items() if clean_ai_summary_output(text)}
+        if known_ids and len(known_ids) == 1 and known_ids[0] not in rows and len(rows) == 1:
+            return {known_ids[0]: next(iter(rows.values()))}
+        return rows
     if isinstance(value, list):
         rows = {}
         for row in value:
