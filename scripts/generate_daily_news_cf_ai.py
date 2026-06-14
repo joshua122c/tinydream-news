@@ -92,6 +92,10 @@ RUN_REPORT = {
     "ai": {
         "summary_candidates": 0,
         "summary_updates": 0,
+        "response_chars": 0,
+        "parsed_summaries": 0,
+        "rejected_summaries": 0,
+        "last_status": "not_called",
     },
 }
 
@@ -495,6 +499,9 @@ def summary_supported_by_text(summary: str, context_text: str, title: str) -> bo
 
 
 def english_source_summary_zh(text: str, title_zh: str = "", original_title: str = "") -> str:
+    # English source text must be summarized by AI from the current source text.
+    # Hard-coded English-to-Chinese summary mappings are intentionally disabled.
+    return ""
     lower = f"{original_title} {text}".lower()
     if "nasdaq" in lower and "ai infrastructure" in lower:
         return "美股大多下跌，Nasdaq 領跌；原文提到多家 AI 基建相關公司急跌，部分跌幅達雙位數，顯示 AI 交易短線受壓。"
@@ -574,6 +581,31 @@ def parse_ai_json_object(value: str) -> dict:
     return data if isinstance(data, dict) else {}
 
 
+def normalize_ai_summaries(data: dict) -> dict[str, str]:
+    if not isinstance(data, dict):
+        return {}
+    value = data.get("summaries")
+    if isinstance(value, dict):
+        return {str(key): clean_text(text) for key, text in value.items() if clean_text(text)}
+    if isinstance(value, list):
+        rows = {}
+        for row in value:
+            if not isinstance(row, dict):
+                continue
+            item_id = clean_text(row.get("id") or row.get("item_id") or row.get("story_id"))
+            text = clean_text(row.get("summary") or row.get("summary_zh") or row.get("text"))
+            if item_id and text:
+                rows[item_id] = text
+        return rows
+    direct_rows = {}
+    for key, text in data.items():
+        if key == "summaries":
+            continue
+        if isinstance(text, str) and key.startswith(TODAY):
+            direct_rows[str(key)] = clean_text(text)
+    return direct_rows
+
+
 def apply_batch_ai_summaries(items: list[dict]) -> None:
     payload = []
     context_by_id = {}
@@ -594,16 +626,19 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
     RUN_REPORT["ai"]["summary_candidates"] += len(payload)
     prompt = (
         "你是香港繁體中文財經新聞編輯。以下是多條新聞的可信來源文字，可能是正文、RSS description 或 meta description。\n"
-        "請只根據 source_text 寫每條新聞的撮要，不可以加入推測、評論、投資建議或 source_text 沒有的背景。\n"
-        "每條輸出 1 至 2 句香港繁體中文；公司名可保留英文，人名不要亂音譯；要保留 source_text 中的重要數字、人物、公司或事件。\n"
-        "即使 source_text 只有一句 description，也要翻譯整理成撮要。不要輸出 Markdown。\n"
-        "只輸出 JSON，格式為 {\"summaries\":{\"id\":\"中文撮要\"}}。\n\n"
+        "任務：只根據每條 source_text 寫新聞摘要。不可加入推測、評論、投資建議，亦不可加入 source_text 沒有的背景。\n"
+        "每條摘要輸出 1 至 2 句香港繁體中文；公司名可保留英文，人名不要亂音譯；必須保留 source_text 中的重要數字、人物、公司或事件。\n"
+        "如果 source_text 太短，只把已有資訊整理成一句；如果完全不能判斷，就回傳空字串。不要輸出 Markdown。\n"
+        "只輸出 JSON object，格式必須是 {\"summaries\":{\"新聞 id\":\"中文摘要或空字串\"}}。\n\n"
         + json.dumps(payload, ensure_ascii=False)
     )
     response = call_cloudflare_ai(prompt)
+    RUN_REPORT["ai"]["response_chars"] += len(response or "")
     data = parse_ai_json_object(response)
-    summaries = data.get("summaries") if isinstance(data, dict) else {}
-    if not isinstance(summaries, dict):
+    summaries = normalize_ai_summaries(data)
+    RUN_REPORT["ai"]["parsed_summaries"] += len(summaries)
+    if not summaries:
+        RUN_REPORT["ai"]["last_status"] = "empty_or_unparseable_response"
         return
     for item in items:
         summary = to_traditional_zh(str(summaries.get(item["id"], "")).strip())
@@ -613,6 +648,9 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             item["summary"] = item["summary_zh"]
             item["summary_status"] = "verified_from_source_text"
             RUN_REPORT["ai"]["summary_updates"] += 1
+        elif summary:
+            RUN_REPORT["ai"]["rejected_summaries"] += 1
+    RUN_REPORT["ai"]["last_status"] = "ok"
 
 
 def source_label(source_name: str) -> str:
