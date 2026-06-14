@@ -78,6 +78,29 @@ function displayTitle(item) {
   return keywordHeadline(item?.title_original || zh, item?.category || "");
 }
 
+const TITLE_LIMITS = {
+  lead: 58,
+  card: 38,
+  desk: 34,
+  list: 28,
+  brief: 44,
+  default: 52,
+};
+
+function shortenHeadline(value = "", variant = "default") {
+  const max = TITLE_LIMITS[variant] || TITLE_LIMITS.default;
+  const text = String(value || "").trim();
+  if (text.length <= max) return text;
+  const clauses = text.split(/[，；：:。]/).map((part) => part.trim()).filter(Boolean);
+  const firstClause = clauses[0] || "";
+  if (firstClause.length >= 12 && firstClause.length <= max) return firstClause;
+  return `${text.slice(0, Math.max(12, max - 1)).trim()}…`;
+}
+
+function storyTitle(item, variant = "default") {
+  return shortenHeadline(displayTitle(item), variant);
+}
+
 function isWeakSummary(value = "") {
   const text = String(value || "");
   return (
@@ -96,9 +119,24 @@ function displaySummary(item) {
   return "";
 }
 
-function summaryBlock(item) {
+function editorialTakeaway(item) {
+  const candidates = [item?.editorial_takeaway, item?.reporter_angle, item?.market_impact, item?.tracking_value]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+  return candidates.find((value) => value.length >= 12 && !isWeakSummary(value)) || "";
+}
+
+function editorialNoteBlock(item) {
+  const note = editorialTakeaway(item);
+  return note ? `<p class="story-takeaway"><span>Why it matters</span>${escapeHtml(note)}</p>` : "";
+}
+
+function summaryBlock(item, options = {}) {
   const summary = displaySummary(item);
-  return summary ? `<p>${escapeHtml(summary)}</p>` : "";
+  if (summary) {
+    return `<p class="story-summary">${escapeHtml(summary)}</p>${options.takeaway ? editorialNoteBlock(item) : ""}`;
+  }
+  return options.showMissing ? `<p class="story-summary missing">未取得足夠可核實來源文字，暫不撰寫摘要。</p>` : "";
 }
 
 function detailBoxes(item) {
@@ -290,33 +328,76 @@ function storyMeta(item, brief) {
   return `<div class="story-meta"><span>${escapeHtml(item.source || "Source")}</span><span>${escapeHtml(storyTime(item, brief))}</span><span>${escapeHtml(primaryTopic(item))}</span></div>`;
 }
 
-function morningBullets(brief) {
+function storyTopicKey(item) {
+  const explicit = item?.topic_key || asList(item?.themes)[0] || item?.category || "";
+  const title = displayTitle(item).toLowerCase().replace(/[^\w\u3400-\u9fff]+/g, "").slice(0, 18);
+  return `${explicit}-${title}`.toLowerCase();
+}
+
+function editorialHomeLayout(brief) {
+  const sorted = sortedNewsItems(brief);
+  const usedIds = new Set();
+  const usedTopics = new Set();
+  const markUsed = (item) => {
+    if (!item) return;
+    usedIds.add(item.id);
+    usedTopics.add(storyTopicKey(item));
+  };
+  const lead = sorted.find((item) => displaySummary(item)) || sorted[0];
+  markUsed(lead);
+
+  const take = (predicate, limit, options = {}) => {
+    const chosen = [];
+    for (const item of sorted) {
+      if (!item || usedIds.has(item.id) || !predicate(item)) continue;
+      const topic = storyTopicKey(item);
+      if (options.uniqueTopic && usedTopics.has(topic)) continue;
+      chosen.push(item);
+      markUsed(item);
+      if (chosen.length >= limit) break;
+    }
+    return chosen;
+  };
+
+  const markets = take((item) => matchesDesk(item, MARKET_PATTERNS), 3, { uniqueTopic: true });
+  const technology = take((item) => matchesDesk(item, TECHNOLOGY_PATTERNS), 3, { uniqueTopic: true });
+  const topStories = take(() => true, 4, { uniqueTopic: true });
+  const latest = sorted
+    .filter((item) => item?.id && !usedIds.has(item.id))
+    .sort((a, b) => new Date(b.published_at || brief.generated_at || 0) - new Date(a.published_at || brief.generated_at || 0))
+    .slice(0, 6);
+
+  return { lead, topStories, markets, technology, latest };
+}
+
+function morningBullets(brief, layout = editorialHomeLayout(brief)) {
   const summary = String(brief.daily_summary_zh || brief.deck || "").trim();
   const sentences = summary
     .split(/(?<=[。！？；;])\s*/)
     .map((item) => item.trim())
     .filter((item) => item.length >= 14)
-    .slice(0, 4);
-  if (sentences.length >= 3) return sentences;
-  return sortedNewsItems(brief).slice(0, 4).map((item) => displaySummary(item) || displayTitle(item));
+    .slice(0, 2);
+  const storyBullets = [layout.lead, ...layout.topStories, ...layout.markets, ...layout.technology]
+    .filter(Boolean)
+    .map((item) => displaySummary(item) || editorialTakeaway(item) || storyTitle(item, "brief"))
+    .filter(Boolean);
+  return [...sentences, ...storyBullets].slice(0, 5);
 }
 
 function homePage(brief) {
-  const items = sortedNewsItems(brief);
-  const lead = items[0];
-  const topStories = items.filter((item) => item.id !== lead?.id).slice(0, 4);
+  const layout = editorialHomeLayout(brief);
   return `<section class="home-front">
-    ${homeLeadSection(brief, lead)}
-    ${morningBriefSection(brief)}
+    ${homeLeadSection(brief, layout.lead)}
+    ${morningBriefSection(brief, layout)}
     <div class="home-layout">
       <main class="home-main">
-        ${topStoriesSection(brief, topStories)}
-        ${deskSection(brief, "Markets", "市場焦點", marketItems(brief), "利率、能源、外匯、商品與宏觀風險。")}
-        ${deskSection(brief, "Technology & AI", "科技與 AI", technologyItems(brief), "AI 平台、半導體、科技企業與資本開支。")}
+        ${topStoriesSection(brief, layout.topStories)}
+        ${deskSection(brief, "Markets", "市場焦點", layout.markets, "利率、能源、外匯、商品與宏觀風險。")}
+        ${deskSection(brief, "Technology & AI", "科技與 AI", layout.technology, "AI 平台、半導體、科技企業與資本開支。")}
         ${archiveSearchAccess(brief)}
       </main>
       <aside class="home-sidebar">
-        ${latestUpdatesSection(brief, items.slice(1, 7))}
+        ${latestUpdatesSection(brief, layout.latest)}
         ${sourceTransparencyBlock(brief)}
       </aside>
     </div>
@@ -334,8 +415,8 @@ function homeLeadSection(brief, lead) {
     <div class="today-lead-grid">
       <article class="lead-copy">
         ${storyMeta(lead, brief)}
-        <h1>${headlineHtml(displayTitle(lead))}</h1>
-        ${summaryBlock(lead)}
+        <h1>${headlineHtml(storyTitle(lead, "lead"))}</h1>
+        ${summaryBlock(lead, { takeaway: true, showMissing: true })}
         <div class="lead-actions">
           <a class="action primary-action" href="${escapeHtml(lead.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>
           <a class="action" href="${linkFor(`/briefs/${brief.update_id || brief.date}`)}" data-link>${UI.readFullBrief}</a>
@@ -350,13 +431,13 @@ function homeLeadSection(brief, lead) {
   </section>`;
 }
 
-function morningBriefSection(brief) {
+function morningBriefSection(brief, layout) {
   return `<section class="morning-brief-section">
     <div>
       <p class="section-kicker">Morning Brief / 今日摘要</p>
       <h2>開市前需要知道的幾件事</h2>
     </div>
-    <ul>${morningBullets(brief).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+    <ul>${morningBullets(brief, layout).map((item) => `<li>${escapeHtml(shortenHeadline(item, "brief"))}</li>`).join("")}</ul>
   </section>`;
 }
 
@@ -374,8 +455,8 @@ function renderTopStoryCard(item, brief, index) {
   return `<article class="top-story-card" id="item-${escapeHtml(item.id)}">
     <span class="story-rank">${String(index + 1).padStart(2, "0")}</span>
     ${storyMeta(item, brief)}
-    <h3>${headlineHtml(displayTitle(item))}</h3>
-    ${summaryBlock(item)}
+    <h3>${headlineHtml(storyTitle(item, "card"))}</h3>
+    ${summaryBlock(item, { takeaway: true, showMissing: true })}
     <a class="story-link-inline" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>
   </article>`;
 }
@@ -383,13 +464,16 @@ function renderTopStoryCard(item, brief, index) {
 function latestUpdatesSection(brief, items) {
   return `<section class="latest-updates">
     <div class="rail-head"><span>Latest Updates</span><strong>${items.length} 條</strong></div>
-    ${items.map((item, index) => `<a class="latest-update" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">
+    ${items.length ? items.map((item, index) => `<a class="latest-update" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">
       <span>${String(index + 1).padStart(2, "0")}</span>
-      <strong>${headlineHtml(displayTitle(item))}</strong>
+      <strong>${headlineHtml(storyTitle(item, "list"))}</strong>
       <em>${escapeHtml(item.source || "")} · ${escapeHtml(storyTime(item, brief))}</em>
-    </a>`).join("")}
+    </a>`).join("") : `<p class="rail-empty">其餘新聞已分配到主要版位。</p>`}
   </section>`;
 }
+
+const MARKET_PATTERNS = ["market", "markets", "能源", "外匯", "商品", "宏觀", "fed", "oil", "gold", "inflation", "rates", "債", "美元"];
+const TECHNOLOGY_PATTERNS = ["technology", "科技", "ai", "半導體", "平台", "nvidia", "spacex", "deepseek", "chip", "semiconductor"];
 
 function matchesDesk(item, patterns) {
   const haystack = [item.category, item.title_original, item.title_zh, ...asList(item.themes)].join(" ").toLowerCase();
@@ -397,13 +481,11 @@ function matchesDesk(item, patterns) {
 }
 
 function marketItems(brief) {
-  const patterns = ["market", "markets", "能源", "外匯", "商品", "宏觀", "fed", "oil", "gold", "inflation", "rates", "債", "美元"];
-  return sortedNewsItems(brief).filter((item) => matchesDesk(item, patterns)).slice(0, 4);
+  return sortedNewsItems(brief).filter((item) => matchesDesk(item, MARKET_PATTERNS)).slice(0, 4);
 }
 
 function technologyItems(brief) {
-  const patterns = ["technology", "科技", "ai", "半導體", "平台", "nvidia", "spacex", "deepseek", "chip", "semiconductor"];
-  return sortedNewsItems(brief).filter((item) => matchesDesk(item, patterns)).slice(0, 4);
+  return sortedNewsItems(brief).filter((item) => matchesDesk(item, TECHNOLOGY_PATTERNS)).slice(0, 4);
 }
 
 function deskSection(brief, label, title, items, note) {
@@ -421,8 +503,8 @@ function deskSection(brief, label, title, items, note) {
 function renderDeskStory(item, brief) {
   return `<article class="desk-story">
     ${storyMeta(item, brief)}
-    <h3>${headlineHtml(displayTitle(item))}</h3>
-    ${summaryBlock(item)}
+    <h3>${headlineHtml(storyTitle(item, "desk"))}</h3>
+    ${summaryBlock(item, { showMissing: true })}
     <a class="story-link-inline" href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>
   </article>`;
 }
