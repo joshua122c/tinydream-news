@@ -477,12 +477,7 @@ def source_excerpt_summary(text: str, title_zh: str = "", original_title: str = 
     zh_summary = english_source_summary_zh(text, title_zh, original_title)
     if zh_summary:
         return to_traditional_zh(zh_summary)[:420]
-    sentences = re.split(r"(?<=[.!?])\s+", text)
-    excerpt = " ".join(sentence.strip() for sentence in sentences[:2] if sentence.strip())
-    excerpt = clean_text(excerpt)[:360]
-    if not excerpt:
-        return ""
-    return f"原文描述：{excerpt}"
+    return ""
 
 
 def summarize_from_context(title_zh: str, original_title: str, source: str, context: dict) -> tuple[str, str, str]:
