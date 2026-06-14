@@ -555,7 +555,7 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
         return "non_chinese_script"
     if re.search(r"^(Yahoo Finance|The Guardian|CNBC|Reuters|MarketWatch|華爾街見聞|財新|LatePost)[：:]", summary):
         return "source_name_prefix"
-    if source_confidence < MIN_AI_CONTEXT_CONFIDENCE:
+    if source_confidence < MIN_DIRECT_CONTEXT_CONFIDENCE:
         return "low_source_confidence"
     if any(phrase in summary for phrase in BAD_READER_PHRASES):
         return "bad_reader_phrase"
