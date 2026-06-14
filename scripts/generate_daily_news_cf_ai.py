@@ -172,12 +172,8 @@ def to_traditional_zh(value: str) -> str:
 
 
 def contains_common_simplified_zh(value: str) -> bool:
-    text = clean_text(value or "")
-    if not text or not has_cjk(text):
-        return False
-    if OPENCC_S2HK:
-        converted = clean_text(OPENCC_S2HK.convert(text))
-        return converted != text
+    # Chinese output is normalized through OpenCC before validation. Do not
+    # treat OpenCC wording differences as proof that the text is Simplified.
     return False
 
 
