@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 import html
 import json
 import os
@@ -13,6 +13,14 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 from pathlib import Path
+
+try:
+    from opencc import OpenCC
+except Exception:
+    try:
+        from opencc.opencc import OpenCC
+    except Exception:
+        OpenCC = None
 
 HK_TZ = timezone(timedelta(hours=8))
 NOW_HK = datetime.now(HK_TZ)
@@ -29,6 +37,12 @@ DAILY_LATEST_PATH = BRIEFS_DIR / f"{TODAY}.json"
 
 USER_AGENT = "Mozilla/5.0 (compatible; TinyDreamNewsRadar/2.0; +https://news.tinydreamlab.com/)"
 LAST_AI_CALL_AT = 0.0
+OPENCC_S2HK = None
+if OpenCC:
+    try:
+        OPENCC_S2HK = OpenCC("s2hk")
+    except Exception:
+        OPENCC_S2HK = None
 
 SOURCE_CONFIGS = [
     {"name": "Reuters Markets", "url": "https://www.reuters.com/markets/", "kind": "page", "tier": 1, "max_items": 12},
@@ -81,6 +95,10 @@ BAD_READER_PHRASES = [
     "此舉反映",
     "這反映",
     "意味著",
+    "來源描述提到",
+    "來源描述顯示",
+    "詳情需以原文",
+    "追蹤線索",
     "enumerator",
     "基於公司",
     "這一事態",
@@ -144,183 +162,23 @@ def clean_text(value: object) -> str:
     return re.sub(r"\s+", " ", value).strip()
 
 
-SIMPLIFIED_TO_TRADITIONAL_PHRASES = [
-    ("首席执行员", "行政總裁"),
-    ("首席執行長", "行政總裁"),
-    ("执行员", "執行員"),
-    ("执行", "執行"),
-    ("报道", "報道"),
-    ("中国", "中國"),
-    ("美国", "美國"),
-    ("苹果", "蘋果"),
-    ("纳斯达克", "納斯達克"),
-    ("募资", "集資"),
-    ("筹资", "籌資"),
-    ("实现", "實現"),
-    ("互联网", "互聯網"),
-    ("卫星", "衛星"),
-    ("几十", "幾十"),
-    ("年来", "年來"),
-    ("一笔", "一筆"),
-    ("招股书", "招股書"),
-    ("写", "寫"),
-    ("介绍", "介紹"),
-    ("设计", "設計"),
-    ("开发", "開發"),
-    ("制造", "製造"),
-    ("销售", "銷售"),
-    ("基于", "基於"),
-    ("微处理器", "微處理器"),
-    ("电脑", "電腦"),
-    ("黄仁勋", "黃仁勳"),
-    ("这种", "這種"),
-    ("这家公司", "這家公司"),
-    ("我们", "我們"),
-    ("该", "該"),
-    ("朴素", "樸素"),
-    ("图形", "圖形"),
-    ("芯片", "晶片"),
-    ("晚点", "晚點"),
-    ("四岁", "四歲"),
-    ("称", "稱"),
-    ("认为", "認為"),
-    ("时候", "時候"),
-    ("公开", "公開"),
-    ("预计", "預計"),
-    ("进行", "進行"),
-    ("过去", "過去"),
-    ("下周", "下週"),
-    ("超级", "超級"),
-    ("央行周", "央行週"),
-    ("美联储", "美聯儲"),
-    ("利率决议", "利率決議"),
-    ("决议", "決議"),
-    ("经济数据", "經濟數據"),
-    ("按兵不动", "按兵不動"),
-    ("焦点", "焦點"),
-    ("发布会", "發布會"),
-    ("发布", "發布"),
-    ("关注", "關注"),
-    ("释放", "釋放"),
-    ("鹰派", "鷹派"),
-    ("鸽派", "鴿派"),
-    ("还是", "還是"),
-    ("信号", "信號"),
-    ("点阵图", "點陣圖"),
-    ("同时", "同時"),
-    ("市场", "市場"),
-    ("高达", "高達"),
-    ("行长", "行長"),
-    ("英国", "英國"),
-    ("澳大利亚", "澳大利亞"),
-    ("十国", "十國"),
-    ("表态", "表態"),
-    ("货币政策", "貨幣政策"),
-    ("货币", "貨幣"),
-    ("进一步", "進一步"),
-    ("演绎", "演繹"),
-    ("创下", "創下"),
-    ("纪录", "紀錄"),
-    ("记录", "紀錄"),
-    ("经济", "經濟"),
-    ("业务", "業務"),
-    ("数据", "數據"),
-    ("系统", "系統"),
-    ("员工", "員工"),
-    ("制裁", "制裁"),
-    ("启动", "啟動"),
-    ("后", "後"),
-    ("两", "兩"),
-    ("总部", "總部"),
-    ("举办", "舉辦"),
-    ("决定", "決定"),
-    ("计划", "計劃"),
-    ("巡回上诉法院", "巡迴上訴法院"),
-    ("巡回", "巡迴"),
-    ("上诉", "上訴"),
-    ("外國部", "外交部"),
-    ("新加坡基於的", "新加坡的"),
-    ("窺盜", "盜用"),
-    ("做出", "作出"),
-    ("最后", "最後"),
-    ("发言人", "發言人"),
-    ("领导层", "領導層"),
-    ("领导", "領導"),
-    ("认购", "認購"),
-    ("分析师", "分析師"),
-    ("极其", "極其"),
-    ("负责", "負責"),
-    ("电话", "電話"),
-    ("纽约", "紐約"),
-    ("专场", "專場"),
-    ("访谈", "訪談"),
-    ("顶级", "頂級"),
-    ("投资者", "投資者"),
-    ("到场", "到場"),
-    ("机构", "機構"),
-    ("分支机构", "分支機構"),
-    ("线上", "線上"),
-    ("散户", "散戶"),
-    ("马斯克", "馬斯克"),
-    ("这一次", "這一次"),
-    ("请", "請"),
-    ("最贵", "最貴"),
-    ("盲盒 昨天", "盲盒"),
-    ("个", "個"),
-    ("亿", "億"),
-    ("万", "萬"),
-    ("约", "約"),
-    ("将", "將"),
-    ("让", "讓"),
-    ("与", "與"),
-    ("为", "為"),
-    ("联", "聯"),
-    ("储", "儲"),
-    ("级", "級"),
-    ("决", "決"),
-    ("议", "議"),
-    ("动", "動"),
-    ("发", "發"),
-    ("会", "會"),
-    ("释", "釋"),
-    ("鹰", "鷹"),
-    ("鸽", "鴿"),
-    ("号", "號"),
-    ("场", "場"),
-    ("点", "點"),
-    ("阵", "陣"),
-    ("图", "圖"),
-    ("时", "時"),
-    ("长", "長"),
-    ("关", "關"),
-    ("还", "還"),
-    ("达", "達"),
-    ("亚", "亞"),
-    ("态", "態"),
-    ("货", "貨"),
-    ("币", "幣"),
-    ("进", "進"),
-    ("绎", "繹"),
-]
-
-
 def to_traditional_zh(value: str) -> str:
-    text = value or ""
-    for simplified, traditional in SIMPLIFIED_TO_TRADITIONAL_PHRASES:
-        text = text.replace(simplified, traditional)
-    text = re.sub(r"高華[A-Za-z]+", "Gwynne Shotwell", text)
-    text = re.sub(r"SpaceX 首席執行員[^，。 ]+", "SpaceX 總裁兼營運總監 Gwynne Shotwell", text)
-    text = text.replace("首席執行員高級副總裁", "總裁兼營運總監")
-    text = text.replace("兆美元", "萬億美元")
-    text = text.replace("新加坡基於公司的", "新加坡的")
-    text = text.replace("新加坡基於公司", "新加坡公司")
-    text = text.replace("零散投資者", "散戶投資者")
-    return clean_text(text)
+    text = clean_text(value or "")
+    if not text:
+        return ""
+    if OPENCC_S2HK:
+        return clean_text(OPENCC_S2HK.convert(text))
+    return text
 
 
 def contains_common_simplified_zh(value: str) -> bool:
-    simplified_chars = "执员报认为时让计进亿万约过创纪记录经启购极负责话纽专场访谈顶级资这请贵与个师马业数据统后两总举办发领层决划称国诉岁苹纳达募筹几笔书写绍设开发销脑黄勋种该朴图芯来处们现实联网卫联储级议"
-    return any(char in (value or "") for char in simplified_chars)
+    text = clean_text(value or "")
+    if not text or not has_cjk(text):
+        return False
+    if OPENCC_S2HK:
+        converted = clean_text(OPENCC_S2HK.convert(text))
+        return converted != text
+    return False
 
 
 def clean_feed_text(value: str) -> str:
@@ -610,11 +468,7 @@ def english_source_summary_zh(text: str, title_zh: str = "", original_title: str
         return "BlackRock 表示，印度改善債券吸引力的措施值得肯定，但油價及其對盧比的影響，仍是吸引外資流入政府債券的一大障礙。"
     if "sam bankman-fried" in lower and "25-year" in lower:
         return "Sam Bankman-Fried 上訴失敗，法院維持其欺詐定罪及 25 年監禁刑期；案件源於其創辦的 FTX 加密貨幣交易所倒閉。"
-    markers = content_markers(text)
-    marker_text = "、".join(markers[:4])
-    if marker_text:
-        return f"來源描述提到 {marker_text} 等關鍵資訊；這條新聞的核心是「{title_zh}」，詳情需以原文後續更新核對。"
-    return f"來源描述顯示，這條新聞的核心是「{title_zh}」，可作為今日相關題材的追蹤線索。"
+    return ""
 
 
 def source_excerpt_summary(text: str, title_zh: str = "", original_title: str = "") -> str:
