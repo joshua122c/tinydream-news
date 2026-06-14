@@ -131,8 +131,14 @@ def looks_like_generic_editorial_title(value: str) -> bool:
     return False
 
 
-def clean_text(value: str) -> str:
-    value = re.sub(r"<[^>]+>", " ", value or "")
+def clean_text(value: object) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, (dict, list)):
+        value = json.dumps(value, ensure_ascii=False)
+    elif not isinstance(value, str):
+        value = str(value)
+    value = re.sub(r"<[^>]+>", " ", value)
     value = re.sub(r"<!\[CDATA\[(.*?)\]\]>", r"\1", value, flags=re.S)
     value = html.unescape(value)
     return re.sub(r"\s+", " ", value).strip()
@@ -645,6 +651,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
         context_text = context_by_id.get(item["id"], "")
         if summary_supported_by_text(summary, context_text, item.get("title_original", "")) and not contains_common_simplified_zh(summary):
             item["summary_zh"] = summary[:420]
+            item["summary"] = item["summary_zh"]
             item["summary_status"] = "verified_from_source_text"
 
 
