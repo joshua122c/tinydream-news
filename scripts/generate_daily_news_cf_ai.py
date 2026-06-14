@@ -12,6 +12,7 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 try:
@@ -66,6 +67,8 @@ SOURCE_CONFIGS = [
 SOURCE_FAMILY_LIMIT = 4
 CATEGORY_LIMIT = 5
 MIN_ITEM_COUNT = 10
+MAX_DATED_NEWS_AGE = timedelta(hours=96)
+MAX_FUTURE_PUBLISHED_AT = timedelta(hours=6)
 
 CATEGORY_TAXONOMY = [
     ("全球市場與宏觀", "global-markets-macro"),
@@ -180,6 +183,34 @@ def contains_common_simplified_zh(value: str) -> bool:
 def clean_feed_text(value: str) -> str:
     value = re.sub(r"<!\[CDATA\[(.*?)\]\]>", r"\1", value or "", flags=re.S)
     return clean_text(value)
+
+
+def parse_published_at(value: str) -> datetime | None:
+    text = clean_text(value)
+    if not text:
+        return None
+    try:
+        parsed = parsedate_to_datetime(text)
+    except Exception:
+        parsed = None
+    if parsed is None:
+        try:
+            parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except Exception:
+            return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(HK_TZ)
+
+
+def candidate_is_fresh(candidate: dict) -> bool:
+    published = parse_published_at(candidate.get("published_at_hint", ""))
+    if not published:
+        return True
+    age = NOW_HK - published
+    if age < -MAX_FUTURE_PUBLISHED_AT:
+        return False
+    return age <= MAX_DATED_NEWS_AGE
 
 
 def headline_entity(title: str) -> str:
@@ -809,6 +840,8 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
         for candidate in extracted[: config.get("max_items", 8)]:
             if not candidate_allowed(config["name"], candidate.get("url", ""), candidate.get("title", "")):
                 continue
+            if not candidate_is_fresh(candidate):
+                continue
             candidate["source_tier"] = config.get("tier", 3)
             candidate["category"] = infer_category(candidate.get("title", ""))
             candidate["score"] = headline_score(candidate)
@@ -1207,6 +1240,11 @@ def validate_brief(brief: dict) -> None:
             fail(f"title_zh looks like a generic editorial placeholder: {item['title_zh']} | original: {item.get('title_original')}")
         if not has_cjk(item["title_zh"]) or looks_mostly_english(item["title_zh"]):
             fail(f"title_zh is not acceptable Traditional Chinese: {item['title_zh']}")
+        published = parse_published_at(item.get("published_at", ""))
+        if published:
+            age = NOW_HK - published
+            if age < -MAX_FUTURE_PUBLISHED_AT or age > MAX_DATED_NEWS_AGE:
+                fail(f"published_at is outside freshness window: {item['id']} | {item.get('published_at')}")
         if contains_common_simplified_zh(item["title_zh"]):
             fail(f"title_zh contains common simplified Chinese characters: {item['title_zh']}")
         if any(phrase in item["summary_zh"] for phrase in BAD_READER_PHRASES):
