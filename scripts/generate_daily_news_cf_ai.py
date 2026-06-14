@@ -46,18 +46,18 @@ if OpenCC:
         OPENCC_S2HK = None
 
 SOURCE_CONFIGS = [
-    {"name": "Reuters Markets", "url": "https://www.reuters.com/markets/", "kind": "page", "tier": 1, "max_items": 12},
-    {"name": "Reuters Technology", "url": "https://www.reuters.com/technology/", "kind": "page", "tier": 1, "max_items": 10},
-    {"name": "CNBC Top News", "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html", "kind": "rss", "tier": 1, "max_items": 6},
-    {"name": "CNBC Markets", "url": "https://www.cnbc.com/markets/", "kind": "page", "tier": 1, "max_items": 5},
-    {"name": "CNBC Technology", "url": "https://www.cnbc.com/technology/", "kind": "page", "tier": 1, "max_items": 5},
-    {"name": "WSJ Markets", "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml", "kind": "rss", "tier": 1, "max_items": 8},
-    {"name": "WSJ Technology", "url": "https://feeds.a.dj.com/rss/RSSWSJD.xml", "kind": "rss", "tier": 1, "max_items": 6},
+    {"name": "Reuters Markets", "url": "https://www.reuters.com/markets/", "kind": "page", "tier": 1, "max_items": 16},
+    {"name": "Reuters Technology", "url": "https://www.reuters.com/technology/", "kind": "page", "tier": 1, "max_items": 12},
+    {"name": "CNBC Top News", "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html", "kind": "rss", "tier": 1, "max_items": 10},
+    {"name": "CNBC Markets", "url": "https://www.cnbc.com/markets/", "kind": "page", "tier": 1, "max_items": 8},
+    {"name": "CNBC Technology", "url": "https://www.cnbc.com/technology/", "kind": "page", "tier": 1, "max_items": 8},
+    {"name": "WSJ Markets", "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml", "kind": "rss", "tier": 1, "max_items": 12},
+    {"name": "WSJ Technology", "url": "https://feeds.a.dj.com/rss/RSSWSJD.xml", "kind": "rss", "tier": 1, "max_items": 8},
     {"name": "Yahoo Finance", "url": "https://finance.yahoo.com/news/rssindex", "kind": "rss", "tier": 2, "max_items": 8},
-    {"name": "MarketWatch Top Stories", "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories", "kind": "rss", "tier": 2, "max_items": 8},
-    {"name": "The Guardian Business", "url": "https://www.theguardian.com/business/rss", "kind": "rss", "tier": 2, "max_items": 6},
+    {"name": "MarketWatch Top Stories", "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories", "kind": "rss", "tier": 2, "max_items": 10},
+    {"name": "The Guardian Business", "url": "https://www.theguardian.com/business/rss", "kind": "rss", "tier": 2, "max_items": 8},
     {"name": "Nikkei Asia Business", "url": "https://asia.nikkei.com/Business", "kind": "page", "tier": 2, "max_items": 5},
-    {"name": "TechCrunch AI", "url": "https://techcrunch.com/category/artificial-intelligence/", "kind": "page", "tier": 2, "max_items": 6},
+    {"name": "TechCrunch AI", "url": "https://techcrunch.com/category/artificial-intelligence/", "kind": "page", "tier": 2, "max_items": 8},
     {"name": "TechCrunch Startups", "url": "https://techcrunch.com/category/startups/", "kind": "page", "tier": 2, "max_items": 5},
     {"name": "Wallstreetcn", "url": "https://wallstreetcn.com/", "kind": "page", "tier": 3, "max_items": 3},
     {"name": "Caixin", "url": "https://www.caixin.com/", "kind": "page", "tier": 3, "max_items": 3},
@@ -69,6 +69,31 @@ CATEGORY_LIMIT = 5
 MIN_ITEM_COUNT = 8
 MAX_DATED_NEWS_AGE = timedelta(hours=96)
 MAX_FUTURE_PUBLISHED_AT = timedelta(hours=6)
+
+RUN_REPORT = {
+    "collection": {
+        "sources_total": len(SOURCE_CONFIGS),
+        "sources_accessible": 0,
+        "raw_candidates": 0,
+        "accepted_candidates": 0,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0,
+        "keyword_candidates": 0,
+        "unique_candidates": 0,
+        "grouped_candidates": 0,
+    },
+    "source_stats": [],
+    "item_quality": {
+        "built_items": 0,
+        "publishable_items": 0,
+        "skipped_items": [],
+        "summaries_removed": 0,
+    },
+    "ai": {
+        "summary_candidates": 0,
+        "summary_updates": 0,
+    },
+}
 
 CATEGORY_TAXONOMY = [
     ("全球市場與宏觀", "global-markets-macro"),
@@ -566,6 +591,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
         })
     if not payload:
         return
+    RUN_REPORT["ai"]["summary_candidates"] += len(payload)
     prompt = (
         "你是香港繁體中文財經新聞編輯。以下是多條新聞的可信來源文字，可能是正文、RSS description 或 meta description。\n"
         "請只根據 source_text 寫每條新聞的撮要，不可以加入推測、評論、投資建議或 source_text 沒有的背景。\n"
@@ -586,6 +612,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             item["summary_zh"] = summary[:420]
             item["summary"] = item["summary_zh"]
             item["summary_status"] = "verified_from_source_text"
+            RUN_REPORT["ai"]["summary_updates"] += 1
 
 
 def source_label(source_name: str) -> str:
@@ -828,6 +855,16 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
     sources = []
     for config in SOURCE_CONFIGS:
         status, body = fetch_url(config["url"])
+        source_stat = {
+            "name": config["name"],
+            "tier": config.get("tier", 3),
+            "access": "Full" if status == 200 else "Blocked",
+            "status_code": status,
+            "extracted_count": 0,
+            "accepted_count": 0,
+            "skipped_by_rule": 0,
+            "skipped_stale": 0,
+        }
         sources.append({
             "name": config["name"],
             "url": config["url"],
@@ -835,17 +872,28 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
             "tier": config.get("tier", 3),
         })
         if status != 200:
+            RUN_REPORT["source_stats"].append(source_stat)
             continue
+        RUN_REPORT["collection"]["sources_accessible"] += 1
         extracted = extract_rss_candidates(config["name"], config["url"], body) if config["kind"] == "rss" else extract_page_candidates(config["name"], config["url"], body)
+        source_stat["extracted_count"] = len(extracted)
+        RUN_REPORT["collection"]["raw_candidates"] += len(extracted)
         for candidate in extracted[: config.get("max_items", 8)]:
             if not candidate_allowed(config["name"], candidate.get("url", ""), candidate.get("title", "")):
+                source_stat["skipped_by_rule"] += 1
+                RUN_REPORT["collection"]["skipped_by_rule"] += 1
                 continue
             if not candidate_is_fresh(candidate):
+                source_stat["skipped_stale"] += 1
+                RUN_REPORT["collection"]["skipped_stale"] += 1
                 continue
             candidate["source_tier"] = config.get("tier", 3)
             candidate["category"] = infer_category(candidate.get("title", ""))
             candidate["score"] = headline_score(candidate)
             all_candidates.append(candidate)
+            source_stat["accepted_count"] += 1
+            RUN_REPORT["collection"]["accepted_candidates"] += 1
+        RUN_REPORT["source_stats"].append(source_stat)
 
     keywords = re.compile(
         r"fed|inflation|treasury|yield|dollar|oil|gold|tariff|sanction|hormuz|iran|"
@@ -859,6 +907,7 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
     filtered = [item for item in all_candidates if keywords.search(item["title"])]
     if len(filtered) < MIN_ITEM_COUNT:
         filtered = all_candidates
+    RUN_REPORT["collection"]["keyword_candidates"] = len(filtered)
     filtered.sort(key=lambda item: item.get("score", 0), reverse=True)
 
     unique_candidates = []
@@ -875,6 +924,7 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
         unique_candidates.append(item)
         if len(unique_candidates) >= 72:
             break
+    RUN_REPORT["collection"]["unique_candidates"] = len(unique_candidates)
 
     clusters = {}
     for item in unique_candidates:
@@ -918,6 +968,7 @@ def collect_news_candidates() -> tuple[list[dict], list[dict]]:
             if len(grouped) >= 12:
                 break
     grouped.sort(key=lambda item: item.get("score", 0), reverse=True)
+    RUN_REPORT["collection"]["grouped_candidates"] = len(grouped)
     return grouped, sources
 
 
@@ -1171,10 +1222,24 @@ def sanitize_items_for_publication(items: list[dict]) -> list[dict]:
         reason = item_rejection_reason(item)
         if reason:
             print(f"Skipping low-quality item {item.get('id')}: {reason} | {item.get('title_original')}")
+            RUN_REPORT["item_quality"]["skipped_items"].append({
+                "id": item.get("id", ""),
+                "reason": reason,
+                "source": item.get("source", ""),
+                "title_original": item.get("title_original", ""),
+                "title_zh": item.get("title_zh", ""),
+            })
             continue
         title = item.get("title_zh", "")
         if title in seen_titles:
             print(f"Skipping duplicate title item {item.get('id')}: {title}")
+            RUN_REPORT["item_quality"]["skipped_items"].append({
+                "id": item.get("id", ""),
+                "reason": "duplicate_title",
+                "source": item.get("source", ""),
+                "title_original": item.get("title_original", ""),
+                "title_zh": title,
+            })
             continue
         seen_titles.add(title)
         summary = item.get("summary_zh", "")
@@ -1187,7 +1252,9 @@ def sanitize_items_for_publication(items: list[dict]) -> list[dict]:
             item["summary"] = ""
             item["summary_zh"] = ""
             item["summary_status"] = "summary_removed_after_quality_check"
+            RUN_REPORT["item_quality"]["summaries_removed"] += 1
         publishable.append(item)
+    RUN_REPORT["item_quality"]["publishable_items"] = len(publishable)
     return publishable
 
 
@@ -1239,6 +1306,7 @@ def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
         fail(f"Only {len(usable)} usable news candidates were collected after quality filters.")
 
     items = [build_item(candidate, idx) for idx, candidate in enumerate(usable, start=1)]
+    RUN_REPORT["item_quality"]["built_items"] = len(items)
     apply_batch_ai_summaries(items)
     for item in items:
         item.pop("_summary_context_text", None)
@@ -1275,6 +1343,7 @@ def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
         "categories": categories,
         "items": items,
         "sources": sources,
+        "generation_report": RUN_REPORT,
         "generated_at": GENERATED_AT,
         "email_body_zh": daily_summary + "\n\n網站：https://news.tinydreamlab.com/",
     }
