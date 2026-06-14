@@ -1,0 +1,663 @@
+{
+  "date": "2026-06-14",
+  "update_id": "2026-06-14-1025",
+  "update_file": "data/briefs/2026-06-14-1025.json",
+  "title": "每日國際財經與科技新聞摘要",
+  "deck": "整理全球市場、科技產業和主要企業消息，協助快速掌握今日值得追蹤的新聞主線。",
+  "daily_summary_zh": "今日國際財經與科技新聞以科技、AI與平台、企業、財報與交易、能源、外匯與商品、全球市場與宏觀為主線。頭版焦點包括AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視、SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應、特朗普稱和平協議周日簽署，伊朗對時間表仍保持審慎。本期共有 2 個主題整合同題材來源，重點不只在單一標題，而是觀察新聞是否正在形成可持續的市場敘事；讀者可先讀焦點主題，再按分類核對原文和後續變化。",
+  "market_focus": [
+    "科技、AI與平台",
+    "企業、財報與交易",
+    "能源、外匯與商品",
+    "全球市場與宏觀"
+  ],
+  "hot_topics": [
+    {
+      "rank": 1,
+      "topic": "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視",
+      "heat_score": 94,
+      "heat_label": "High",
+      "source_count": 2,
+      "main_sources": [
+        "WSJ Markets",
+        "WSJ Technology"
+      ],
+      "item_ids": [
+        "2026-06-14-headline-001"
+      ],
+      "one_line_reason": "AI 應用與雲端平台消息可能改變市場對大型科技股增長和資本開支的判斷。",
+      "reporter_angle": ""
+    },
+    {
+      "rank": 2,
+      "topic": "SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應",
+      "heat_score": 94,
+      "heat_label": "High",
+      "source_count": 2,
+      "main_sources": [
+        "CNBC",
+        "Yahoo Finance"
+      ],
+      "item_ids": [
+        "2026-06-14-headline-002"
+      ],
+      "one_line_reason": "企業融資、財報或交易消息會直接影響個股估值，並可能擴散至同業。",
+      "reporter_angle": ""
+    },
+    {
+      "rank": 3,
+      "topic": "特朗普稱和平協議周日簽署，伊朗對時間表仍保持審慎",
+      "heat_score": 94,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC"
+      ],
+      "item_ids": [
+        "2026-06-14-headline-003"
+      ],
+      "one_line_reason": "商品和外匯價格會影響通脹預期、企業成本和避險資金流向。",
+      "reporter_angle": ""
+    },
+    {
+      "rank": 4,
+      "topic": "金價受壓，避險與通脹交易出現重新定價",
+      "heat_score": 94,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "WSJ Markets"
+      ],
+      "item_ids": [
+        "2026-06-14-headline-004"
+      ],
+      "one_line_reason": "商品和外匯價格會影響通脹預期、企業成本和避險資金流向。",
+      "reporter_angle": ""
+    },
+    {
+      "rank": 5,
+      "topic": "SpaceX 估值與上市憧憬升溫，私人市場財富效應受關注",
+      "heat_score": 94,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC"
+      ],
+      "item_ids": [
+        "2026-06-14-headline-005"
+      ],
+      "one_line_reason": "企業融資、財報或交易消息會直接影響個股估值，並可能擴散至同業。",
+      "reporter_angle": ""
+    }
+  ],
+  "categories": [
+    {
+      "name": "全球市場與宏觀",
+      "slug": "global-markets-macro",
+      "item_ids": [
+        "2026-06-14-headline-008",
+        "2026-06-14-headline-011"
+      ]
+    },
+    {
+      "name": "科技、AI與平台",
+      "slug": "technology-ai-platforms",
+      "item_ids": [
+        "2026-06-14-headline-001"
+      ]
+    },
+    {
+      "name": "企業、財報與交易",
+      "slug": "companies-earnings-deals",
+      "item_ids": [
+        "2026-06-14-headline-002",
+        "2026-06-14-headline-005",
+        "2026-06-14-headline-009",
+        "2026-06-14-headline-010",
+        "2026-06-14-headline-012"
+      ]
+    },
+    {
+      "name": "能源、外匯與商品",
+      "slug": "energy-fx-commodities",
+      "item_ids": [
+        "2026-06-14-headline-003",
+        "2026-06-14-headline-004",
+        "2026-06-14-headline-006",
+        "2026-06-14-headline-007"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "2026-06-14-headline-001",
+      "date": "2026-06-14",
+      "title_original": "Stocks Sink in Broad AI Rout Sparked by China's DeepSeek",
+      "title_zh": "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/nikkei-may-rise-as-weak-yen-raises-earnings-hopes-776a8056?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 14:26:00 -0500",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "AI投資熱潮",
+        "企業與資本市場"
+      ],
+      "summary": "美股大多下跌，Nasdaq 領跌；原文提到多家 AI 基建相關公司急跌，部分跌幅達雙位數，顯示 AI 交易短線受壓。",
+      "summary_zh": "美股大多下跌，Nasdaq 領跌；原文提到多家 AI 基建相關公司急跌，部分跌幅達雙位數，顯示 AI 交易短線受壓。",
+      "summary_basis": "rss_description",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：WSJ Markets",
+        "同題材來源數：2",
+        "同題材來源：WSJ Markets、WSJ Technology",
+        "代表性原始標題：Stocks Sink in Broad AI Rout Sparked by China's DeepSeek；DeepSeek Won't Sink U.S. AI Titans"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 2,
+      "sources_reporting_same_topic": [
+        "WSJ Markets",
+        "WSJ Technology"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "ai-platforms"
+    },
+    {
+      "id": "2026-06-14-headline-002",
+      "date": "2026-06-14",
+      "title_original": "From 10% chance of success to $2 trillion market cap: SpaceX's historic IPO",
+      "title_zh": "SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/13/from-10percent-chance-of-success-to-2-trillion-spacexs-historic-ipo.html",
+      "published_at": "Sat, 13 Jun 2026 15:50:43 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易",
+        "企業與資本市場"
+      ],
+      "summary": "來源描述提到 Shortly、Nasdaq、Friday、Elon Musk 等關鍵資訊；這條新聞的核心是「SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應」，詳情需以原文後續更新核對。",
+      "summary_zh": "來源描述提到 Shortly、Nasdaq、Friday、Elon Musk 等關鍵資訊；這條新聞的核心是「SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應」，詳情需以原文後續更新核對。",
+      "summary_basis": "article_body",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：2",
+        "同題材來源：CNBC、Yahoo Finance",
+        "代表性原始標題：From 10% chance of success to $2 trillion market cap: SpaceX's historic IPO；SpaceX IPO sticks the landing. Here's what investors are saying about its epic first trading day"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 2,
+      "sources_reporting_same_topic": [
+        "CNBC",
+        "Yahoo Finance"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "spacex"
+    },
+    {
+      "id": "2026-06-14-headline-003",
+      "date": "2026-06-14",
+      "title_original": "Trump says peace deal will be signed Sunday after Iran said it remains cautious on timing",
+      "title_zh": "特朗普稱和平協議周日簽署，伊朗對時間表仍保持審慎",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/13/trump-iran-deal-strait-of-hormuz.html",
+      "published_at": "Sat, 13 Jun 2026 19:44:44 GMT",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "企業與資本市場"
+      ],
+      "summary": "特朗普政府官員表示，美國與伊朗可能在數日內簽署協議，內容包括重開霍爾木茲海峽，以及推動拆除伊朗核計劃的部分步驟。",
+      "summary_zh": "特朗普政府官員表示，美國與伊朗可能在數日內簽署協議，內容包括重開霍爾木茲海峽，以及推動拆除伊朗核計劃的部分步驟。",
+      "summary_basis": "article_body",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：1",
+        "同題材來源：CNBC",
+        "代表性原始標題：Trump says peace deal will be signed Sunday after Iran said it remains cautious on timing"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "trump-says-peace"
+    },
+    {
+      "id": "2026-06-14-headline-004",
+      "date": "2026-06-14",
+      "title_original": "Comex Gold, Silver Settle Lower",
+      "title_zh": "金價受壓，避險與通脹交易出現重新定價",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/gold-edges-lower-feds-rate-decision-in-focus-09dbfceb?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 14:01:00 -0500",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "商品與外匯"
+      ],
+      "summary": "COMEX 黃金結算價下跌 1.4%，過去三個交易日有兩日下跌；銀價下跌 2.5%，過去四個交易日有三日下跌。",
+      "summary_zh": "COMEX 黃金結算價下跌 1.4%，過去三個交易日有兩日下跌；銀價下跌 2.5%，過去四個交易日有三日下跌。",
+      "summary_basis": "rss_description",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：WSJ Markets",
+        "同題材來源數：1",
+        "同題材來源：WSJ Markets",
+        "代表性原始標題：Comex Gold, Silver Settle Lower"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 9,
+      "heat_score": 94,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Markets"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "gold"
+    },
+    {
+      "id": "2026-06-14-headline-005",
+      "date": "2026-06-14",
+      "title_original": "SpaceX IPO sticks the landing. Here's what investors are saying about its epic first trading day",
+      "title_zh": "SpaceX 估值與上市憧憬升溫，私人市場財富效應受關注",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/13/spacex-ipo-sticks-the-landing-heres-what-investors-are-saying-about-its-epic-first-trading-day.html",
+      "published_at": "Sat, 13 Jun 2026 13:37:31 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易",
+        "企業與資本市場"
+      ],
+      "summary": "來源描述提到 Investors、SpaceX、Nasdaq Friday. Despite、IPO 等關鍵資訊；這條新聞的核心是「SpaceX 估值與上市憧憬升溫，私人市場財富效應受關注」，詳情需以原文後續更新核對。",
+      "summary_zh": "來源描述提到 Investors、SpaceX、Nasdaq Friday. Despite、IPO 等關鍵資訊；這條新聞的核心是「SpaceX 估值與上市憧憬升溫，私人市場財富效應受關注」，詳情需以原文後續更新核對。",
+      "summary_basis": "article_body",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：1",
+        "同題材來源：CNBC",
+        "代表性原始標題：SpaceX IPO sticks the landing. Here's what investors are saying about its epic first trading day"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 9,
+      "heat_score": 94,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "spacex"
+    },
+    {
+      "id": "2026-06-14-headline-006",
+      "date": "2026-06-14",
+      "title_original": "UAE denies 'false' reports of fund transfer to Iran",
+      "title_zh": "阿聯酋否認同意向伊朗轉移或釋放凍結資金",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/13/uae-denies-false-reports-of-fund-transfer-to-iran.html",
+      "published_at": "Sat, 13 Jun 2026 09:30:18 GMT",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品"
+      ],
+      "summary": "阿聯酋政府否認媒體所指同意向伊朗釋放數十億美元凍結資金，並稱相關指控完全不實，沒有經阿聯酋釋放、轉移或協助任何伊朗凍結資金。",
+      "summary_zh": "阿聯酋政府否認媒體所指同意向伊朗釋放數十億美元凍結資金，並稱相關指控完全不實，沒有經阿聯酋釋放、轉移或協助任何伊朗凍結資金。",
+      "summary_basis": "article_body",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：1",
+        "同題材來源：CNBC",
+        "代表性原始標題：UAE denies 'false' reports of fund transfer to Iran"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 8,
+      "heat_score": 89,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "denies-false-reports"
+    },
+    {
+      "id": "2026-06-14-headline-007",
+      "date": "2026-06-14",
+      "title_original": "Arabica Coffee Prices Hit Record on U.S., Colombia Tariff Spat",
+      "title_zh": "農產品與關稅消息牽動商品價格，通脹預期再受關注",
+      "source": "WSJ Markets",
+      "url": "https://www.wsj.com/articles/arabica-coffee-prices-hit-new-high-on-u-s-colombia-tariff-spat-582446fe?mod=rss_markets_main",
+      "published_at": "Mon, 27 Jan 2025 12:20:00 -0500",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品"
+      ],
+      "summary": "阿拉比卡咖啡價格創紀錄高位，交易商消化特朗普撤回對哥倫比亞徵收關稅及經濟制裁威脅的消息。",
+      "summary_zh": "阿拉比卡咖啡價格創紀錄高位，交易商消化特朗普撤回對哥倫比亞徵收關稅及經濟制裁威脅的消息。",
+      "summary_basis": "rss_description",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：WSJ Markets",
+        "同題材來源數：1",
+        "同題材來源：WSJ Markets",
+        "代表性原始標題：Arabica Coffee Prices Hit Record on U.S., Colombia Tariff Spat"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 8,
+      "heat_score": 88,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "WSJ Markets"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "arabica-coffee-prices"
+    },
+    {
+      "id": "2026-06-14-headline-008",
+      "date": "2026-06-14",
+      "title_original": "'I love inflation!': Trump unbothered by 4.2% spike even as costs skyrocket. Shield your portfolio before it's too late",
+      "title_zh": "利率與通脹預期牽動美債和股市走向",
+      "source": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/economy/policy/articles/love-inflation-trump-unbothered-4-195500630.html",
+      "published_at": "2026-06-12T19:55:00Z",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "利率與通脹"
+      ],
+      "summary": "來源描述提到 Moneywise、Yahoo Finance LLC、President Donald Trump、Iran. Speaking 等關鍵資訊；這條新聞的核心是「利率與通脹預期牽動美債和股市走向」，詳情需以原文後續更新核對。",
+      "summary_zh": "來源描述提到 Moneywise、Yahoo Finance LLC、President Donald Trump、Iran. Speaking 等關鍵資訊；這條新聞的核心是「利率與通脹預期牽動美債和股市走向」，詳情需以原文後續更新核對。",
+      "summary_basis": "article_body",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：Yahoo Finance",
+        "同題材來源數：1",
+        "同題材來源：Yahoo Finance",
+        "代表性原始標題：'I love inflation!': Trump unbothered by 4.2% spike even as costs skyrocket. Shield your portfolio before it's too late"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 7,
+      "heat_score": 84,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "Yahoo Finance"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "rates-inflation"
+    },
+    {
+      "id": "2026-06-14-headline-009",
+      "date": "2026-06-14",
+      "title_original": "Sam Bankman-Fried loses bid to appeal against fraud conviction in FTX case",
+      "title_zh": "FTX 創辦人上訴失敗，欺詐定罪維持不變",
+      "source": "The Guardian",
+      "url": "https://www.theguardian.com/business/2026/jun/12/sam-bankman-fried-loses-appeal",
+      "published_at": "Fri, 12 Jun 2026 13:52:59 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易"
+      ],
+      "summary": "Sam Bankman-Fried 上訴失敗，法院維持其欺詐定罪及 25 年監禁刑期；案件源於其創辦的 FTX 加密貨幣交易所倒閉。",
+      "summary_zh": "Sam Bankman-Fried 上訴失敗，法院維持其欺詐定罪及 25 年監禁刑期；案件源於其創辦的 FTX 加密貨幣交易所倒閉。",
+      "summary_basis": "article_body",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：The Guardian",
+        "同題材來源數：1",
+        "同題材來源：The Guardian",
+        "代表性原始標題：Sam Bankman-Fried loses bid to appeal against fraud conviction in FTX case"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 7,
+      "heat_score": 83,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "The Guardian"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "bankman-fried-loses"
+    },
+    {
+      "id": "2026-06-14-headline-010",
+      "date": "2026-06-14",
+      "title_original": "US justice department approves $111bn merger of Paramount and Warner Bros Discovery",
+      "title_zh": "美國司法部批准派拉蒙與華納兄弟探索 1,110 億美元合併",
+      "source": "The Guardian",
+      "url": "https://www.theguardian.com/us-news/2026/jun/12/paramount-warner-bros-merger",
+      "published_at": "Sat, 13 Jun 2026 00:54:31 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易"
+      ],
+      "summary": "美國司法部批准 Paramount Skydance 收購 Warner Bros. Discovery 的交易，意味大型媒體併購向前推進，行業整合再受關注。",
+      "summary_zh": "美國司法部批准 Paramount Skydance 收購 Warner Bros. Discovery 的交易，意味大型媒體併購向前推進，行業整合再受關注。",
+      "summary_basis": "article_body",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：The Guardian",
+        "同題材來源數：1",
+        "同題材來源：The Guardian",
+        "代表性原始標題：US justice department approves $111bn merger of Paramount and Warner Bros Discovery"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 6,
+      "heat_score": 75,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "The Guardian"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "paramount-wbd"
+    },
+    {
+      "id": "2026-06-14-headline-011",
+      "date": "2026-06-14",
+      "title_original": "下周“超级央行周”：美联储利率决议沃什首秀、日本央行或加息、中国5月经济数据",
+      "title_zh": "下週“超級央行週”：美聯儲利率決議沃什首秀、日本央行或加息、中國5月經濟數據",
+      "source": "華爾街見聞",
+      "url": "https://wallstreetcn.com/articles/3774492",
+      "published_at": "2026-06-14T10:25:30+08:00",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀"
+      ],
+      "summary": "首先是，“央行超級周” ：美聯儲料按兵不動，焦點是新主席沃什的首次發布會——市場關注其將釋放鷹派還是鴿派信號，同時是否會“取消點陣圖”。同時，日本央行加息概率高達88%，但行長植田和男因病缺席。英國、澳大利亞、印尼、巴西等十國央行亦將密集表態，全球貨幣政策分化格局進一步演繹。",
+      "summary_zh": "首先是，“央行超級周” ：美聯儲料按兵不動，焦點是新主席沃什的首次發布會——市場關注其將釋放鷹派還是鴿派信號，同時是否會“取消點陣圖”。同時，日本央行加息概率高達88%，但行長植田和男因病缺席。英國、澳大利亞、印尼、巴西等十國央行亦將密集表態，全球貨幣政策分化格局進一步演繹。",
+      "summary_basis": "article_body",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：華爾街見聞",
+        "同題材來源數：1",
+        "同題材來源：華爾街見聞",
+        "代表性原始標題：下周“超级央行周”：美联储利率决议沃什首秀、日本央行或加息、中国5月经济数据"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 6,
+      "heat_score": 71,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "華爾街見聞"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "下周超级央行周美联储利率决议沃什首秀日本央行或加"
+    },
+    {
+      "id": "2026-06-14-headline-012",
+      "date": "2026-06-14",
+      "title_original": "50 年科技 IPO丨晚点小数据 06月12日",
+      "title_zh": "50 年科技 IPO 回顧：從蘋果、Nvidia 到 SpaceX 的上市週期",
+      "source": "晚點",
+      "url": "https://www.latepost.com/news/dj_detail?id=3595",
+      "published_at": "2026-06-14T10:25:30+08:00",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易",
+        "企業與資本市場"
+      ],
+      "summary": "1980 年，四歲的蘋果在納斯達克上市，集資 1 億美元，已是幾十年來最大的一筆。招股書寫的介紹是：“這家公司設計、開發、製造、銷售基於微處理器的電腦系統，供個人使用。” 多年後，黃仁勳照搬了這種樸素：“我們設計、開發、銷售 3D 圖形加速晶片”。",
+      "summary_zh": "1980 年，四歲的蘋果在納斯達克上市，集資 1 億美元，已是幾十年來最大的一筆。招股書寫的介紹是：“這家公司設計、開發、製造、銷售基於微處理器的電腦系統，供個人使用。” 多年後，黃仁勳照搬了這種樸素：“我們設計、開發、銷售 3D 圖形加速晶片”。",
+      "summary_basis": "article_body",
+      "summary_status": "verified_from_source_text",
+      "key_facts": [
+        "主要來源：晚點",
+        "同題材來源數：1",
+        "同題材來源：晚點",
+        "代表性原始標題：50 年科技 IPO丨晚点小数据 06月12日"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 5,
+      "heat_score": 65,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "晚點"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "50年科技ipo丨晚点小数据06月12日"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Reuters Markets",
+      "url": "https://www.reuters.com/markets/",
+      "access": "Blocked",
+      "tier": 1
+    },
+    {
+      "name": "Reuters Technology",
+      "url": "https://www.reuters.com/technology/",
+      "access": "Blocked",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Top News",
+      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Markets",
+      "url": "https://www.cnbc.com/markets/",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Technology",
+      "url": "https://www.cnbc.com/technology/",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "WSJ Markets",
+      "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "WSJ Technology",
+      "url": "https://feeds.a.dj.com/rss/RSSWSJD.xml",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/news/rssindex",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "MarketWatch Top Stories",
+      "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "The Guardian Business",
+      "url": "https://www.theguardian.com/business/rss",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "Nikkei Asia Business",
+      "url": "https://asia.nikkei.com/Business",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "TechCrunch AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "TechCrunch Startups",
+      "url": "https://techcrunch.com/category/startups/",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "Wallstreetcn",
+      "url": "https://wallstreetcn.com/",
+      "access": "Full",
+      "tier": 3
+    },
+    {
+      "name": "Caixin",
+      "url": "https://www.caixin.com/",
+      "access": "Full",
+      "tier": 3
+    },
+    {
+      "name": "LatePost",
+      "url": "https://www.latepost.com/",
+      "access": "Full",
+      "tier": 3
+    }
+  ],
+  "generated_at": "2026-06-14T10:25:30+08:00",
+  "email_body_zh": "今日國際財經與科技新聞以科技、AI與平台、企業、財報與交易、能源、外匯與商品、全球市場與宏觀為主線。頭版焦點包括AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視、SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應、特朗普稱和平協議周日簽署，伊朗對時間表仍保持審慎。本期共有 2 個主題整合同題材來源，重點不只在單一標題，而是觀察新聞是否正在形成可持續的市場敘事；讀者可先讀焦點主題，再按分類核對原文和後續變化。\n\n網站：https://news.tinydreamlab.com/"
+}
