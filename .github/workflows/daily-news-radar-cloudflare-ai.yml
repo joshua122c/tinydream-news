@@ -3,8 +3,8 @@ name: Daily Finance Tech News Radar - Cloudflare AI
 on:
   workflow_dispatch:
   schedule:
-    # 22:09 Hong Kong time = 14:09 UTC.
-    - cron: "9 14 * * *"
+    # 08:15 Hong Kong time = 00:15 UTC.
+    - cron: "15 0 * * *"
 
 permissions:
   contents: write
@@ -28,6 +28,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Install news generation dependencies
+        run: python -m pip install opencc-python-reimplemented==0.1.7
 
       - name: Generate daily brief with Cloudflare Workers AI
         env:
