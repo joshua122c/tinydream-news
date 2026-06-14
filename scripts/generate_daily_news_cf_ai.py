@@ -778,11 +778,11 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
     RUN_REPORT["ai"]["summary_candidates"] += len(payload)
     item_by_id = {item["id"]: item for item in items}
     parsed_any = False
-    for start in range(0, len(payload), 4):
-        batch = payload[start:start + 4]
+    for start in range(0, len(payload), 1):
+        batch = payload[start:start + 1]
         prompt = (
-            "你是香港繁體中文財經新聞編輯。以下是多條新聞的可信來源文字，可能是正文、RSS description 或 meta description。\n"
-            "任務：只根據每條 source_text 寫新聞摘要。不可加入推測、評論、投資建議，亦不可加入 source_text 沒有的背景。\n"
+            "你是香港繁體中文財經新聞編輯。以下是一條新聞的可信來源文字，可能是正文、RSS description 或 meta description。\n"
+            "任務：只根據該條 source_text 寫新聞摘要。不可加入推測、評論、投資建議，亦不可加入 source_text 沒有的背景。\n"
             "每條摘要輸出 1 至 2 句自然香港繁體中文，約 50 至 120 字；公司名可保留英文，人名不要亂音譯；必須保留 source_text 中的重要數字、人物、公司或事件。\n"
             "請像財經編輯寫 brief：先講事件，再講關鍵數字或影響。不要直譯英文語序；Fed 寫作美聯儲，Strait of Hormuz 寫作霍爾木茲海峽。\n"
             "如果 source_text 太短，只把已有資訊整理成一句；如果完全不能判斷，就回傳空字串。不要輸出 Markdown。\n"
