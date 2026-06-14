@@ -754,6 +754,8 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
     for item in items:
         context_text = clean_text(item.get("_summary_context_text", ""))
         context_confidence = float(item.get("_summary_context_confidence") or 0)
+        if item.get("summary_zh") and item.get("summary_status") == "verified_from_source_text":
+            continue
         if not context_text:
             continue
         if context_confidence < MIN_AI_CONTEXT_CONFIDENCE:
