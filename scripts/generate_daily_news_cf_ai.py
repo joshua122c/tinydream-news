@@ -494,9 +494,31 @@ def summary_supported_by_text(summary: str, context_text: str, title: str) -> bo
         return False
     if not has_cjk(summary):
         return False
+    if re.search(r"[{}\\]|\":|\":\s*\}\}", summary):
+        return False
     if any(phrase in summary for phrase in BAD_READER_PHRASES):
         return False
     return len(summary) >= 35
+
+
+def clean_ai_summary_output(value: object) -> str:
+    text = to_traditional_zh(clean_text(value))
+    text = re.sub(r'["”」』\']?\s*[:：]\s*["“「『\']?\s*\}+\s*$', "", text)
+    text = re.sub(r'["”」』\']?\s*\}+[,]?\s*$', "", text)
+    text = text.strip(" \"'，,;；")
+    sentences = re.split(r"(?<=[。！？!?])", text)
+    unique_sentences = []
+    seen = set()
+    for sentence in sentences:
+        clean_sentence = sentence.strip()
+        if not clean_sentence:
+            continue
+        key = re.sub(r"\s+", "", clean_sentence)
+        if key in seen:
+            continue
+        seen.add(key)
+        unique_sentences.append(clean_sentence)
+    return clean_text("".join(unique_sentences))[:420]
 
 
 def english_source_summary_zh(text: str, title_zh: str = "", original_title: str = "") -> str:
@@ -587,14 +609,14 @@ def normalize_ai_summaries(data: dict, response_text: str = "", known_ids: list[
         data = {}
     value = data.get("summaries")
     if isinstance(value, dict):
-        return {str(key): clean_text(text) for key, text in value.items() if clean_text(text)}
+        return {str(key): clean_ai_summary_output(text) for key, text in value.items() if clean_ai_summary_output(text)}
     if isinstance(value, list):
         rows = {}
         for row in value:
             if not isinstance(row, dict):
                 continue
             item_id = clean_text(row.get("id") or row.get("item_id") or row.get("story_id"))
-            text = clean_text(row.get("summary") or row.get("summary_zh") or row.get("text"))
+            text = clean_ai_summary_output(row.get("summary") or row.get("summary_zh") or row.get("text"))
             if item_id and text:
                 rows[item_id] = text
         return rows
@@ -603,7 +625,7 @@ def normalize_ai_summaries(data: dict, response_text: str = "", known_ids: list[
         if key == "summaries":
             continue
         if isinstance(text, str) and key.startswith(TODAY):
-            direct_rows[str(key)] = clean_text(text)
+            direct_rows[str(key)] = clean_ai_summary_output(text)
     if direct_rows:
         return direct_rows
     rows = {}
@@ -614,7 +636,7 @@ def normalize_ai_summaries(data: dict, response_text: str = "", known_ids: list[
         pattern = rf"({id_pattern})\s*[\"'）\)]?\s*(?:[:：\-–—]|摘要[:：])\s*[\"']?(.+?)(?=(?:{id_pattern})\s*[\"'）\)]?\s*(?:[:：\-–—]|摘要[:：])|$)"
         for match in re.finditer(pattern, compact, flags=re.S):
             item_id = match.group(1)
-            summary = clean_text(match.group(2).strip(" \"'，,;；"))
+            summary = clean_ai_summary_output(match.group(2))
             if item_id and summary:
                 rows[item_id] = summary
     return rows
@@ -665,7 +687,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             item = item_by_id.get(item_id)
             if not item:
                 continue
-            summary = to_traditional_zh(str(value).strip())
+            summary = clean_ai_summary_output(value)
             context_text = context_by_id.get(item_id, "")
             if summary_supported_by_text(summary, context_text, item.get("title_original", "")) and not contains_common_simplified_zh(summary):
                 item["summary_zh"] = summary[:420]
