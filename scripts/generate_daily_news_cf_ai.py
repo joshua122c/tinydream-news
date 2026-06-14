@@ -66,7 +66,7 @@ SOURCE_CONFIGS = [
 
 SOURCE_FAMILY_LIMIT = 4
 CATEGORY_LIMIT = 5
-MIN_ITEM_COUNT = 10
+MIN_ITEM_COUNT = 8
 MAX_DATED_NEWS_AGE = timedelta(hours=96)
 MAX_FUTURE_PUBLISHED_AT = timedelta(hours=6)
 
@@ -1148,6 +1148,49 @@ def hot_topic_reason(item: dict) -> str:
     return "此題材可能影響今日市場情緒，值得優先追蹤原文細節。"
 
 
+def item_rejection_reason(item: dict) -> str:
+    title = item.get("title_zh", "")
+    if title in BAD_GENERIC_TITLES or looks_like_generic_editorial_title(title):
+        return "generic_title"
+    if not has_cjk(title) or looks_mostly_english(title):
+        return "bad_title_language"
+    published = parse_published_at(item.get("published_at", ""))
+    if published:
+        age = NOW_HK - published
+        if age < -MAX_FUTURE_PUBLISHED_AT or age > MAX_DATED_NEWS_AGE:
+            return "stale_or_future_published_at"
+    if not isinstance(item.get("source_count"), int) or item["source_count"] < 1:
+        return "bad_source_count"
+    return ""
+
+
+def sanitize_items_for_publication(items: list[dict]) -> list[dict]:
+    publishable = []
+    seen_titles = set()
+    for item in items:
+        reason = item_rejection_reason(item)
+        if reason:
+            print(f"Skipping low-quality item {item.get('id')}: {reason} | {item.get('title_original')}")
+            continue
+        title = item.get("title_zh", "")
+        if title in seen_titles:
+            print(f"Skipping duplicate title item {item.get('id')}: {title}")
+            continue
+        seen_titles.add(title)
+        summary = item.get("summary_zh", "")
+        if summary and (
+            any(phrase in summary for phrase in BAD_READER_PHRASES)
+            or contains_common_simplified_zh(summary)
+            or not item.get("summary_basis")
+            or item.get("summary_status") != "verified_from_source_text"
+        ):
+            item["summary"] = ""
+            item["summary_zh"] = ""
+            item["summary_status"] = "summary_removed_after_quality_check"
+        publishable.append(item)
+    return publishable
+
+
 def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
     usable = candidates[:12]
     if not usable:
@@ -1160,6 +1203,9 @@ def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
     for item in items:
         item.pop("_summary_context_text", None)
         item.pop("_summary_context_basis", None)
+    items = sanitize_items_for_publication(items)
+    if len(items) < MIN_ITEM_COUNT:
+        fail(f"Only {len(items)} publishable news items remained after item quality isolation.")
     categories = []
     for name, slug in CATEGORY_TAXONOMY:
         refs = [item["id"] for item in items if item["category"] == name]
