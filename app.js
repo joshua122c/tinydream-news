@@ -564,6 +564,16 @@ function archiveSearchAccess(brief) {
 function sourceTransparencyBlock(brief) {
   const sourceLinks = asList(brief.items).filter((item) => item.url && item.url !== "https://news.tinydreamlab.com/").length;
   const sourceNames = asList(brief.sources).map((source) => source.name).filter(Boolean).slice(0, 8);
+  const report = brief.generation_report || {};
+  const collection = report.collection || {};
+  const quality = report.item_quality || {};
+  const ai = report.ai || {};
+  const sourceStats = asList(report.source_stats);
+  const blockedSources = sourceStats.filter((source) => source.access === "Blocked").length;
+  const topSourceStats = sourceStats
+    .filter((source) => Number(source.accepted_count || 0) > 0)
+    .sort((a, b) => Number(b.accepted_count || 0) - Number(a.accepted_count || 0))
+    .slice(0, 5);
   return `<section class="source-transparency">
     <p class="section-kicker">Source Transparency</p>
     <h2>來源透明度</h2>
@@ -572,8 +582,16 @@ function sourceTransparencyBlock(brief) {
       <div><dt>原文入口</dt><dd>${sourceLinks}/${asList(brief.items).length}</dd></div>
       <div><dt>核對方式</dt><dd>保留原文連結</dd></div>
     </dl>
+    ${Object.keys(report).length ? `<div class="generation-report" aria-label="生成報告">
+      <div><span>候選新聞</span><strong>${escapeHtml(collection.accepted_candidates || 0)}</strong><em>${escapeHtml(collection.raw_candidates || 0)} raw</em></div>
+      <div><span>舊聞過濾</span><strong>${escapeHtml(collection.skipped_stale || 0)}</strong><em>96 小時外</em></div>
+      <div><span>品質隔離</span><strong>${escapeHtml(asList(quality.skipped_items).length || 0)}</strong><em>不影響整次更新</em></div>
+      <div><span>AI 摘要</span><strong>${escapeHtml(ai.summary_updates || 0)}/${escapeHtml(ai.summary_candidates || 0)}</strong><em>可核對文字</em></div>
+      <div><span>來源狀態</span><strong>${escapeHtml((collection.sources_accessible || 0))}/${escapeHtml((collection.sources_total || asList(brief.sources).length))}</strong><em>${escapeHtml(blockedSources)} blocked</em></div>
+    </div>` : ""}
     <p>每條新聞保留來源、時間、題材標籤和原文入口；摘要只使用可讀來源文字或可信 description。</p>
     <div class="source-mini-list">${sourceNames.map((name) => `<span>${escapeHtml(name)}</span>`).join("")}</div>
+    ${topSourceStats.length ? `<div class="source-stat-list">${topSourceStats.map((source) => `<span>${escapeHtml(source.name)} <b>${escapeHtml(source.accepted_count)}</b></span>`).join("")}</div>` : ""}
   </section>`;
 }
 
