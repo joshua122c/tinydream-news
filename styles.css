@@ -453,6 +453,65 @@ aside,
   gap: var(--space-5);
 }
 
+.theme-list {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.theme-card {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: var(--space-5);
+  padding: var(--space-5) 0;
+  border-top: var(--rule);
+}
+
+.theme-card:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.theme-rank {
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.theme-body h3 {
+  max-width: 820px;
+  margin: var(--space-2) 0 0;
+  font-size: 34px;
+}
+
+.theme-related {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.theme-related a {
+  display: grid;
+  gap: var(--space-1);
+  padding-top: var(--space-3);
+  border-top: var(--rule);
+  text-decoration: none;
+}
+
+.theme-related strong {
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.theme-related em {
+  color: var(--muted);
+  font-size: var(--step-meta);
+  font-style: normal;
+}
+
 .top-story-card,
 .desk-story {
   min-width: 0;
@@ -1289,6 +1348,8 @@ span { overflow-wrap: anywhere; }
   .today-lead-grid,
   .morning-brief-section,
   .home-section-head,
+  .theme-card,
+  .theme-related,
   .top-story-grid,
   .desk-list,
   .utility-access,
