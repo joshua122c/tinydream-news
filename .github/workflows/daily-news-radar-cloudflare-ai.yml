@@ -3,8 +3,9 @@ name: Daily Finance Tech News Radar - Cloudflare AI
 on:
   workflow_dispatch:
   schedule:
-    # 08:15 Hong Kong time = 00:15 UTC.
-    - cron: "15 0 * * *"
+    # Fallback only: 08:45 Hong Kong time = 00:45 UTC.
+    # Primary trigger is the Cloudflare Worker at 08:15 HKT.
+    - cron: "45 0 * * *"
 
 permissions:
   contents: write
@@ -32,7 +33,28 @@ jobs:
       - name: Install news generation dependencies
         run: python -m pip install opencc-python-reimplemented==0.1.7
 
+      - name: Check scheduled fallback requirement
+        id: precheck
+        if: github.event_name == 'schedule'
+        run: |
+          TODAY="$(TZ=Asia/Hong_Kong date +%F)"
+          LATEST_DATE="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("data/index.json").read_text(encoding="utf-8"))
+          print(data.get("latest_date") or "")
+          PY
+          )"
+          if [ "$LATEST_DATE" = "$TODAY" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Today's brief already exists. Skipping scheduled fallback."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "No brief found for today. Running scheduled fallback."
+          fi
+
       - name: Generate daily brief with Cloudflare Workers AI
+        if: steps.precheck.outputs.skip != 'true'
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -43,6 +65,7 @@ jobs:
         run: python scripts/generate_daily_news_cf_ai.py
 
       - name: Commit website data
+        if: steps.precheck.outputs.skip != 'true'
         run: |
           git config user.name "tinydream-news-bot"
           git config user.email "tinydream-news-bot@users.noreply.github.com"
