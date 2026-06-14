@@ -552,11 +552,18 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
         return "not_chinese"
     if re.search(r"[{}\\]|\":|\":\s*\}\}", summary):
         return "json_fragment"
+    if re.search(r"[\u0e00-\u0e7f]", summary):
+        return "non_chinese_script"
+    if re.search(r"^(Yahoo Finance|The Guardian|CNBC|Reuters|MarketWatch|華爾街見聞|財新|LatePost)[：:]", summary):
+        return "source_name_prefix"
     if source_confidence < MIN_AI_CONTEXT_CONFIDENCE:
         return "low_source_confidence"
     if any(phrase in summary for phrase in BAD_READER_PHRASES):
         return "bad_reader_phrase"
-    if any(phrase in summary for phrase in ["source_text", "JSON", "Markdown", "內部之聲", "黑幫 Shadow Fleet", "Oil 減油船"]):
+    if any(phrase in summary for phrase in [
+        "source_text", "JSON", "Markdown", "內部之聲", "黑幫 Shadow Fleet", "Oil 減油船",
+        "cryptocurrency Industry", "重要一角", "規模和影響力", "會再受關注", "項目將於",
+    ]):
         return "machine_translation_artifact"
     if re.search(r"\b(Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放)\b", summary):
         return "machine_translation_artifact"
@@ -572,6 +579,14 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
     normalized = [re.sub(r"\s+", "", sentence) for sentence in sentences]
     if len(normalized) != len(set(normalized)):
         return "repeated_sentence"
+    clauses = [re.sub(r"\s+", "", clause) for clause in re.split(r"[，,；;。]", summary) if len(re.sub(r"\s+", "", clause)) >= 10]
+    if len(clauses) != len(set(clauses)):
+        return "repeated_clause"
+    for idx, clause in enumerate(clauses):
+        if any(clause and clause in other for other in clauses[idx + 1:]):
+            return "repeated_clause"
+    if re.search(r"(達到|表示|指出|包括|以及|影響)$", summary):
+        return "incomplete_sentence"
     title_tokens = {
         token.lower()
         for token in re.findall(r"\b[A-Za-z][A-Za-z0-9&.-]{2,}\b", title or "")
@@ -1622,7 +1637,7 @@ def validate_brief(brief: dict) -> None:
             fail(f"summary_zh must be verified from source text: {item['id']}")
         if item.get("summary_zh") and float(item.get("source_confidence") or 0) < MIN_AI_CONTEXT_CONFIDENCE:
             fail(f"summary_zh source confidence is too low: {item['id']} | {item.get('source_confidence')}")
-        if item.get("summary_zh") and re.search(r"[{}\\]|\":|\":\s*\}\}|Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放", item["summary_zh"]):
+        if item.get("summary_zh") and re.search(r"[{}\\]|\":|\":\s*\}\}|[\u0e00-\u0e7f]|Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放|cryptocurrency Industry|重要一角|規模和影響力|會再受關注", item["summary_zh"]):
             fail(f"summary_zh failed final quality gate: {item['id']} | {item['summary_zh'][:180]}")
         if not isinstance(item.get("source_count"), int) or item["source_count"] < 1:
             fail(f"source_count must be a positive integer: {item['id']}")
