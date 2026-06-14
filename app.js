@@ -391,7 +391,7 @@ function homePage(brief) {
     ${morningBriefSection(brief, layout)}
     <div class="home-layout">
       <main class="home-main">
-        ${topStoriesSection(brief, layout.topStories)}
+        ${topNewsThemesSection(brief)}
         ${deskSection(brief, "Markets", "市場焦點", layout.markets, "利率、能源、外匯、商品與宏觀風險。")}
         ${deskSection(brief, "Technology & AI", "科技與 AI", layout.technology, "AI 平台、半導體、科技企業與資本開支。")}
         ${archiveSearchAccess(brief)}
@@ -449,6 +449,43 @@ function topStoriesSection(brief, items) {
     </div>
     <div class="top-story-grid">${items.map((item, index) => renderTopStoryCard(item, brief, index)).join("")}</div>
   </section>`;
+}
+
+function itemByIdMap(brief) {
+  return new Map(asList(brief.items).map((item) => [item.id, item]));
+}
+
+function topNewsThemesSection(brief) {
+  const topics = asList(brief.hot_topics).slice(0, 6);
+  if (!topics.length) return "";
+  const byId = itemByIdMap(brief);
+  return `<section class="home-section topic-themes">
+    <div class="home-section-head">
+      <p class="section-kicker">Top News Themes</p>
+      <h2>今日新聞熱點</h2>
+      <p>先看市場集中討論的題材，再按相關原文深入核對。</p>
+    </div>
+    <div class="theme-list">${topics.map((topic) => renderThemeCard(topic, byId, brief)).join("")}</div>
+  </section>`;
+}
+
+function renderThemeCard(topic, byId, brief) {
+  const related = asList(topic.item_ids).map((id) => byId.get(id)).filter(Boolean);
+  const primary = related[0];
+  const summary = primary ? displaySummary(primary) : "";
+  const sources = asList(topic.main_sources).slice(0, 4).join("、");
+  return `<article class="theme-card">
+    <div class="theme-rank">#${escapeHtml(topic.rank || "")}</div>
+    <div class="theme-body">
+      <div class="story-meta"><span>${escapeHtml(sources || "主要來源")}</span><span>${escapeHtml(topic.related_story_count || related.length || 1)} 條相關新聞</span><span>熱度 ${escapeHtml(topic.heat_score || 0)}</span></div>
+      <h3>${headlineHtml(shortenHeadline(topic.topic || primary?.title_zh || "", "lead"))}</h3>
+      ${summary ? `<p class="story-summary">${escapeHtml(summary)}</p>` : ""}
+      <p class="story-takeaway"><span>Why it matters</span>${escapeHtml(topic.one_line_reason || editorialTakeaway(primary) || "")}</p>
+      <div class="theme-related">
+        ${related.slice(0, 4).map((item) => `<a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer"><strong>${headlineHtml(storyTitle(item, "list"))}</strong><em>${escapeHtml(item.source || "")} · ${escapeHtml(storyTime(item, brief))}</em></a>`).join("")}
+      </div>
+    </div>
+  </article>`;
 }
 
 function renderTopStoryCard(item, brief, index) {
