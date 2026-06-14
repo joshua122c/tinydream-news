@@ -562,13 +562,14 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
     if any(phrase in summary for phrase in [
         "source_text", "JSON", "Markdown", "內部之聲", "黑幫 Shadow Fleet", "Oil 減油船",
         "cryptocurrency Industry", "重要一角", "規模和影響力", "會再受關注", "項目將於",
+        "plan 中", "monetary", "真相尋", "communicate",
     ]):
         return "machine_translation_artifact"
     if re.search(r"\b(Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放)\b", summary):
         return "machine_translation_artifact"
     if len(summary) < 35:
         return "too_short"
-    if len(summary) > 260:
+    if len(summary) > 160:
         return "too_long"
     cjk_count = len(re.findall(r"[\u3400-\u9fff]", summary))
     latin_count = len(re.findall(r"[A-Za-z]", summary))
@@ -1636,7 +1637,7 @@ def validate_brief(brief: dict) -> None:
             fail(f"summary_zh must be verified from source text: {item['id']}")
         if item.get("summary_zh") and float(item.get("source_confidence") or 0) < MIN_AI_CONTEXT_CONFIDENCE:
             fail(f"summary_zh source confidence is too low: {item['id']} | {item.get('source_confidence')}")
-        if item.get("summary_zh") and re.search(r"[{}\\]|\":|\":\s*\}\}|[\u0e00-\u0e7f]|Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放|cryptocurrency Industry|重要一角|規模和影響力|會再受關注", item["summary_zh"]):
+        if item.get("summary_zh") and re.search(r"[{}\\]|\":|\":\s*\}\}|[\u0e00-\u0e7f]|Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放|cryptocurrency Industry|重要一角|規模和影響力|會再受關注|plan 中|monetary|真相尋|communicate", item["summary_zh"]):
             fail(f"summary_zh failed final quality gate: {item['id']} | {item['summary_zh'][:180]}")
         if not isinstance(item.get("source_count"), int) or item["source_count"] < 1:
             fail(f"source_count must be a positive integer: {item['id']}")
