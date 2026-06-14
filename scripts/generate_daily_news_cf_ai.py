@@ -565,6 +565,7 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
         "plan 中", "monetary", "真相尋", "communicate", "tensions", "panel", "油漆",
         "聯手監控", "一名三名", "第六次會議", "合作移除",
         "美聯儲在AI", "美聯儲公司", "大言不慮", "透漏", "重頭戲", "Industry", "cryptocurrency",
+        "香港聯合廣播公司", "美聯儲批准", "media", "付款用户",
     ]):
         return "machine_translation_artifact"
     if re.search(r"\b(Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放)\b|\$[0-9]", summary):
@@ -1644,7 +1645,7 @@ def validate_brief(brief: dict) -> None:
             fail(f"summary_zh must be verified from source text: {item['id']}")
         if item.get("summary_zh") and float(item.get("source_confidence") or 0) < MIN_AI_CONTEXT_CONFIDENCE:
             fail(f"summary_zh source confidence is too low: {item['id']} | {item.get('source_confidence')}")
-        if item.get("summary_zh") and re.search(r"[{}\\]|\":|\":\s*\}\}|[\u0e00-\u0e7f]|Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放|cryptocurrency Industry|重要一角|規模和影響力|會再受關注|plan 中|monetary|真相尋|communicate|tensions|panel|油漆|聯手監控|一名三名|第六次會議|合作移除|美聯儲在AI|美聯儲公司|大言不慮|透漏|重頭戲|Industry|cryptocurrency|\$[0-9]", item["summary_zh"]):
+        if item.get("summary_zh") and re.search(r"[{}\\]|\":|\":\s*\}\}|[\u0e00-\u0e7f]|Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放|cryptocurrency Industry|重要一角|規模和影響力|會再受關注|plan 中|monetary|真相尋|communicate|tensions|panel|油漆|聯手監控|一名三名|第六次會議|合作移除|美聯儲在AI|美聯儲公司|大言不慮|透漏|重頭戲|Industry|cryptocurrency|香港聯合廣播公司|美聯儲批准|media|付款用户|\$[0-9]", item["summary_zh"]):
             fail(f"summary_zh failed final quality gate: {item['id']} | {item['summary_zh'][:180]}")
         if not isinstance(item.get("source_count"), int) or item["source_count"] < 1:
             fail(f"source_count must be a positive integer: {item['id']}")
