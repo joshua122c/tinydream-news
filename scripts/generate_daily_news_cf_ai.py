@@ -991,6 +991,8 @@ def keyword_headline(title: str, category: str) -> str:
     entity = company or headline_entity(title)
     if entity.lower() in {"oil", "crude", "gold", "silver", "comex", "trump", "u.s", "us", "global", "market", "markets", "iran"}:
         entity = ""
+    if re.search(r"iran|hormuz|tehran|middle east|peace deal|peace agreement", text):
+        return "伊朗和平協議時間表仍存變數，能源與地緣風險重新定價"
     if re.search(r"coffee|cocoa|wheat|corn|tariff", text):
         return "農產品與關稅消息牽動商品價格，通脹預期再受關注"
     if re.search(r"natural gas|gas falls|gas prices", text):
@@ -1059,6 +1061,7 @@ def headline_to_zh(title: str, category: str) -> str:
         (r"Global oil prices drop to \$88.*Iran peace deal.*", "油價跌至每桶 88 美元附近，市場憧憬伊朗和平協議最快周末達成"),
         (r"Proposed Iran-U\.S\. deal would reopen Hormuz.*", "伊朗官媒稱美伊協議或重開霍爾木茲海峽並解除石油制裁"),
         (r"Trump claims US and Iran on verge of signing peace agreement.*", "特朗普稱美伊接近簽署和平協議，德黑蘭稱尚未作最終決定"),
+        (r"Trump says peace deal will be signed Sunday after Iran said it remains cautious on timing.*", "特朗普稱和平協議周日簽署，伊朗對時間表仍保持審慎"),
         (r"Trump denies Iran's account of deal terms.*", "特朗普否認伊朗對協議條款的說法，並譴責新一輪無人機攻擊"),
         (r"Trump administration: Iran deal signing likely in coming days.*not '?100%'? certain.*", "特朗普政府稱伊朗協議或數日內簽署，但仍未完全確定"),
         (r"Meta reportedly begins dismantling.*Manus deal.*", "Meta 據報按北京要求拆解 Manus 交易，AI 併購監管風險升溫"),
