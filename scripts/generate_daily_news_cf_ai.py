@@ -69,6 +69,16 @@ CATEGORY_LIMIT = 5
 MIN_ITEM_COUNT = 8
 MAX_DATED_NEWS_AGE = timedelta(hours=96)
 MAX_FUTURE_PUBLISHED_AT = timedelta(hours=6)
+MIN_AI_CONTEXT_CONFIDENCE = 0.70
+MIN_DIRECT_CONTEXT_CONFIDENCE = 0.74
+
+SUMMARY_BASIS_CONFIDENCE = {
+    "rss_description": 0.84,
+    "meta_description": 0.76,
+    "jsonld_article": 0.88,
+    "article_body": 0.72,
+    "low_confidence_body": 0.45,
+}
 
 RUN_REPORT = {
     "collection": {
@@ -88,6 +98,8 @@ RUN_REPORT = {
         "publishable_items": 0,
         "skipped_items": [],
         "summaries_removed": 0,
+        "summary_rejections": [],
+        "context_confidence": {},
     },
     "ai": {
         "summary_candidates": 0,
@@ -385,27 +397,71 @@ def extract_article_body_text(body: str) -> str:
     return clean_text(" ".join(paragraphs))
 
 
+def source_text_confidence(basis: str, text: str = "", title: str = "") -> float:
+    confidence = SUMMARY_BASIS_CONFIDENCE.get(basis, 0.0)
+    if basis == "article_body":
+        confidence = max(confidence, 0.70 if title_text_overlap(title, text) >= 2 else 0.56)
+    if len(clean_text(text)) < 120:
+        confidence -= 0.08
+    return max(0.0, min(0.95, round(confidence, 2)))
+
+
+def title_text_overlap(title: str, text: str) -> int:
+    title_markers = set(marker.lower() for marker in content_markers(title))
+    text_lower = clean_text(text).lower()
+    overlap = sum(1 for marker in title_markers if marker and marker in text_lower)
+    title_words = {
+        token.lower()
+        for token in re.findall(r"\b[A-Za-z][A-Za-z0-9&.-]{3,}\b", title or "")
+        if token.lower() not in {"from", "with", "after", "this", "that", "says", "said", "will", "over"}
+    }
+    overlap += sum(1 for word in title_words if word in text_lower)
+    return overlap
+
+
+def make_context(basis: str, text: str, url_status: int = 0) -> dict:
+    return {
+        "basis": basis,
+        "text": clean_text(text),
+        "confidence": source_text_confidence(basis, text),
+        "url_status": url_status,
+    }
+
+
 def article_context(candidate: dict) -> dict:
     title = clean_text(candidate.get("title", ""))
     hint = clean_text(candidate.get("summary_hint", ""))
     fallbacks = []
     if text_is_useful_summary(hint, title):
-        fallbacks.append({"basis": candidate.get("summary_hint_basis") or "rss_description", "text": hint[:1600]})
+        basis = candidate.get("summary_hint_basis") or "rss_description"
+        fallbacks.append(make_context(basis, hint[:1600]))
     status, body = fetch_url(candidate.get("url", ""))
     if status == 200:
         article_text = extract_article_body_text(body)
         jsonld_text = extract_jsonld_article_text(body)
         meta = extract_meta_description(body)
         if text_is_useful_summary(meta, title):
-            fallbacks.append({"basis": "meta_description", "text": meta[:1200]})
+            fallbacks.append(make_context("meta_description", meta[:1200], status))
         if text_is_useful_summary(jsonld_text, title):
-            fallbacks.append({"basis": "jsonld_article", "text": jsonld_text[:3000]})
+            fallbacks.append(make_context("jsonld_article", jsonld_text[:3000], status))
         if text_is_useful_summary(article_text, title) and len(article_text) >= 350:
-            return {"basis": "article_body", "text": article_text[:3600], "url_status": status, "fallback_contexts": fallbacks}
+            body_basis = "article_body" if title_text_overlap(title, article_text) >= 2 else "low_confidence_body"
+            body_context = make_context(body_basis, article_text[:3600], status)
+            if body_context["confidence"] >= MIN_AI_CONTEXT_CONFIDENCE:
+                body_context["fallback_contexts"] = fallbacks
+                return body_context
+            fallbacks.append(body_context)
     if fallbacks:
+        fallbacks.sort(key=lambda row: row.get("confidence", 0), reverse=True)
         first = fallbacks[0]
-        return {"basis": first["basis"], "text": first["text"], "url_status": status, "fallback_contexts": fallbacks[1:]}
-    return {"basis": "", "text": "", "url_status": status, "fallback_contexts": []}
+        return {
+            "basis": first["basis"],
+            "text": first["text"],
+            "confidence": first.get("confidence", 0),
+            "url_status": status,
+            "fallback_contexts": fallbacks[1:],
+        }
+    return {"basis": "", "text": "", "confidence": 0, "url_status": status, "fallback_contexts": []}
 
 
 def call_cloudflare_ai(prompt: str) -> str:
@@ -416,7 +472,7 @@ def call_cloudflare_ai(prompt: str) -> str:
     if not (account_id and token and model):
         return ""
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{urllib.parse.quote(model, safe='@/-')}"
-    payload = json.dumps({"messages": [{"role": "user", "content": prompt}], "max_tokens": 420}, ensure_ascii=False).encode("utf-8")
+    payload = json.dumps({"messages": [{"role": "user", "content": prompt}], "max_tokens": 760}, ensure_ascii=False).encode("utf-8")
     request = urllib.request.Request(
         url,
         data=payload,
@@ -489,16 +545,48 @@ def content_markers(value: str) -> list[str]:
     return list(dict.fromkeys(markers))[:20]
 
 
-def summary_supported_by_text(summary: str, context_text: str, title: str) -> bool:
+def summary_rejection_reason(summary: str, context_text: str, title: str, source_confidence: float = 1.0) -> str:
     if not summary or "NO_VERIFIABLE_SUMMARY" in summary:
-        return False
+        return "empty_summary"
     if not has_cjk(summary):
-        return False
+        return "not_chinese"
     if re.search(r"[{}\\]|\":|\":\s*\}\}", summary):
-        return False
+        return "json_fragment"
+    if source_confidence < MIN_AI_CONTEXT_CONFIDENCE:
+        return "low_source_confidence"
     if any(phrase in summary for phrase in BAD_READER_PHRASES):
-        return False
-    return len(summary) >= 35
+        return "bad_reader_phrase"
+    if any(phrase in summary for phrase in ["source_text", "JSON", "Markdown", "內部之聲", "黑幫 Shadow Fleet", "Oil 減油船"]):
+        return "machine_translation_artifact"
+    if re.search(r"\b(Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放)\b", summary):
+        return "machine_translation_artifact"
+    if len(summary) < 35:
+        return "too_short"
+    if len(summary) > 260:
+        return "too_long"
+    cjk_count = len(re.findall(r"[\u3400-\u9fff]", summary))
+    latin_count = len(re.findall(r"[A-Za-z]", summary))
+    if latin_count > 45 and latin_count > cjk_count * 0.65:
+        return "too_much_english"
+    sentences = [clean_text(sentence) for sentence in re.split(r"(?<=[。！？!?])", summary) if clean_text(sentence)]
+    normalized = [re.sub(r"\s+", "", sentence) for sentence in sentences]
+    if len(normalized) != len(set(normalized)):
+        return "repeated_sentence"
+    title_tokens = {
+        token.lower()
+        for token in re.findall(r"\b[A-Za-z][A-Za-z0-9&.-]{2,}\b", title or "")
+        if token.lower() not in {"the", "and", "for", "with", "from", "after", "said", "says"}
+    }
+    context_lower = clean_text(context_text).lower()
+    summary_lower = summary.lower()
+    unsupported_tokens = [token for token in re.findall(r"\b[A-Za-z][A-Za-z0-9&.-]{2,}\b", summary_lower) if token not in context_lower and token not in title_tokens]
+    if len([token for token in unsupported_tokens if not token.isdigit()]) > 4:
+        return "unsupported_entities"
+    return ""
+
+
+def summary_supported_by_text(summary: str, context_text: str, title: str, source_confidence: float = 1.0) -> bool:
+    return not summary_rejection_reason(summary, context_text, title, source_confidence)
 
 
 def clean_ai_summary_output(value: object) -> str:
@@ -573,17 +661,20 @@ def summarize_from_context(title_zh: str, original_title: str, source: str, cont
     for candidate_context in contexts:
         text = clean_text(candidate_context.get("text", ""))
         basis = candidate_context.get("basis", "")
+        confidence = float(candidate_context.get("confidence") or SUMMARY_BASIS_CONFIDENCE.get(basis, 0))
         if basis and not first_basis:
             first_basis = basis
         if not text:
             continue
+        if confidence < MIN_DIRECT_CONTEXT_CONFIDENCE:
+            continue
         if has_cjk(text):
             sentences = re.split(r"(?<=[。！？])", text)
             summary = to_traditional_zh("".join(sentences[:3]))[:360]
-            if summary_supported_by_text(summary, text, original_title):
+            if summary_supported_by_text(summary, text, original_title, confidence):
                 return summary, basis, "verified_from_source_text"
         fallback = source_excerpt_summary(text, title_zh, original_title)
-        if summary_supported_by_text(fallback, text, original_title):
+        if summary_supported_by_text(fallback, text, original_title, confidence):
             first_fallback = first_fallback or fallback
             first_basis = first_basis or basis
     if first_fallback:
@@ -647,7 +738,16 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
     context_by_id = {}
     for item in items:
         context_text = clean_text(item.get("_summary_context_text", ""))
+        context_confidence = float(item.get("_summary_context_confidence") or 0)
         if not context_text:
+            continue
+        if context_confidence < MIN_AI_CONTEXT_CONFIDENCE:
+            RUN_REPORT["item_quality"]["summary_rejections"].append({
+                "id": item.get("id", ""),
+                "reason": "low_source_confidence",
+                "basis": item.get("_summary_context_basis", ""),
+                "confidence": context_confidence,
+            })
             continue
         context_by_id[item["id"]] = context_text
         payload.append({
@@ -655,6 +755,8 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             "title_zh": item["title_zh"],
             "title_original": item["title_original"],
             "source": item["source"],
+            "source_confidence": context_confidence,
+            "summary_basis": item.get("_summary_context_basis", ""),
             "source_text": context_text[:900],
         })
     if not payload:
@@ -667,7 +769,8 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
         prompt = (
             "你是香港繁體中文財經新聞編輯。以下是多條新聞的可信來源文字，可能是正文、RSS description 或 meta description。\n"
             "任務：只根據每條 source_text 寫新聞摘要。不可加入推測、評論、投資建議，亦不可加入 source_text 沒有的背景。\n"
-            "每條摘要輸出 1 至 2 句香港繁體中文；公司名可保留英文，人名不要亂音譯；必須保留 source_text 中的重要數字、人物、公司或事件。\n"
+            "每條摘要輸出 1 至 2 句自然香港繁體中文，約 50 至 120 字；公司名可保留英文，人名不要亂音譯；必須保留 source_text 中的重要數字、人物、公司或事件。\n"
+            "請像財經編輯寫 brief：先講事件，再講關鍵數字或影響。不要直譯英文語序；Fed 寫作美聯儲，Strait of Hormuz 寫作霍爾木茲海峽。\n"
             "如果 source_text 太短，只把已有資訊整理成一句；如果完全不能判斷，就回傳空字串。不要輸出 Markdown。\n"
             "只輸出 JSON object，格式必須是 {\"summaries\":{\"新聞 id\":\"中文摘要或空字串\"}}。\n\n"
             + json.dumps(batch, ensure_ascii=False)
@@ -689,13 +792,23 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
                 continue
             summary = clean_ai_summary_output(value)
             context_text = context_by_id.get(item_id, "")
-            if summary_supported_by_text(summary, context_text, item.get("title_original", "")) and not contains_common_simplified_zh(summary):
+            confidence = float(item.get("_summary_context_confidence") or 0)
+            rejection_reason = summary_rejection_reason(summary, context_text, item.get("title_original", ""), confidence)
+            if not rejection_reason and not contains_common_simplified_zh(summary):
                 item["summary_zh"] = summary[:420]
                 item["summary"] = item["summary_zh"]
                 item["summary_status"] = "verified_from_source_text"
+                item["summary_quality_status"] = "passed"
                 RUN_REPORT["ai"]["summary_updates"] += 1
             elif summary:
                 RUN_REPORT["ai"]["rejected_summaries"] += 1
+                RUN_REPORT["item_quality"]["summary_rejections"].append({
+                    "id": item.get("id", ""),
+                    "reason": rejection_reason or "simplified_chinese",
+                    "basis": item.get("_summary_context_basis", ""),
+                    "confidence": confidence,
+                    "preview": summary[:120],
+                })
     RUN_REPORT["ai"]["last_status"] = "ok" if parsed_any else "empty_or_unparseable_response"
 
 
@@ -1231,6 +1344,11 @@ def build_item(candidate: dict, idx: int) -> dict:
     if related_titles:
         key_facts.append("代表性原始標題：" + "；".join(related_titles[:2]))
     context = article_context(candidate)
+    context_confidence = float(context.get("confidence") or 0)
+    context_basis = context.get("basis", "")
+    if context_basis:
+        confidence_key = f"{context_basis}:{context_confidence:.2f}"
+        RUN_REPORT["item_quality"]["context_confidence"][confidence_key] = RUN_REPORT["item_quality"]["context_confidence"].get(confidence_key, 0) + 1
     summary_zh, summary_basis, summary_status = summarize_from_context(title_zh, original_title, source, context)
     if summary_basis:
         key_facts.append(f"摘要依據：{summary_basis}")
@@ -1250,6 +1368,9 @@ def build_item(candidate: dict, idx: int) -> dict:
         "summary_zh": summary_zh,
         "summary_basis": summary_basis,
         "summary_status": summary_status,
+        "summary_quality_status": "passed" if summary_zh else "unavailable",
+        "source_confidence": context_confidence,
+        "source_confidence_label": "high" if context_confidence >= 0.80 else "medium" if context_confidence >= MIN_AI_CONTEXT_CONFIDENCE else "low",
         "key_facts": key_facts[:4],
         "market_impact": "",
         "reporter_angle": "",
@@ -1262,7 +1383,8 @@ def build_item(candidate: dict, idx: int) -> dict:
         "tracking_value": "",
         "topic_key": cluster,
         "_summary_context_text": clean_text(context.get("text", "")),
-        "_summary_context_basis": context.get("basis", ""),
+        "_summary_context_basis": context_basis,
+        "_summary_context_confidence": context_confidence,
     }
 
 
@@ -1327,16 +1449,31 @@ def sanitize_items_for_publication(items: list[dict]) -> list[dict]:
             continue
         seen_titles.add(title)
         summary = item.get("summary_zh", "")
+        summary_rejection = summary_rejection_reason(
+            summary,
+            item.get("_summary_context_text", ""),
+            item.get("title_original", ""),
+            float(item.get("source_confidence") or 0),
+        ) if summary else ""
         if summary and (
             any(phrase in summary for phrase in BAD_READER_PHRASES)
             or contains_common_simplified_zh(summary)
             or not item.get("summary_basis")
             or item.get("summary_status") != "verified_from_source_text"
+            or summary_rejection
         ):
             item["summary"] = ""
             item["summary_zh"] = ""
             item["summary_status"] = "summary_removed_after_quality_check"
+            item["summary_quality_status"] = summary_rejection or "removed_after_quality_check"
             RUN_REPORT["item_quality"]["summaries_removed"] += 1
+            RUN_REPORT["item_quality"]["summary_rejections"].append({
+                "id": item.get("id", ""),
+                "reason": item["summary_quality_status"],
+                "basis": item.get("summary_basis", ""),
+                "confidence": item.get("source_confidence", 0),
+                "preview": summary[:120],
+            })
         publishable.append(item)
     RUN_REPORT["item_quality"]["publishable_items"] = len(publishable)
     return publishable
@@ -1392,10 +1529,11 @@ def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
     items = [build_item(candidate, idx) for idx, candidate in enumerate(usable, start=1)]
     RUN_REPORT["item_quality"]["built_items"] = len(items)
     apply_batch_ai_summaries(items)
+    items = sanitize_items_for_publication(items)
     for item in items:
         item.pop("_summary_context_text", None)
         item.pop("_summary_context_basis", None)
-    items = sanitize_items_for_publication(items)
+        item.pop("_summary_context_confidence", None)
     if len(items) < MIN_ITEM_COUNT:
         fail(f"Only {len(items)} publishable news items remained after item quality isolation.")
     categories = []
@@ -1482,6 +1620,10 @@ def validate_brief(brief: dict) -> None:
             fail(f"summary_zh must include summary_basis: {item['id']}")
         if item.get("summary_zh") and item.get("summary_status") != "verified_from_source_text":
             fail(f"summary_zh must be verified from source text: {item['id']}")
+        if item.get("summary_zh") and float(item.get("source_confidence") or 0) < MIN_AI_CONTEXT_CONFIDENCE:
+            fail(f"summary_zh source confidence is too low: {item['id']} | {item.get('source_confidence')}")
+        if item.get("summary_zh") and re.search(r"[{}\\]|\":|\":\s*\}\}|Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放", item["summary_zh"]):
+            fail(f"summary_zh failed final quality gate: {item['id']} | {item['summary_zh'][:180]}")
         if not isinstance(item.get("source_count"), int) or item["source_count"] < 1:
             fail(f"source_count must be a positive integer: {item['id']}")
     duplicate_titles = [title for title, count in title_counts.items() if count > 1]
