@@ -568,6 +568,11 @@ function sourceTransparencyBlock(brief) {
   const collection = report.collection || {};
   const quality = report.item_quality || {};
   const ai = report.ai || {};
+  const contextConfidence = quality.context_confidence || {};
+  const confidenceText = Object.entries(contextConfidence)
+    .slice(0, 4)
+    .map(([key, value]) => `${key} ${value}`)
+    .join(" · ");
   const sourceStats = asList(report.source_stats);
   const blockedSources = sourceStats.filter((source) => source.access === "Blocked").length;
   const topSourceStats = sourceStats
@@ -587,9 +592,11 @@ function sourceTransparencyBlock(brief) {
       <div><span>舊聞過濾</span><strong>${escapeHtml(collection.skipped_stale || 0)}</strong><em>96 小時外</em></div>
       <div><span>品質隔離</span><strong>${escapeHtml(asList(quality.skipped_items).length || 0)}</strong><em>不影響整次更新</em></div>
       <div><span>AI 摘要</span><strong>${escapeHtml(ai.summary_updates || 0)}/${escapeHtml(ai.summary_candidates || 0)}</strong><em>可核對文字</em></div>
+      <div><span>摘要拒收</span><strong>${escapeHtml(asList(quality.summary_rejections).length || 0)}</strong><em>品質閘門</em></div>
       <div><span>來源狀態</span><strong>${escapeHtml((collection.sources_accessible || 0))}/${escapeHtml((collection.sources_total || asList(brief.sources).length))}</strong><em>${escapeHtml(blockedSources)} blocked</em></div>
     </div>` : ""}
-    <p>每條新聞保留來源、時間、題材標籤和原文入口；摘要只使用可讀來源文字或可信 description。</p>
+    <p>每條新聞保留來源、時間、題材標籤和原文入口；摘要只使用可讀來源文字或可信 description，並通過摘要品質閘門。</p>
+    ${confidenceText ? `<p class="confidence-note">來源可信度：${escapeHtml(confidenceText)}</p>` : ""}
     <div class="source-mini-list">${sourceNames.map((name) => `<span>${escapeHtml(name)}</span>`).join("")}</div>
     ${topSourceStats.length ? `<div class="source-stat-list">${topSourceStats.map((source) => `<span>${escapeHtml(source.name)} <b>${escapeHtml(source.accepted_count)}</b></span>`).join("")}</div>` : ""}
   </section>`;
