@@ -296,6 +296,7 @@ async function renderBrief(id, isHome = false) {
     ? homePage(brief)
     : `${hero(brief, false)}${latestTicker(brief)}<div class="edition-layout"><main>${summarySection(brief)}${frontPageSection(brief)}${topicSections(brief)}${categoriesSection(brief)}${sourcesSection(brief)}</main>${tagsSidebar(brief)}</div>`;
   if (document.querySelector("#category-panel")) bindCategoryControls(brief);
+  if (document.querySelector("[data-workspace]")) bindWorkspaceControls(brief);
   bindItemJumpControls();
 }
 
@@ -904,6 +905,453 @@ function collectThemes() {
 
 function slugify(value = "") {
   return String(value).trim().toLowerCase().replaceAll("&", "and").replace(/[^a-z0-9\u3400-\u9fff]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+const WORKSPACE_DEFAULTS = {
+  filter: "all",
+  query: "",
+  fullOnly: false,
+  focusOnly: false,
+  readIds: new Set(),
+};
+
+function workspaceState(brief) {
+  if (!state.workspace || state.workspace.briefId !== (brief.update_id || brief.date)) {
+    const briefId = brief.update_id || brief.date;
+    let readIds = [];
+    try {
+      readIds = JSON.parse(localStorage.getItem(`tdn-read-${briefId}`) || "[]");
+    } catch {
+      readIds = [];
+    }
+    state.workspace = { ...WORKSPACE_DEFAULTS, briefId, readIds: new Set(readIds) };
+  }
+  return state.workspace;
+}
+
+function saveWorkspaceState() {
+  if (!state.workspace?.briefId) return;
+  localStorage.setItem(`tdn-read-${state.workspace.briefId}`, JSON.stringify([...state.workspace.readIds]));
+}
+
+function itemSummaryTier(item) {
+  const summary = displaySummary(item);
+  if (!summary) return { grade: "C", label: "只列原文", detail: "未取得足夠可核實來源文字", readable: false };
+  const confidence = Number(item?.source_confidence || 0);
+  if (summary.length >= 85 && confidence >= 0.74) return { grade: "A", label: "完整摘要", detail: "通過品質閘門", readable: true };
+  return { grade: "B", label: "有限摘要", detail: item?.summary_basis ? "根據來源描述生成" : "根據可讀來源文字", readable: true };
+}
+
+function normalizeDesk(item) {
+  const text = [item?.category, item?.title_original, item?.title_zh, ...asList(item?.themes)].join(" ").toLowerCase();
+  if (/fed|inflation|rate|yield|treasury|macro|央行|利率|通脹|宏觀|債/.test(text)) return "macro";
+  if (/\bai\b|artificial intelligence|technology|tech|chip|semiconductor|meta|nvidia|microsoft|openai|科技|平台|半導體|算力/.test(text)) return "tech-ai";
+  if (/oil|gold|commodity|energy|gas|dollar|yen|能源|原油|商品|黃金|外匯/.test(text)) return "energy";
+  if (/earnings|stock|shares|ipo|deal|merger|acquisition|company|企業|併購|財報|上市/.test(text)) return "companies";
+  return "markets";
+}
+
+const WORKSPACE_FILTERS = [
+  ["all", "全部"],
+  ["lead", "今日焦點"],
+  ["macro", "宏觀"],
+  ["tech-ai", "科技與 AI"],
+  ["markets", "市場"],
+  ["energy", "能源與商品"],
+  ["companies", "企業"],
+  ["full", "只看完整摘要"],
+];
+
+function leadItem(brief) {
+  const sorted = sortedNewsItems(brief);
+  return sorted.find((item) => displaySummary(item)) || sorted[0];
+}
+
+function workspaceCollections(brief) {
+  const lead = leadItem(brief);
+  const all = sortedNewsItems(brief);
+  const readable = all.filter((item) => itemSummaryTier(item).readable);
+  const sourceOnly = all.filter((item) => !itemSummaryTier(item).readable);
+  return { lead, all, readable, sourceOnly };
+}
+
+function matchesWorkspaceFilter(item, filter, lead) {
+  if (filter === "all") return true;
+  if (filter === "lead") return item?.id === lead?.id;
+  if (filter === "full") return itemSummaryTier(item).grade === "A";
+  return normalizeDesk(item) === filter;
+}
+
+function matchesWorkspaceQuery(item, query) {
+  const normalized = String(query || "").trim().toLowerCase();
+  if (!normalized) return true;
+  const haystack = [displayTitle(item), item?.title_original, item?.source, item?.category, displaySummary(item), ...asList(item?.themes)].join(" ").toLowerCase();
+  return haystack.includes(normalized);
+}
+
+function filteredReadableItems(brief) {
+  const ws = workspaceState(brief);
+  const { lead, readable } = workspaceCollections(brief);
+  return readable.filter((item) => {
+    const filter = ws.fullOnly ? "full" : ws.focusOnly ? "lead" : ws.filter;
+    return matchesWorkspaceFilter(item, filter, lead) && matchesWorkspaceQuery(item, ws.query);
+  });
+}
+
+function filteredSourceOnlyItems(brief) {
+  const ws = workspaceState(brief);
+  if (ws.fullOnly) return [];
+  const { lead, sourceOnly } = workspaceCollections(brief);
+  const filter = ws.focusOnly ? "lead" : ws.filter;
+  return sourceOnly.filter((item) => matchesWorkspaceFilter(item, filter, lead) && matchesWorkspaceQuery(item, ws.query));
+}
+
+function workspaceCounts(brief) {
+  const { lead, all } = workspaceCollections(brief);
+  const counts = Object.fromEntries(WORKSPACE_FILTERS.map(([key]) => [key, 0]));
+  all.forEach((item) => {
+    counts.all += 1;
+    if (item.id === lead?.id) counts.lead += 1;
+    const desk = normalizeDesk(item);
+    counts[desk] = (counts[desk] || 0) + 1;
+    if (itemSummaryTier(item).grade === "A") counts.full += 1;
+  });
+  return counts;
+}
+
+function estimateReadingMinutes(items) {
+  const words = items.reduce((sum, item) => sum + Math.max(70, (displaySummary(item).length || displayTitle(item).length) * 1.3), 0);
+  return Math.max(2, Math.ceil(words / 420));
+}
+
+function readProgress(brief) {
+  const ws = workspaceState(brief);
+  const readable = workspaceCollections(brief).readable;
+  if (!readable.length) return 0;
+  const readCount = readable.filter((item) => ws.readIds.has(item.id)).length;
+  return Math.round((readCount / readable.length) * 100);
+}
+
+function homePage(brief) {
+  workspaceState(brief);
+  return `<section class="morning-workbench" data-workspace>
+    ${workbenchHero(brief)}
+    ${mobileWorkspaceBar(brief)}
+    <div class="workbench-grid">
+      ${readingSidebar(brief)}
+      <main class="reading-main">
+        ${workspaceToolbar(brief)}
+        ${articleWorkspace(brief)}
+        ${sourceOnlySection(brief)}
+        ${trustMethodologyPanel(brief)}
+      </main>
+    </div>
+    <button class="back-top" type="button" data-back-top>回到頂部</button>
+  </section>`;
+}
+
+function workbenchHero(brief) {
+  const lead = leadItem(brief);
+  const updateTime = brief.generated_at ? `${formatTime(brief.generated_at)} HKT` : brief.date;
+  return `<section class="brief-hero">
+    <div class="brief-hero-top">
+      <p class="section-kicker">Editorial Morning Brief</p>
+      <span>${escapeHtml(updateTime)}</span>
+    </div>
+    <div class="brief-hero-grid">
+      <article class="brief-lead-card" id="item-${escapeHtml(lead?.id || "lead")}">
+        <div class="workspace-meta">${lead ? storyMeta(lead, brief) : ""}<span>${escapeHtml(itemSummaryTier(lead || {}).label)}</span></div>
+        <p class="lead-overline">Today’s Lead / 今日焦點</p>
+        <h1>${headlineHtml(storyTitle(lead || {}, "lead"))}</h1>
+        <p class="lead-conclusion">${escapeHtml(oneLineConclusion(lead))}</p>
+        ${displaySummary(lead) ? `<p class="lead-summary">${escapeHtml(displaySummary(lead))}</p>` : `<p class="lead-summary muted">今日焦點未有足夠可信摘要文字，請由原文入口核對。</p>`}
+        ${lead?.url ? `<a class="action primary-action" href="${escapeHtml(lead.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>` : ""}
+      </article>
+      <aside class="morning-five">
+        <p class="section-kicker">Morning Brief / 開市前 5 件事</p>
+        <ol>${morningFive(brief).map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ol>
+      </aside>
+    </div>
+    ${marketPulse(brief)}
+  </section>`;
+}
+
+function morningFive(brief) {
+  const points = [];
+  asList(brief.hot_topics).slice(0, 5).forEach((topic) => {
+    const text = topic.one_line_reason || topic.topic;
+    if (text) points.push(shortenHeadline(text, "brief"));
+  });
+  if (points.length < 5) {
+    sortedNewsItems(brief).forEach((item) => {
+      const text = oneLineConclusion(item);
+      if (text && !points.includes(text)) points.push(shortenHeadline(text, "brief"));
+    });
+  }
+  return points.slice(0, 5);
+}
+
+function marketPulse(brief) {
+  const counts = workspaceCounts(brief);
+  const chips = [
+    ["宏觀", counts.macro || 0],
+    ["科技與 AI", counts["tech-ai"] || 0],
+    ["市場", counts.markets || 0],
+    ["能源與商品", counts.energy || 0],
+    ["企業", counts.companies || 0],
+  ];
+  return `<section class="market-pulse">
+    <div><p class="section-kicker">Market Pulse / 今日市場主線</p><h2>先抓主線，再讀全文</h2></div>
+    <div class="pulse-strip">${chips.map(([label, count]) => `<span><strong>${escapeHtml(count)}</strong>${escapeHtml(label)}</span>`).join("")}</div>
+  </section>`;
+}
+
+function readingSidebar(brief) {
+  const counts = workspaceCounts(brief);
+  const items = workspaceCollections(brief).readable;
+  return `<aside class="reading-sidebar">
+    <div class="sidebar-date">${formatBriefDate(brief.date)}</div>
+    <h2>今日早報 · 共 ${asList(brief.items).length} 篇</h2>
+    <div class="progress-block">
+      <div><span>閱讀進度</span><strong data-progress-text>${readProgress(brief)}%</strong></div>
+      <div class="progress-track"><span data-progress-bar style="width:${readProgress(brief)}%"></span></div>
+    </div>
+    <p class="reading-time">預計閱讀時間 ${estimateReadingMinutes(items)} 分鐘</p>
+    <nav class="sidebar-filters">${WORKSPACE_FILTERS.slice(0, 7).map(([key, label]) => `<button type="button" data-filter="${escapeHtml(key)}">${escapeHtml(label)} <b>${escapeHtml(counts[key] || 0)}</b></button>`).join("")}</nav>
+    <div class="reading-method">
+      <strong>今日閱讀法</strong>
+      <p>先讀「開市前 5 件事」，再看今日焦點；有時間再按分類閱讀完整摘要。</p>
+    </div>
+  </aside>`;
+}
+
+function mobileWorkspaceBar(brief) {
+  return `<section class="mobile-workspace-bar">
+    <div><strong>${formatBriefDate(brief.date)}</strong><span>閱讀進度 <b data-progress-text>${readProgress(brief)}%</b></span></div>
+    <div class="progress-track"><span data-progress-bar style="width:${readProgress(brief)}%"></span></div>
+  </section>`;
+}
+
+function workspaceToolbar(brief) {
+  const ws = workspaceState(brief);
+  const counts = workspaceCounts(brief);
+  return `<section class="workspace-toolbar">
+    <div class="toolbar-head">
+      <div><p class="section-kicker">Reading Workspace</p><h2>今日文章</h2></div>
+      <label class="workspace-search"><span>Search</span><input data-workspace-search type="search" value="${escapeHtml(ws.query)}" placeholder="搜尋公司、題材、來源" /></label>
+    </div>
+    <div class="filter-chips">${WORKSPACE_FILTERS.map(([key, label]) => `<button type="button" class="${workspaceActiveClass(key, ws)}" data-filter="${escapeHtml(key)}">${escapeHtml(label)} <b>${escapeHtml(counts[key] || 0)}</b></button>`).join("")}</div>
+  </section>`;
+}
+
+function workspaceActiveClass(key, ws) {
+  const active = (ws.fullOnly && key === "full") || (ws.focusOnly && key === "lead") || (!ws.fullOnly && !ws.focusOnly && ws.filter === key);
+  return active ? "chip active" : "chip";
+}
+
+function articleWorkspace(brief) {
+  const items = filteredReadableItems(brief);
+  return `<section class="article-workspace" aria-live="polite">
+    ${items.length ? items.map((item, index) => renderWorkbenchArticle(item, brief, index)).join("") : `<div class="empty-workspace"><h3>此篩選沒有完整可讀摘要</h3><p>可切換到「全部」或在下方 More source links 直接閱讀原文。</p></div>`}
+  </section>`;
+}
+
+function renderWorkbenchArticle(item, brief, index) {
+  const tier = itemSummaryTier(item);
+  const summary = displaySummary(item);
+  const read = workspaceState(brief).readIds.has(item.id);
+  const points = articleKeyPoints(item);
+  return `<article class="workbench-article ${tier.grade === "A" ? "full" : "limited"} ${read ? "is-read" : ""}" id="item-${escapeHtml(item.id)}" data-article-id="${escapeHtml(item.id)}" data-grade="${escapeHtml(tier.grade)}">
+    <div class="article-main">
+      <div class="article-meta-row">
+        <span>${escapeHtml(storyTime(item, brief))}</span>
+        <span>${escapeHtml(item.source || "Source")}</span>
+        <span>${escapeHtml(primaryTopic(item))}</span>
+        <span class="summary-grade grade-${escapeHtml(tier.grade.toLowerCase())}">${escapeHtml(tier.label)}</span>
+        <span>${Math.max(1, Math.ceil(summary.length / 180))} 分鐘</span>
+      </div>
+      <h2>${headlineHtml(storyTitle(item, "lead"))}</h2>
+      <p class="one-line">${escapeHtml(oneLineConclusion(item))}</p>
+      <div class="article-summary" data-summary-body>
+        ${summaryParagraphs(summary, tier.grade).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+      </div>
+      <button class="summary-toggle" type="button" data-toggle-summary>展開 / 收起詳細摘要</button>
+      ${contextMap(item)}
+      <div class="article-footer">
+        <div class="tag-row">${asList(item.themes).slice(0, 4).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+        <div class="article-actions">
+          <button type="button" data-mark-read="${escapeHtml(item.id)}">${read ? "已讀" : "標記已讀"}</button>
+          <a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>
+        </div>
+      </div>
+      ${tier.grade === "B" ? `<p class="source-note">根據來源描述生成，請以原文作最後核對。</p>` : ""}
+    </div>
+    <aside class="article-points">
+      <strong>重點</strong>
+      <ul>${points.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ul>
+    </aside>
+  </article>`;
+}
+
+function oneLineConclusion(item) {
+  const summary = displaySummary(item);
+  if (summary) return shortenHeadline(summary.split(/[。；;]/)[0], "brief");
+  return storyTitle(item, "brief");
+}
+
+function summaryParagraphs(summary, grade) {
+  const sentences = String(summary || "").split(/(?<=[。！？；;])\s*/).map((part) => part.trim()).filter(Boolean);
+  if (!sentences.length) return [];
+  if (grade === "B") return [sentences.slice(0, 2).join("")];
+  const paragraphs = [];
+  for (let index = 0; index < sentences.length; index += 2) {
+    paragraphs.push(sentences.slice(index, index + 2).join(""));
+  }
+  return paragraphs.slice(0, 4);
+}
+
+function articleKeyPoints(item) {
+  const facts = asList(item.key_facts).filter((fact) => !String(fact).includes("摘要依據")).slice(0, 3);
+  const points = [...facts];
+  const summary = displaySummary(item);
+  summary.split(/[。；;]/).map((part) => part.trim()).filter((part) => part.length >= 12).slice(0, 3).forEach((part) => {
+    if (!points.some((point) => point.includes(part.slice(0, 8)))) points.push(shortenHeadline(part, "brief"));
+  });
+  points.push(`來源：${item.source || "主要來源"}`);
+  return points.slice(0, 5);
+}
+
+function contextMap(item) {
+  const issue = primaryTopic(item);
+  const event = storyTitle(item, "brief");
+  const impact = normalizeDesk(item) === "tech-ai" ? "科技股 / AI 估值" : normalizeDesk(item) === "macro" ? "利率 / 風險情緒" : normalizeDesk(item) === "energy" ? "能源 / 通脹" : "市場情緒";
+  const risk = itemSummaryTier(item).grade === "A" ? "需追蹤後續數據" : "摘要有限，需核對原文";
+  return `<div class="context-map" aria-label="脈絡圖">
+    <span><b>核心議題</b>${escapeHtml(issue)}</span>
+    <span><b>事件</b>${escapeHtml(event)}</span>
+    <span><b>市場影響</b>${escapeHtml(impact)}</span>
+    <span><b>風險</b>${escapeHtml(risk)}</span>
+  </div>`;
+}
+
+function sourceOnlySection(brief) {
+  const items = filteredSourceOnlyItems(brief);
+  if (!items.length) return "";
+  return `<section class="source-only-section">
+    <details open>
+      <summary>More source links / 只列原文 <span>${items.length}</span></summary>
+      <div class="source-only-list">${items.map((item) => `<a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">
+        <strong>${headlineHtml(storyTitle(item, "desk"))}</strong>
+        <span>${escapeHtml(item.source || "")} · ${escapeHtml(storyTime(item, brief))} · ${escapeHtml(primaryTopic(item))}</span>
+      </a>`).join("")}</div>
+    </details>
+  </section>`;
+}
+
+function trustMethodologyPanel(brief) {
+  const report = brief.generation_report || {};
+  const collection = report.collection || {};
+  const quality = report.item_quality || {};
+  const ai = report.ai || {};
+  const sourceLinks = asList(brief.items).filter((item) => item.url && item.url !== "https://news.tinydreamlab.com/").length;
+  return `<section class="trust-panel">
+    <div class="trust-head">
+      <p class="section-kicker">Trust & Methodology</p>
+      <h2>今日來源處理</h2>
+    </div>
+    <dl class="reader-metrics">
+      <div><dt>候選新聞</dt><dd>${escapeHtml(collection.accepted_candidates || asList(brief.items).length)}</dd></div>
+      <div><dt>通過品質閘門</dt><dd>${escapeHtml(asList(brief.items).length)}</dd></div>
+      <div><dt>原文入口</dt><dd>${sourceLinks}/${asList(brief.items).length}</dd></div>
+      <div><dt>拒收摘要</dt><dd>${escapeHtml(asList(quality.summary_rejections).length || 0)}</dd></div>
+      <div><dt>來源狀態</dt><dd>${escapeHtml(collection.sources_accessible || 0)}/${escapeHtml(collection.sources_total || asList(brief.sources).length)}</dd></div>
+    </dl>
+    <details class="method-details">
+      <summary>查看詳細處理數據</summary>
+      <pre>${escapeHtml(JSON.stringify({ collection, ai, context_confidence: quality.context_confidence, rejected: asList(quality.summary_rejections).slice(0, 8) }, null, 2))}</pre>
+    </details>
+  </section>`;
+}
+
+function formatBriefDate(value) {
+  const date = new Date(`${value}T00:00:00+08:00`);
+  if (Number.isNaN(date.getTime())) return value || "今日";
+  return date.toLocaleDateString("zh-HK", { month: "long", day: "numeric" });
+}
+
+function bindWorkspaceControls(brief) {
+  const root = document.querySelector("[data-workspace]");
+  if (!root) return;
+  const ws = workspaceState(brief);
+  root.querySelectorAll("[data-filter]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const key = button.dataset.filter || "all";
+      ws.fullOnly = key === "full";
+      ws.focusOnly = key === "lead";
+      if (!ws.fullOnly && !ws.focusOnly) ws.filter = key;
+      refreshWorkspace(brief);
+    });
+  });
+  root.querySelector("[data-workspace-search]")?.addEventListener("input", (event) => {
+    ws.query = event.target.value.trim();
+    refreshWorkspace(brief);
+  });
+  root.querySelectorAll("[data-mark-read]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.markRead;
+      if (!id) return;
+      if (ws.readIds.has(id)) ws.readIds.delete(id);
+      else ws.readIds.add(id);
+      saveWorkspaceState();
+      refreshWorkspace(brief);
+    });
+  });
+  root.querySelectorAll("[data-toggle-summary]").forEach((button) => {
+    button.addEventListener("click", () => button.closest(".workbench-article")?.classList.toggle("summary-collapsed"));
+  });
+  root.querySelector("[data-back-top]")?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  observeReadingProgress(root, brief);
+}
+
+function refreshWorkspace(brief) {
+  const main = document.querySelector(".reading-main");
+  if (!main) return;
+  main.innerHTML = `${workspaceToolbar(brief)}${articleWorkspace(brief)}${sourceOnlySection(brief)}${trustMethodologyPanel(brief)}`;
+  document.querySelector(".reading-sidebar")?.replaceWith(htmlToElement(readingSidebar(brief)));
+  const mobile = document.querySelector(".mobile-workspace-bar");
+  if (mobile) mobile.outerHTML = mobileWorkspaceBar(brief);
+  bindWorkspaceControls(brief);
+}
+
+function htmlToElement(html) {
+  const template = document.createElement("template");
+  template.innerHTML = html.trim();
+  return template.content.firstElementChild;
+}
+
+function observeReadingProgress(root, brief) {
+  if (!("IntersectionObserver" in window)) return;
+  const ws = workspaceState(brief);
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting && entry.intersectionRatio > 0.72) {
+        const id = entry.target.dataset.articleId;
+        if (id && !ws.readIds.has(id)) {
+          ws.readIds.add(id);
+          saveWorkspaceState();
+          updateProgressUI(brief);
+          entry.target.classList.add("is-read");
+        }
+      }
+    });
+  }, { threshold: [0.72] });
+  root.querySelectorAll("[data-article-id]").forEach((card) => observer.observe(card));
+}
+
+function updateProgressUI(brief) {
+  const progress = readProgress(brief);
+  document.querySelectorAll("[data-progress-text]").forEach((node) => { node.textContent = `${progress}%`; });
+  document.querySelectorAll("[data-progress-bar]").forEach((node) => { node.style.width = `${progress}%`; });
 }
 
 boot();
