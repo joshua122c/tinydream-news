@@ -1,0 +1,895 @@
+{
+  "date": "2026-06-16",
+  "update_id": "2026-06-16-0816",
+  "update_file": "data/briefs/2026-06-16-0816.json",
+  "title": "每日國際財經與科技新聞摘要",
+  "deck": "整理全球市場、科技產業和主要企業消息，協助快速掌握今日值得追蹤的新聞主線。",
+  "daily_summary_zh": "今日國際財經與科技新聞以科技、AI與平台、全球市場與宏觀、能源、外匯與商品、企業、財報與交易為主線。頭版焦點包括AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視、利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價、中東與原油供應風險再受關注，能源價格牽動通脹與避險定價。本期共有 3 個主題整合同題材來源，重點不只在單一標題，而是觀察新聞是否正在形成可持續的市場敘事；讀者可先讀焦點主題，再按分類核對原文和後續變化。",
+  "market_focus": [
+    "科技、AI與平台",
+    "全球市場與宏觀",
+    "能源、外匯與商品",
+    "企業、財報與交易"
+  ],
+  "hot_topics": [
+    {
+      "rank": 1,
+      "topic": "利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價",
+      "heat_score": 99,
+      "heat_label": "High",
+      "source_count": 2,
+      "main_sources": [
+        "CNBC",
+        "Yahoo Finance"
+      ],
+      "item_ids": [
+        "2026-06-16-headline-002",
+        "2026-06-16-headline-004"
+      ],
+      "one_line_reason": "2 條相關新聞集中在同一題材，反映它是今日主要新聞熱點之一；宏觀數據和利率預期會同時影響股債匯商品，是今日市場定價的核心變數。",
+      "reporter_angle": "",
+      "related_story_count": 2,
+      "supporting_titles": [
+        "利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價",
+        "利率與通脹預期牽動美債和股市走向"
+      ]
+    },
+    {
+      "rank": 2,
+      "topic": "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視",
+      "heat_score": 99,
+      "heat_label": "High",
+      "source_count": 4,
+      "main_sources": [
+        "CNBC",
+        "Yahoo Finance",
+        "TechCrunch AI",
+        "晚點"
+      ],
+      "item_ids": [
+        "2026-06-16-headline-001"
+      ],
+      "one_line_reason": "AI 應用與雲端平台消息可能改變市場對大型科技股增長和資本開支的判斷。",
+      "reporter_angle": "",
+      "related_story_count": 1,
+      "supporting_titles": [
+        "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視"
+      ]
+    },
+    {
+      "rank": 3,
+      "topic": "中東與原油供應風險再受關注，能源價格牽動通脹與避險定價",
+      "heat_score": 96,
+      "heat_label": "High",
+      "source_count": 2,
+      "main_sources": [
+        "CNBC",
+        "The Guardian"
+      ],
+      "item_ids": [
+        "2026-06-16-headline-003"
+      ],
+      "one_line_reason": "商品和外匯價格會影響通脹預期、企業成本和避險資金流向。",
+      "reporter_angle": "",
+      "related_story_count": 1,
+      "supporting_titles": [
+        "中東與原油供應風險再受關注，能源價格牽動通脹與避險定價"
+      ]
+    },
+    {
+      "rank": 4,
+      "topic": "天然氣價格受天氣預報牽動，能源市場重新評估短線需求",
+      "heat_score": 85,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "Yahoo Finance"
+      ],
+      "item_ids": [
+        "2026-06-16-headline-007"
+      ],
+      "one_line_reason": "商品和外匯價格會影響通脹預期、企業成本和避險資金流向。",
+      "reporter_angle": "",
+      "related_story_count": 1,
+      "supporting_titles": [
+        "天然氣價格受天氣預報牽動，能源市場重新評估短線需求"
+      ]
+    },
+    {
+      "rank": 5,
+      "topic": "FTX 創辦人上訴失敗，欺詐定罪維持不變",
+      "heat_score": 84,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "The Guardian"
+      ],
+      "item_ids": [
+        "2026-06-16-headline-008"
+      ],
+      "one_line_reason": "企業融資、財報或交易消息會直接影響個股估值，並可能擴散至同業。",
+      "reporter_angle": "",
+      "related_story_count": 1,
+      "supporting_titles": [
+        "FTX 創辦人上訴失敗，欺詐定罪維持不變"
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "name": "全球市場與宏觀",
+      "slug": "global-markets-macro",
+      "item_ids": [
+        "2026-06-16-headline-002",
+        "2026-06-16-headline-004"
+      ]
+    },
+    {
+      "name": "科技、AI與平台",
+      "slug": "technology-ai-platforms",
+      "item_ids": [
+        "2026-06-16-headline-001"
+      ]
+    },
+    {
+      "name": "企業、財報與交易",
+      "slug": "companies-earnings-deals",
+      "item_ids": [
+        "2026-06-16-headline-008",
+        "2026-06-16-headline-011"
+      ]
+    },
+    {
+      "name": "能源、外匯與商品",
+      "slug": "energy-fx-commodities",
+      "item_ids": [
+        "2026-06-16-headline-003",
+        "2026-06-16-headline-007",
+        "2026-06-16-headline-010",
+        "2026-06-16-headline-012"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "2026-06-16-headline-001",
+      "date": "2026-06-16",
+      "title_original": "Nvidia plans to raise at least $20 billion in its first debt sale since start of AI boom",
+      "title_zh": "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/15/nvidia-plans-to-raise-about-20-billion-first-debt-sale-in-ai-boom.html",
+      "published_at": "Mon, 15 Jun 2026 22:56:16 GMT",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "AI投資熱潮"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "jsonld_article",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.88,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：4",
+        "同題材來源：CNBC、Yahoo Finance、TechCrunch AI、晚點",
+        "代表性原始標題：Nvidia plans to raise at least $20 billion in its first debt sale since start of AI boom；XPeng Is Getting Serious About Physical AI as Its CEO Takes Over the Robotics Division"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 4,
+      "sources_reporting_same_topic": [
+        "CNBC",
+        "Yahoo Finance",
+        "TechCrunch AI",
+        "晚點"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "ai-platforms"
+    },
+    {
+      "id": "2026-06-16-headline-002",
+      "date": "2026-06-16",
+      "title_original": "Trump trusts Fed Chair Kevin Warsh. It matters for more than interest rates",
+      "title_zh": "利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/15/trump-warsh-fed-reshape.html",
+      "published_at": "Mon, 15 Jun 2026 20:14:06 GMT",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "利率與通脹"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "jsonld_article",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.88,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：2",
+        "同題材來源：CNBC、Yahoo Finance",
+        "代表性原始標題：Trump trusts Fed Chair Kevin Warsh. It matters for more than interest rates；Warsh's Fed is likely to hold rates steady — what the leadership change could mean for your money"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 2,
+      "sources_reporting_same_topic": [
+        "CNBC",
+        "Yahoo Finance"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "rates-inflation"
+    },
+    {
+      "id": "2026-06-16-headline-003",
+      "date": "2026-06-16",
+      "title_original": "Vance says 'a lot' of Iran deal details to figure out, but U.S. has 'all the cards'",
+      "title_zh": "中東與原油供應風險再受關注，能源價格牽動通脹與避險定價",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/15/vance-iran-deal-negotiations-nuclear.html",
+      "published_at": "Mon, 15 Jun 2026 17:09:11 GMT",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "企業與資本市場"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "jsonld_article",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.8,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：2",
+        "同題材來源：CNBC、The Guardian",
+        "代表性原始標題：Vance says 'a lot' of Iran deal details to figure out, but U.S. has 'all the cards'；The Iran deal came just in time as Strategic Petroleum Reserve hits lowest level since 1983"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 2,
+      "sources_reporting_same_topic": [
+        "CNBC",
+        "The Guardian"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "iran-oil"
+    },
+    {
+      "id": "2026-06-16-headline-004",
+      "date": "2026-06-16",
+      "title_original": "Warsh's Fed is likely to hold rates steady — what the leadership change could mean for your money",
+      "title_zh": "利率與通脹預期牽動美債和股市走向",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/15/warsh-fed-interest-rates.html",
+      "published_at": "Mon, 15 Jun 2026 16:37:28 GMT",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "利率與通脹"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "jsonld_article",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.88,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：1",
+        "同題材來源：CNBC",
+        "代表性原始標題：Warsh's Fed is likely to hold rates steady — what the leadership change could mean for your money"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 9,
+      "heat_score": 94,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "rates-inflation"
+    },
+    {
+      "id": "2026-06-16-headline-007",
+      "date": "2026-06-16",
+      "title_original": "Oil executives send a blunt message to Americans on gas prices",
+      "title_zh": "天然氣價格受天氣預報牽動，能源市場重新評估短線需求",
+      "source": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/sectors/energy/articles/oil-executives-send-blunt-message-200700286.html",
+      "published_at": "2026-06-14T20:07:00Z",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "商品與外匯"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "jsonld_article",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.88,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：Yahoo Finance",
+        "同題材來源數：1",
+        "同題材來源：Yahoo Finance",
+        "代表性原始標題：Oil executives send a blunt message to Americans on gas prices"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 8,
+      "heat_score": 85,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "Yahoo Finance"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "executives-send-blunt"
+    },
+    {
+      "id": "2026-06-16-headline-008",
+      "date": "2026-06-16",
+      "title_original": "Sam Bankman-Fried loses bid to appeal against fraud conviction in FTX case",
+      "title_zh": "FTX 創辦人上訴失敗，欺詐定罪維持不變",
+      "source": "The Guardian",
+      "url": "https://www.theguardian.com/business/2026/jun/12/sam-bankman-fried-loses-appeal",
+      "published_at": "Fri, 12 Jun 2026 13:52:59 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "rss_description",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.84,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：The Guardian",
+        "同題材來源數：1",
+        "同題材來源：The Guardian",
+        "代表性原始標題：Sam Bankman-Fried loses bid to appeal against fraud conviction in FTX case"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 7,
+      "heat_score": 84,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "The Guardian"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "bankman-fried-loses"
+    },
+    {
+      "id": "2026-06-16-headline-010",
+      "date": "2026-06-16",
+      "title_original": "Here’s when gas prices will come down if the U.S. deal to end the Iran war pans out",
+      "title_zh": "伊朗和平協議時間表仍存變數，能源與地緣風險重新定價",
+      "source": "MarketWatch",
+      "url": "https://www.marketwatch.com/story/heres-when-gas-prices-will-go-down-now-that-theres-a-deal-to-end-the-iran-war-6a482f4d?mod=mw_rss_topstories",
+      "published_at": "Mon, 15 Jun 2026 22:31:00 GMT",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "企業與資本市場"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "rss_description",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.76,
+      "source_confidence_label": "low",
+      "key_facts": [
+        "主要來源：MarketWatch",
+        "同題材來源數：1",
+        "同題材來源：MarketWatch",
+        "代表性原始標題：Here’s when gas prices will come down if the U.S. deal to end the Iran war pans out"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 6,
+      "heat_score": 75,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "MarketWatch"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "here-when-prices"
+    },
+    {
+      "id": "2026-06-16-headline-011",
+      "date": "2026-06-16",
+      "title_original": "US justice department approves $111bn merger of Paramount and Warner Bros Discovery",
+      "title_zh": "美國司法部批准派拉蒙與華納兄弟探索 1,110 億美元合併",
+      "source": "The Guardian",
+      "url": "https://www.theguardian.com/us-news/2026/jun/12/paramount-warner-bros-merger",
+      "published_at": "Sat, 13 Jun 2026 00:54:31 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "rss_description",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.84,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：The Guardian",
+        "同題材來源數：1",
+        "同題材來源：The Guardian",
+        "代表性原始標題：US justice department approves $111bn merger of Paramount and Warner Bros Discovery"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 6,
+      "heat_score": 74,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "The Guardian"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "paramount-wbd"
+    },
+    {
+      "id": "2026-06-16-headline-012",
+      "date": "2026-06-16",
+      "title_original": "上市第2天，SpaceX再涨近20%，估值已达2.5万亿美元！接下来这两个日子要高度关注",
+      "title_zh": "上市第2天，SpaceX再漲近20%，估值已達2.5萬億美元！接下來這兩個日子要高度關注",
+      "source": "華爾街見聞",
+      "url": "https://wallstreetcn.com/articles/3774742",
+      "published_at": "2026-06-16T08:16:14+08:00",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品"
+      ],
+      "summary": "SpaceX上市兩日市值即破2.5萬億美元，馬斯克一躍成為全球首位萬億富翁。然而這場資本盛宴遠未結束——7月7日納指強制納入將引爆80至180億美元被動買盤，與極低流通量的正面碰撞可能製造極端行情；7月底財報解禁窗口、馬斯克8月70億美元税務大限，甚至浮現合併特斯拉的終極資本大戲。",
+      "summary_zh": "SpaceX上市兩日市值即破2.5萬億美元，馬斯克一躍成為全球首位萬億富翁。然而這場資本盛宴遠未結束——7月7日納指強制納入將引爆80至180億美元被動買盤，與極低流通量的正面碰撞可能製造極端行情；7月底財報解禁窗口、馬斯克8月70億美元税務大限，甚至浮現合併特斯拉的終極資本大戲。",
+      "summary_basis": "meta_description",
+      "summary_status": "verified_from_source_text",
+      "summary_quality_status": "passed",
+      "source_confidence": 0.76,
+      "source_confidence_label": "low",
+      "key_facts": [
+        "主要來源：華爾街見聞",
+        "同題材來源數：1",
+        "同題材來源：華爾街見聞",
+        "代表性原始標題：上市第2天，SpaceX再涨近20%，估值已达2.5万亿美元！接下来这两个日子要高度关注"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 5,
+      "heat_score": 70,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "華爾街見聞"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "spacex"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Reuters Markets",
+      "url": "https://www.reuters.com/markets/",
+      "access": "Blocked",
+      "tier": 1
+    },
+    {
+      "name": "Reuters Technology",
+      "url": "https://www.reuters.com/technology/",
+      "access": "Blocked",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Top News",
+      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Markets",
+      "url": "https://www.cnbc.com/markets/",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Technology",
+      "url": "https://www.cnbc.com/technology/",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "WSJ Markets",
+      "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "WSJ Technology",
+      "url": "https://feeds.a.dj.com/rss/RSSWSJD.xml",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/news/rssindex",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "MarketWatch Top Stories",
+      "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "The Guardian Business",
+      "url": "https://www.theguardian.com/business/rss",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "Nikkei Asia Business",
+      "url": "https://asia.nikkei.com/Business",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "TechCrunch AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "TechCrunch Startups",
+      "url": "https://techcrunch.com/category/startups/",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "Wallstreetcn",
+      "url": "https://wallstreetcn.com/",
+      "access": "Full",
+      "tier": 3
+    },
+    {
+      "name": "Caixin",
+      "url": "https://www.caixin.com/",
+      "access": "Full",
+      "tier": 3
+    },
+    {
+      "name": "LatePost",
+      "url": "https://www.latepost.com/",
+      "access": "Full",
+      "tier": 3
+    }
+  ],
+  "generation_report": {
+    "collection": {
+      "sources_total": 16,
+      "sources_accessible": 14,
+      "raw_candidates": 346,
+      "accepted_candidates": 38,
+      "skipped_by_rule": 45,
+      "skipped_stale": 16,
+      "keyword_candidates": 19,
+      "unique_candidates": 18,
+      "grouped_candidates": 12
+    },
+    "source_stats": [
+      {
+        "name": "Reuters Markets",
+        "tier": 1,
+        "access": "Blocked",
+        "status_code": 0,
+        "extracted_count": 0,
+        "accepted_count": 0,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Reuters Technology",
+        "tier": 1,
+        "access": "Blocked",
+        "status_code": 0,
+        "extracted_count": 0,
+        "accepted_count": 0,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "CNBC Top News",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 8,
+        "skipped_by_rule": 2,
+        "skipped_stale": 0
+      },
+      {
+        "name": "CNBC Markets",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 1,
+        "skipped_by_rule": 7,
+        "skipped_stale": 0
+      },
+      {
+        "name": "CNBC Technology",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 1,
+        "skipped_by_rule": 7,
+        "skipped_stale": 0
+      },
+      {
+        "name": "WSJ Markets",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 20,
+        "accepted_count": 0,
+        "skipped_by_rule": 1,
+        "skipped_stale": 11
+      },
+      {
+        "name": "WSJ Technology",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 20,
+        "accepted_count": 0,
+        "skipped_by_rule": 3,
+        "skipped_stale": 5
+      },
+      {
+        "name": "Yahoo Finance",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 8,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "MarketWatch Top Stories",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 10,
+        "accepted_count": 5,
+        "skipped_by_rule": 5,
+        "skipped_stale": 0
+      },
+      {
+        "name": "The Guardian Business",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 20,
+        "accepted_count": 8,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Nikkei Asia Business",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 0,
+        "skipped_by_rule": 5,
+        "skipped_stale": 0
+      },
+      {
+        "name": "TechCrunch AI",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 2,
+        "skipped_by_rule": 6,
+        "skipped_stale": 0
+      },
+      {
+        "name": "TechCrunch Startups",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 0,
+        "skipped_by_rule": 5,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Wallstreetcn",
+        "tier": 3,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 26,
+        "accepted_count": 3,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Caixin",
+        "tier": 3,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 1,
+        "skipped_by_rule": 2,
+        "skipped_stale": 0
+      },
+      {
+        "name": "LatePost",
+        "tier": 3,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 10,
+        "accepted_count": 1,
+        "skipped_by_rule": 2,
+        "skipped_stale": 0
+      }
+    ],
+    "item_quality": {
+      "built_items": 12,
+      "publishable_items": 9,
+      "skipped_items": [
+        {
+          "id": "2026-06-16-headline-005",
+          "reason": "generic_title",
+          "source": "TechCrunch AI",
+          "title_original": "Sundar Pichai faces boos, walkout at Stanford graduation ceremony over Google’s Israel, ICE ties",
+          "title_zh": "圍繞 Google 的市場消息牽動投資者風險判斷"
+        },
+        {
+          "id": "2026-06-16-headline-006",
+          "reason": "duplicate_title",
+          "source": "Yahoo Finance",
+          "title_original": "Micron Stock is Now Close to Fair Value, But Shorting 2-Week Puts Yield 7.0%",
+          "title_zh": "利率與通脹預期牽動美債和股市走向"
+        },
+        {
+          "id": "2026-06-16-headline-009",
+          "reason": "generic_title",
+          "source": "Yahoo Finance",
+          "title_original": "A $1.24 Trillion Reason to Buy Dell Stock Now",
+          "title_zh": "圍繞 Trillion Reason 的企業消息牽動投資者對盈利與估值的判斷"
+        }
+      ],
+      "summaries_removed": 0,
+      "summary_rejections": [
+        {
+          "id": "2026-06-16-headline-001",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.88
+        },
+        {
+          "id": "2026-06-16-headline-002",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.88
+        },
+        {
+          "id": "2026-06-16-headline-003",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.8
+        },
+        {
+          "id": "2026-06-16-headline-004",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.88
+        },
+        {
+          "id": "2026-06-16-headline-005",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.88
+        },
+        {
+          "id": "2026-06-16-headline-006",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.88
+        },
+        {
+          "id": "2026-06-16-headline-007",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.88
+        },
+        {
+          "id": "2026-06-16-headline-008",
+          "reason": "low_source_confidence",
+          "basis": "rss_description",
+          "confidence": 0.84
+        },
+        {
+          "id": "2026-06-16-headline-009",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.88
+        },
+        {
+          "id": "2026-06-16-headline-010",
+          "reason": "low_source_confidence",
+          "basis": "rss_description",
+          "confidence": 0.76
+        },
+        {
+          "id": "2026-06-16-headline-011",
+          "reason": "low_source_confidence",
+          "basis": "rss_description",
+          "confidence": 0.84
+        }
+      ],
+      "context_confidence": {
+        "jsonld_article:0.88": 7,
+        "jsonld_article:0.80": 1,
+        "rss_description:0.84": 2,
+        "rss_description:0.76": 1,
+        "meta_description:0.76": 1
+      }
+    },
+    "ai": {
+      "summary_candidates": 0,
+      "summary_updates": 0,
+      "response_chars": 0,
+      "parsed_summaries": 0,
+      "rejected_summaries": 0,
+      "response_samples": [],
+      "last_status": "not_called"
+    }
+  },
+  "generated_at": "2026-06-16T08:16:14+08:00",
+  "email_body_zh": "今日國際財經與科技新聞以科技、AI與平台、全球市場與宏觀、能源、外匯與商品、企業、財報與交易為主線。頭版焦點包括AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視、利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價、中東與原油供應風險再受關注，能源價格牽動通脹與避險定價。本期共有 3 個主題整合同題材來源，重點不只在單一標題，而是觀察新聞是否正在形成可持續的市場敘事；讀者可先讀焦點主題，再按分類核對原文和後續變化。\n\n網站：https://news.tinydreamlab.com/"
+}
