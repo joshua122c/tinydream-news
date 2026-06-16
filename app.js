@@ -84,6 +84,9 @@ const TITLE_LIMITS = {
   desk: 34,
   list: 28,
   brief: 44,
+  morning: 20,
+  editorialLead: 28,
+  editorialCard: 34,
   default: 52,
 };
 
@@ -99,6 +102,60 @@ function shortenHeadline(value = "", variant = "default") {
 
 function storyTitle(item, variant = "default") {
   return shortenHeadline(displayTitle(item), variant);
+}
+
+function cleanEditorialHeadline(value = "") {
+  return String(value || "")
+    .replace(/[!！]+/g, "")
+    .replace(/接下來[^。；;，,]*?(關注|留意)[^。；;，,]*/g, "")
+    .replace(/這幾件事[^。；;，,]*/g, "")
+    .replace(/值得高度關注/g, "受關注")
+    .replace(/\s+/g, " ")
+    .replace(/\s*([，。；：])\s*/g, "$1")
+    .trim();
+}
+
+function splitEditorialClauses(value = "") {
+  return cleanEditorialHeadline(value)
+    .split(/[，,；;：:。]/)
+    .map((part) => part.trim())
+    .filter((part) => part.length >= 3);
+}
+
+function compactEditorialText(value = "", variant = "editorialCard") {
+  const max = TITLE_LIMITS[variant] || TITLE_LIMITS.editorialCard;
+  const text = cleanEditorialHeadline(value);
+  if (Array.from(text).length <= max) return text;
+  const clauses = splitEditorialClauses(text);
+  const useful = clauses.find((part) => Array.from(part).length >= 8 && Array.from(part).length <= max);
+  if (useful) return useful;
+  return `${Array.from(text).slice(0, Math.max(10, max - 1)).join("").trim()}…`;
+}
+
+function editorialHeadlineParts(item, variant = "card") {
+  const raw = cleanEditorialHeadline(displayTitle(item));
+  const maxVariant = variant === "lead" ? "editorialLead" : "editorialCard";
+  const company = raw.match(/\b(Nvidia|Apple|Microsoft|Google|Alphabet|Amazon|Meta|Tesla|Oracle|SpaceX|OpenAI|AMD|TSMC|Intel|Broadcom|DeepSeek)\b/i)?.[1];
+  const clauses = splitEditorialClauses(raw);
+  const valuation = clauses.find((part) => /估值|市值|valuation/i.test(part));
+  const listing = /上市|IPO|掛牌/i.test(raw);
+  let headline = "";
+
+  if (company && valuation) {
+    headline = listing ? `${company} 上市後${valuation.replace(new RegExp(company, "i"), "").trim()}` : `${company} ${valuation}`;
+  } else if (company && clauses.length > 1) {
+    headline = `${company} ${clauses.find((part) => !new RegExp(company, "i").test(part)) || clauses[0]}`;
+  } else {
+    headline = clauses.find((part) => Array.from(part).length >= 8) || raw;
+  }
+
+  headline = compactEditorialText(headline, maxVariant);
+  const summaryFirst = displaySummary(item).split(/[。；;]/).map((part) => part.trim()).find((part) => part && !headline.includes(part.slice(0, 8)));
+  const dekSource = clauses.filter((part) => !headline.includes(part.slice(0, 6))).slice(0, 2).join("，") || summaryFirst || editorialTakeaway(item) || "";
+  return {
+    headline,
+    dek: compactEditorialText(dekSource, variant === "lead" ? "brief" : "card"),
+  };
 }
 
 function isWeakSummary(value = "") {
@@ -956,10 +1013,8 @@ const WORKSPACE_FILTERS = [
   ["lead", "今日焦點"],
   ["macro", "宏觀"],
   ["tech-ai", "科技與 AI"],
-  ["markets", "市場"],
   ["energy", "能源與商品"],
   ["companies", "企業"],
-  ["full", "只看完整摘要"],
 ];
 
 function leadItem(brief) {
@@ -978,7 +1033,6 @@ function workspaceCollections(brief) {
 function matchesWorkspaceFilter(item, filter, lead) {
   if (filter === "all") return true;
   if (filter === "lead") return item?.id === lead?.id;
-  if (filter === "full") return itemSummaryTier(item).grade === "A";
   return normalizeDesk(item) === filter;
 }
 
@@ -993,8 +1047,9 @@ function filteredReadableItems(brief) {
   const ws = workspaceState(brief);
   const { lead, readable } = workspaceCollections(brief);
   return readable.filter((item) => {
-    const filter = ws.fullOnly ? "full" : ws.focusOnly ? "lead" : ws.filter;
-    return matchesWorkspaceFilter(item, filter, lead) && matchesWorkspaceQuery(item, ws.query);
+    const filter = ws.focusOnly ? "lead" : ws.filter;
+    const fullAllowed = !ws.fullOnly || itemSummaryTier(item).grade === "A";
+    return fullAllowed && matchesWorkspaceFilter(item, filter, lead) && matchesWorkspaceQuery(item, ws.query);
   });
 }
 
@@ -1009,6 +1064,8 @@ function filteredSourceOnlyItems(brief) {
 function workspaceCounts(brief) {
   const { lead, all } = workspaceCollections(brief);
   const counts = Object.fromEntries(WORKSPACE_FILTERS.map(([key]) => [key, 0]));
+  counts.markets = 0;
+  counts.full = 0;
   all.forEach((item) => {
     counts.all += 1;
     if (item.id === lead?.id) counts.lead += 1;
@@ -1052,6 +1109,7 @@ function homePage(brief) {
 
 function workbenchHero(brief) {
   const lead = leadItem(brief);
+  const leadHeadline = editorialHeadlineParts(lead || {}, "lead");
   const updateTime = brief.generated_at ? `${formatTime(brief.generated_at)} HKT` : brief.date;
   return `<section class="brief-hero">
     <div class="brief-hero-top">
@@ -1062,14 +1120,15 @@ function workbenchHero(brief) {
       <article class="brief-lead-card" id="item-${escapeHtml(lead?.id || "lead")}">
         <div class="workspace-meta">${lead ? storyMeta(lead, brief) : ""}<span>${escapeHtml(itemSummaryTier(lead || {}).label)}</span></div>
         <p class="lead-overline">Today’s Lead / 今日焦點</p>
-        <h1>${headlineHtml(storyTitle(lead || {}, "lead"))}</h1>
+        <h1>${headlineHtml(leadHeadline.headline)}</h1>
+        ${leadHeadline.dek ? `<p class="lead-dek">${escapeHtml(leadHeadline.dek)}</p>` : ""}
         <p class="lead-conclusion">${escapeHtml(oneLineConclusion(lead))}</p>
         ${displaySummary(lead) ? `<p class="lead-summary">${escapeHtml(displaySummary(lead))}</p>` : `<p class="lead-summary muted">今日焦點未有足夠可信摘要文字，請由原文入口核對。</p>`}
         ${lead?.url ? `<a class="action primary-action" href="${escapeHtml(lead.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>` : ""}
       </article>
       <aside class="morning-five">
         <p class="section-kicker">Morning Brief / 開市前 5 件事</p>
-        <ol>${morningFive(brief).map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ol>
+        <ol>${morningFive(brief).map((point) => `<li>${headlineHtml(point)}</li>`).join("")}</ol>
       </aside>
     </div>
     ${marketPulse(brief)}
@@ -1077,15 +1136,30 @@ function workbenchHero(brief) {
 }
 
 function morningFive(brief) {
+  const { lead, all } = workspaceCollections(brief);
+  const slots = [
+    ["lead", "今日焦點", lead],
+    ["macro", "宏觀與利率", all.find((item) => item?.id !== lead?.id && normalizeDesk(item) === "macro")],
+    ["tech-ai", "科技與 AI", all.find((item) => item?.id !== lead?.id && normalizeDesk(item) === "tech-ai")],
+    ["energy", "能源與商品", all.find((item) => item?.id !== lead?.id && normalizeDesk(item) === "energy")],
+    ["companies", "企業事件", all.find((item) => item?.id !== lead?.id && normalizeDesk(item) === "companies")],
+  ];
+  const usedTopics = new Set();
   const points = [];
-  asList(brief.hot_topics).slice(0, 5).forEach((topic) => {
-    const text = topic.one_line_reason || topic.topic;
-    if (text) points.push(shortenHeadline(text, "brief"));
+  slots.forEach(([key, label, item]) => {
+    if (!item) return;
+    const topic = key === "lead" ? item?.id : normalizeDesk(item);
+    if (usedTopics.has(topic)) return;
+    usedTopics.add(topic);
+    const text = `${label}：${editorialHeadlineParts(item).headline}`;
+    points.push(compactEditorialText(text, "morning"));
   });
   if (points.length < 5) {
-    sortedNewsItems(brief).forEach((item) => {
-      const text = oneLineConclusion(item);
-      if (text && !points.includes(text)) points.push(shortenHeadline(text, "brief"));
+    all.forEach((item) => {
+      const topic = storyTopicKey(item);
+      if (points.length >= 5 || usedTopics.has(topic)) return;
+      usedTopics.add(topic);
+      points.push(compactEditorialText(editorialHeadlineParts(item).headline, "morning"));
     });
   }
   return points.slice(0, 5);
@@ -1093,22 +1167,41 @@ function morningFive(brief) {
 
 function marketPulse(brief) {
   const counts = workspaceCounts(brief);
-  const chips = [
-    ["宏觀", counts.macro || 0],
-    ["科技與 AI", counts["tech-ai"] || 0],
-    ["市場", counts.markets || 0],
-    ["能源與商品", counts.energy || 0],
-    ["企業", counts.companies || 0],
+  const all = sortedNewsItems(brief);
+  const cards = [
+    ["macro", "央行與利率", counts.macro || 0],
+    ["tech-ai", "科技與 AI", counts["tech-ai"] || 0],
+    ["energy", "能源與商品", counts.energy || 0],
+    ["companies", "企業事件", counts.companies || 0],
   ];
   return `<section class="market-pulse">
-    <div><p class="section-kicker">Market Pulse / 今日市場主線</p><h2>先抓主線，再讀全文</h2></div>
-    <div class="pulse-strip">${chips.map(([label, count]) => `<span><strong>${escapeHtml(count)}</strong>${escapeHtml(label)}</span>`).join("")}</div>
+    <div class="pulse-head"><p class="section-kicker">Market Pulse / 今日市場主線</p><h2>市場正在看什麼</h2></div>
+    <div class="pulse-grid">${cards.map(([key, label, count]) => {
+      const item = all.find((entry) => normalizeDesk(entry) === key);
+      return `<article class="pulse-card">
+        <span>${escapeHtml(label)}</span>
+        <p>${escapeHtml(pulseMeaning(key, item))}</p>
+        <b>${escapeHtml(count)} 篇相關</b>
+      </article>`;
+    }).join("")}</div>
   </section>`;
+}
+
+function pulseMeaning(key, item) {
+  if (item) return compactEditorialText(oneLineConclusion(item), "brief");
+  const fallback = {
+    macro: "利率與通脹訊號仍是風險資產定價核心。",
+    "tech-ai": "AI 資本開支與估值壓力繼續主導科技股情緒。",
+    energy: "油價、金價與美元走勢影響通脹與避險交易。",
+    companies: "企業交易、財報與上市消息影響個股估值。",
+  };
+  return fallback[key] || "今日未有足夠明確主線。";
 }
 
 function readingSidebar(brief) {
   const counts = workspaceCounts(brief);
   const items = workspaceCollections(brief).readable;
+  const ws = workspaceState(brief);
   return `<aside class="reading-sidebar">
     <div class="sidebar-date">${formatBriefDate(brief.date)}</div>
     <h2>今日早報 · 共 ${asList(brief.items).length} 篇</h2>
@@ -1117,7 +1210,7 @@ function readingSidebar(brief) {
       <div class="progress-track"><span data-progress-bar style="width:${readProgress(brief)}%"></span></div>
     </div>
     <p class="reading-time">預計閱讀時間 ${estimateReadingMinutes(items)} 分鐘</p>
-    <nav class="sidebar-filters">${WORKSPACE_FILTERS.slice(0, 7).map(([key, label]) => `<button type="button" data-filter="${escapeHtml(key)}">${escapeHtml(label)} <b>${escapeHtml(counts[key] || 0)}</b></button>`).join("")}</nav>
+    <nav class="sidebar-filters">${WORKSPACE_FILTERS.map(([key, label]) => filterButtonHtml(key, label, counts, ws)).join("")}</nav>
     <div class="reading-method">
       <strong>今日閱讀法</strong>
       <p>先讀「開市前 5 件事」，再看今日焦點；有時間再按分類閱讀完整摘要。</p>
@@ -1140,19 +1233,29 @@ function workspaceToolbar(brief) {
       <div><p class="section-kicker">Reading Workspace</p><h2>今日文章</h2></div>
       <label class="workspace-search"><span>Search</span><input data-workspace-search type="search" value="${escapeHtml(ws.query)}" placeholder="搜尋公司、題材、來源" /></label>
     </div>
-    <div class="filter-chips">${WORKSPACE_FILTERS.map(([key, label]) => `<button type="button" class="${workspaceActiveClass(key, ws)}" data-filter="${escapeHtml(key)}">${escapeHtml(label)} <b>${escapeHtml(counts[key] || 0)}</b></button>`).join("")}</div>
+    <div class="workspace-controls">
+      <div class="filter-chips">${WORKSPACE_FILTERS.map(([key, label]) => filterButtonHtml(key, label, counts, ws)).join("")}</div>
+      <button type="button" class="summary-filter-toggle ${ws.fullOnly ? "active" : ""}" data-full-toggle>只看完整摘要 <b>${escapeHtml(counts.full || 0)}</b></button>
+    </div>
   </section>`;
 }
 
+function filterButtonHtml(key, label, counts, ws) {
+  const count = counts[key] || 0;
+  const disabled = key !== "all" && count === 0;
+  const className = `${workspaceActiveClass(key, ws)}${disabled ? " disabled" : ""}`;
+  return `<button type="button" class="${className}" data-filter="${escapeHtml(key)}" ${disabled ? "disabled aria-disabled=\"true\"" : ""}>${escapeHtml(label)} <b>${escapeHtml(count)}</b></button>`;
+}
+
 function workspaceActiveClass(key, ws) {
-  const active = (ws.fullOnly && key === "full") || (ws.focusOnly && key === "lead") || (!ws.fullOnly && !ws.focusOnly && ws.filter === key);
+  const active = (ws.focusOnly && key === "lead") || (!ws.focusOnly && ws.filter === key);
   return active ? "chip active" : "chip";
 }
 
 function articleWorkspace(brief) {
   const items = filteredReadableItems(brief);
   return `<section class="article-workspace" aria-live="polite">
-    ${items.length ? items.map((item, index) => renderWorkbenchArticle(item, brief, index)).join("") : `<div class="empty-workspace"><h3>此篩選沒有完整可讀摘要</h3><p>可切換到「全部」或在下方 More source links 直接閱讀原文。</p></div>`}
+    ${items.length ? items.map((item, index) => renderWorkbenchArticle(item, brief, index)).join("") : `<div class="empty-workspace"><h3>今日可核實摘要不足</h3><p>這個篩選暫時沒有通過品質檢查的摘要；可改看其他分類，或在下方 More source links 直接閱讀原文。</p></div>`}
   </section>`;
 }
 
@@ -1161,6 +1264,7 @@ function renderWorkbenchArticle(item, brief, index) {
   const summary = displaySummary(item);
   const read = workspaceState(brief).readIds.has(item.id);
   const points = articleKeyPoints(item);
+  const title = editorialHeadlineParts(item);
   return `<article class="workbench-article ${tier.grade === "A" ? "full" : "limited"} ${read ? "is-read" : ""}" id="item-${escapeHtml(item.id)}" data-article-id="${escapeHtml(item.id)}" data-grade="${escapeHtml(tier.grade)}">
     <div class="article-main">
       <div class="article-meta-row">
@@ -1170,7 +1274,8 @@ function renderWorkbenchArticle(item, brief, index) {
         <span class="summary-grade grade-${escapeHtml(tier.grade.toLowerCase())}">${escapeHtml(tier.label)}</span>
         <span>${Math.max(1, Math.ceil(summary.length / 180))} 分鐘</span>
       </div>
-      <h2>${headlineHtml(storyTitle(item, "lead"))}</h2>
+      <h2>${headlineHtml(title.headline)}</h2>
+      ${title.dek ? `<p class="article-dek">${escapeHtml(title.dek)}</p>` : ""}
       <p class="one-line">${escapeHtml(oneLineConclusion(item))}</p>
       <div class="article-summary" data-summary-body>
         ${summaryParagraphs(summary, tier.grade).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
@@ -1187,7 +1292,7 @@ function renderWorkbenchArticle(item, brief, index) {
       ${tier.grade === "B" ? `<p class="source-note">根據來源描述生成，請以原文作最後核對。</p>` : ""}
     </div>
     <aside class="article-points">
-      <strong>重點</strong>
+      <strong>Editor’s Notes</strong>
       <ul>${points.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ul>
     </aside>
   </article>`;
@@ -1195,19 +1300,31 @@ function renderWorkbenchArticle(item, brief, index) {
 
 function oneLineConclusion(item) {
   const summary = displaySummary(item);
-  if (summary) return shortenHeadline(summary.split(/[。；;]/)[0], "brief");
-  return storyTitle(item, "brief");
+  if (summary) {
+    const sentence = summary.split(/[。；;]/).map((part) => part.trim()).find((part) => part.length >= 8) || summary;
+    return compactEditorialText(sentence, "brief");
+  }
+  return editorialHeadlineParts(item).headline;
 }
 
 function summaryParagraphs(summary, grade) {
-  const sentences = String(summary || "").split(/(?<=[。！？；;])\s*/).map((part) => part.trim()).filter(Boolean);
+  const sentences = String(summary || "")
+    .split(/(?<=[。！？；;])\s*/)
+    .map((part) => part.trim())
+    .filter((part) => part && !isVagueSummarySentence(part));
   if (!sentences.length) return [];
   if (grade === "B") return [sentences.slice(0, 2).join("")];
   const paragraphs = [];
   for (let index = 0; index < sentences.length; index += 2) {
     paragraphs.push(sentences.slice(index, index + 2).join(""));
   }
-  return paragraphs.slice(0, 4);
+  return paragraphs.slice(0, 3);
+}
+
+function isVagueSummarySentence(value = "") {
+  const text = String(value || "");
+  const vague = ["市場可能重新定價", "投資者需關注", "值得關注", "後續仍需觀察"];
+  return vague.some((phrase) => text === phrase || (text.includes(phrase) && text.length < phrase.length + 10));
 }
 
 function articleKeyPoints(item) {
@@ -1217,14 +1334,25 @@ function articleKeyPoints(item) {
   summary.split(/[。；;]/).map((part) => part.trim()).filter((part) => part.length >= 12).slice(0, 3).forEach((part) => {
     if (!points.some((point) => point.includes(part.slice(0, 8)))) points.push(shortenHeadline(part, "brief"));
   });
+  const impact = impactSurface(item);
+  if (!points.some((point) => point.includes("影響層面"))) points.push(`影響層面：${impact}`);
   points.push(`來源：${item.source || "主要來源"}`);
   return points.slice(0, 5);
+}
+
+function impactSurface(item) {
+  const desk = normalizeDesk(item);
+  if (desk === "macro") return "利率 / 美債 / 風險情緒";
+  if (desk === "tech-ai") return "科技股 / AI 資本開支 / 估值";
+  if (desk === "energy") return "商品 / 通脹 / 避險資金";
+  if (desk === "companies") return "企業估值 / 交易風險 / 個股情緒";
+  return "市場廣度 / 風險情緒";
 }
 
 function contextMap(item) {
   const issue = primaryTopic(item);
   const event = storyTitle(item, "brief");
-  const impact = normalizeDesk(item) === "tech-ai" ? "科技股 / AI 估值" : normalizeDesk(item) === "macro" ? "利率 / 風險情緒" : normalizeDesk(item) === "energy" ? "能源 / 通脹" : "市場情緒";
+  const impact = impactSurface(item);
   const risk = itemSummaryTier(item).grade === "A" ? "需追蹤後續數據" : "摘要有限，需核對原文";
   return `<div class="context-map" aria-label="脈絡圖">
     <span><b>核心議題</b>${escapeHtml(issue)}</span>
@@ -1238,7 +1366,7 @@ function sourceOnlySection(brief) {
   const items = filteredSourceOnlyItems(brief);
   if (!items.length) return "";
   return `<section class="source-only-section">
-    <details open>
+    <details>
       <summary>More source links / 只列原文 <span>${items.length}</span></summary>
       <div class="source-only-list">${items.map((item) => `<a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">
         <strong>${headlineHtml(storyTitle(item, "desk"))}</strong>
@@ -1253,18 +1381,23 @@ function trustMethodologyPanel(brief) {
   const collection = report.collection || {};
   const quality = report.item_quality || {};
   const ai = report.ai || {};
-  const sourceLinks = asList(brief.items).filter((item) => item.url && item.url !== "https://news.tinydreamlab.com/").length;
+  const { readable, sourceOnly } = workspaceCollections(brief);
+  const sourceLinks = readable.filter((item) => item.url && item.url !== "https://news.tinydreamlab.com/").length;
+  const candidates = collection.raw_candidates || collection.candidate_count || collection.accepted_candidates || asList(brief.items).length;
+  const sourcesTotal = collection.sources_total || asList(brief.sources).length;
+  const sourcesAccessible = collection.sources_accessible || sourcesTotal;
   return `<section class="trust-panel">
     <div class="trust-head">
       <p class="section-kicker">Trust & Methodology</p>
-      <h2>今日來源處理</h2>
+      <h2>今日核查</h2>
     </div>
+    <p class="trust-readable">${escapeHtml(candidates)} 條候選新聞中，${escapeHtml(readable.length)} 條通過摘要品質檢查；所有已摘要新聞均保留原文入口；${escapeHtml(sourceOnly.length)} 條因來源文字不足而只列原文。</p>
     <dl class="reader-metrics">
-      <div><dt>候選新聞</dt><dd>${escapeHtml(collection.accepted_candidates || asList(brief.items).length)}</dd></div>
-      <div><dt>通過品質閘門</dt><dd>${escapeHtml(asList(brief.items).length)}</dd></div>
-      <div><dt>原文入口</dt><dd>${sourceLinks}/${asList(brief.items).length}</dd></div>
-      <div><dt>拒收摘要</dt><dd>${escapeHtml(asList(quality.summary_rejections).length || 0)}</dd></div>
-      <div><dt>來源狀態</dt><dd>${escapeHtml(collection.sources_accessible || 0)}/${escapeHtml(collection.sources_total || asList(brief.sources).length)}</dd></div>
+      <div><dt>候選新聞</dt><dd>${escapeHtml(candidates)}</dd></div>
+      <div><dt>可摘要新聞</dt><dd>${escapeHtml(readable.length)}</dd></div>
+      <div><dt>原文入口</dt><dd>${sourceLinks}/${readable.length}</dd></div>
+      <div><dt>只列原文</dt><dd>${escapeHtml(sourceOnly.length)}</dd></div>
+      <div><dt>來源狀態</dt><dd>${escapeHtml(sourcesAccessible)}/${escapeHtml(sourcesTotal)}</dd></div>
     </dl>
     <details class="method-details">
       <summary>查看詳細處理數據</summary>
@@ -1286,11 +1419,15 @@ function bindWorkspaceControls(brief) {
   root.querySelectorAll("[data-filter]").forEach((button) => {
     button.addEventListener("click", () => {
       const key = button.dataset.filter || "all";
-      ws.fullOnly = key === "full";
+      ws.fullOnly = false;
       ws.focusOnly = key === "lead";
       if (!ws.fullOnly && !ws.focusOnly) ws.filter = key;
       refreshWorkspace(brief);
     });
+  });
+  root.querySelector("[data-full-toggle]")?.addEventListener("click", () => {
+    ws.fullOnly = !ws.fullOnly;
+    refreshWorkspace(brief);
   });
   root.querySelector("[data-workspace-search]")?.addEventListener("input", (event) => {
     ws.query = event.target.value.trim();
