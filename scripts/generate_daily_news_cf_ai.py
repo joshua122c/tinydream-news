@@ -67,6 +67,7 @@ SOURCE_CONFIGS = [
 SOURCE_FAMILY_LIMIT = 4
 CATEGORY_LIMIT = 5
 MIN_ITEM_COUNT = 8
+MIN_PUBLISHABLE_ITEM_COUNT = 5
 MAX_DATED_NEWS_AGE = timedelta(hours=96)
 MAX_FUTURE_PUBLISHED_AT = timedelta(hours=6)
 MIN_AI_CONTEXT_CONFIDENCE = 0.90
@@ -1557,8 +1558,15 @@ def build_brief(candidates: list[dict], sources: list[dict]) -> dict:
         item.pop("_summary_context_text", None)
         item.pop("_summary_context_basis", None)
         item.pop("_summary_context_confidence", None)
-    if len(items) < MIN_ITEM_COUNT:
+    RUN_REPORT["item_quality"]["minimum_publishable_items"] = MIN_PUBLISHABLE_ITEM_COUNT
+    if len(items) < MIN_PUBLISHABLE_ITEM_COUNT:
         fail(f"Only {len(items)} publishable news items remained after item quality isolation.")
+    if len(items) < MIN_ITEM_COUNT:
+        RUN_REPORT["item_quality"]["degraded_publishable_count"] = True
+        RUN_REPORT["item_quality"]["degraded_reason"] = (
+            f"Only {len(items)} publishable items remained after quality isolation; "
+            f"publishing a smaller verified brief instead of blocking the daily update."
+        )
     categories = []
     for name, slug in CATEGORY_TAXONOMY:
         refs = [item["id"] for item in items if item["category"] == name]
@@ -1605,8 +1613,8 @@ def validate_brief(brief: dict) -> None:
         if phrase in text_dump:
             fail(f"Reader-facing brief contains bad phrase: {phrase}")
     items = brief.get("items")
-    if not isinstance(items, list) or len(items) < MIN_ITEM_COUNT:
-        fail(f"items must contain at least {MIN_ITEM_COUNT} entries.")
+    if not isinstance(items, list) or len(items) < MIN_PUBLISHABLE_ITEM_COUNT:
+        fail(f"items must contain at least {MIN_PUBLISHABLE_ITEM_COUNT} publishable entries.")
     item_ids = set()
     title_counts = {}
     summary_counts = {}
