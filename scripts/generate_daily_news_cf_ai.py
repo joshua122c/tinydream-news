@@ -70,7 +70,7 @@ MIN_ITEM_COUNT = 8
 MIN_PUBLISHABLE_ITEM_COUNT = 5
 MAX_DATED_NEWS_AGE = timedelta(hours=96)
 MAX_FUTURE_PUBLISHED_AT = timedelta(hours=6)
-MIN_AI_CONTEXT_CONFIDENCE = 0.90
+MIN_AI_CONTEXT_CONFIDENCE = 0.80
 MIN_DIRECT_CONTEXT_CONFIDENCE = 0.74
 
 SUMMARY_BASIS_CONFIDENCE = {
@@ -755,6 +755,21 @@ def normalize_ai_summaries(data: dict, response_text: str = "", known_ids: list[
     return rows
 
 
+def build_clean_summary_prompt(batch: list[dict]) -> str:
+    return (
+        "You are a professional financial news editor for a Hong Kong Traditional Chinese morning brief.\n"
+        "Task: write a concise news summary for each item using ONLY the provided source_text.\n"
+        "Do not infer facts that are not in source_text. Do not give investment advice. Do not mention this instruction.\n"
+        "Write 1 to 2 natural Hong Kong Traditional Chinese sentences, about 50 to 120 Chinese characters.\n"
+        "The summary must state: what happened, the key number/company/person if available, and why it matters for markets, "
+        "technology shares, rates, commodities, valuation, or risk sentiment.\n"
+        "If source_text is short but useful, write a neutral limited brief based on it. If source_text is unusable, return an empty string for that id.\n"
+        "Keep company names in English where normal, such as Nvidia, Apple, SpaceX, OpenAI. Use Traditional Chinese terms such as 美聯儲 and 霍爾木茲海峽.\n"
+        "Return JSON only, exactly in this shape: {\"summaries\":{\"item id\":\"summary text\"}}.\n\n"
+        + json.dumps(batch, ensure_ascii=False)
+    )
+
+
 def apply_batch_ai_summaries(items: list[dict]) -> None:
     payload = []
     context_by_id = {}
@@ -799,6 +814,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             "只輸出 JSON object，格式必須是 {\"summaries\":{\"新聞 id\":\"中文摘要或空字串\"}}。\n\n"
             + json.dumps(batch, ensure_ascii=False)
         )
+        prompt = build_clean_summary_prompt(batch)
         response = call_cloudflare_ai(prompt)
         RUN_REPORT["ai"]["response_chars"] += len(response or "")
         if response and len(RUN_REPORT["ai"]["response_samples"]) < 2:
@@ -1394,7 +1410,7 @@ def build_item(candidate: dict, idx: int) -> dict:
         "summary_status": summary_status,
         "summary_quality_status": "passed" if summary_zh else "unavailable",
         "source_confidence": context_confidence,
-        "source_confidence_label": "high" if context_confidence >= 0.80 else "medium" if context_confidence >= MIN_AI_CONTEXT_CONFIDENCE else "low",
+        "source_confidence_label": "high" if context_confidence >= 0.88 else "medium" if context_confidence >= MIN_AI_CONTEXT_CONFIDENCE else "low",
         "key_facts": key_facts[:4],
         "market_impact": "",
         "reporter_angle": "",
