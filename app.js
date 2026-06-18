@@ -999,7 +999,7 @@ function itemSummaryTier(item) {
   if (!summary) return { grade: "C", label: "只列原文", detail: "未取得足夠可核實來源文字", readable: false };
   const confidence = Number(item?.source_confidence || 0);
   if (summary.length >= 85 && confidence >= 0.74) return { grade: "A", label: "完整摘要", detail: "通過品質閘門", readable: true };
-  return { grade: "B", label: "有限摘要", detail: item?.summary_basis ? "根據來源描述生成" : "根據可讀來源文字", readable: true };
+  return { grade: "B", label: "摘要", detail: item?.summary_basis ? "根據來源描述生成" : "根據可讀來源文字", readable: true };
 }
 
 function normalizeDesk(item) {
@@ -1154,21 +1154,27 @@ function morningFive(brief) {
     ["companies", "企業事件", all.find((item) => item?.id !== lead?.id && normalizeDesk(item) === "companies")],
   ];
   const usedTopics = new Set();
+  const usedLines = new Set();
   const points = [];
   slots.forEach(([key, label, item]) => {
     if (!item) return;
-    const topic = key === "lead" ? item?.id : normalizeDesk(item);
-    if (usedTopics.has(topic)) return;
+    const topic = normalizeDesk(item);
+    const lineKey = compactEditorialText(editorialHeadlineParts(item).headline, "morning").replace(/\s+/g, "");
+    if (usedTopics.has(topic) || usedLines.has(lineKey)) return;
     usedTopics.add(topic);
+    usedLines.add(lineKey);
     const text = `${label}：${editorialHeadlineParts(item).headline}`;
     points.push(compactEditorialText(text, "morning"));
   });
   if (points.length < 5) {
     all.forEach((item) => {
       const topic = storyTopicKey(item);
-      if (points.length >= 5 || usedTopics.has(topic)) return;
+      const line = compactEditorialText(editorialHeadlineParts(item).headline, "morning");
+      const lineKey = line.replace(/\s+/g, "");
+      if (points.length >= 5 || usedTopics.has(topic) || usedLines.has(lineKey)) return;
       usedTopics.add(topic);
-      points.push(compactEditorialText(editorialHeadlineParts(item).headline, "morning"));
+      usedLines.add(lineKey);
+      points.push(line);
     });
   }
   return points.slice(0, 5);
@@ -1237,6 +1243,13 @@ function mobileWorkspaceBar(brief) {
 function workspaceToolbar(brief) {
   const ws = workspaceState(brief);
   const counts = workspaceCounts(brief);
+  if (counts.full === 0 && ws.fullOnly) {
+    ws.fullOnly = false;
+    saveWorkspaceState();
+  }
+  const fullSummaryToggle = counts.full > 0
+    ? `<button type="button" class="summary-filter-toggle ${ws.fullOnly ? "active" : ""}" data-full-toggle>只看完整摘要 <b>${escapeHtml(counts.full)}</b></button>`
+    : "";
   return `<section class="workspace-toolbar">
     <div class="toolbar-head">
       <div><p class="section-kicker">Today’s Stories</p><h2>今日文章</h2><p class="section-note">每篇先顯示約 100 字摘要；需要更多背景時再展開詳情。</p></div>
@@ -1244,7 +1257,7 @@ function workspaceToolbar(brief) {
     </div>
     <div class="workspace-controls">
       <div class="filter-chips">${WORKSPACE_FILTERS.map(([key, label]) => filterButtonHtml(key, label, counts, ws)).join("")}</div>
-      <button type="button" class="summary-filter-toggle ${ws.fullOnly ? "active" : ""}" data-full-toggle>只看完整摘要 <b>${escapeHtml(counts.full || 0)}</b></button>
+      ${fullSummaryToggle}
     </div>
   </section>`;
 }
