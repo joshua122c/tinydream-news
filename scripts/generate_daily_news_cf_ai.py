@@ -72,6 +72,7 @@ MAX_DATED_NEWS_AGE = timedelta(hours=96)
 MAX_FUTURE_PUBLISHED_AT = timedelta(hours=6)
 MIN_AI_CONTEXT_CONFIDENCE = 0.80
 MIN_DIRECT_CONTEXT_CONFIDENCE = 0.74
+MIN_LIMITED_AI_CONTEXT_CONFIDENCE = MIN_DIRECT_CONTEXT_CONFIDENCE
 
 SUMMARY_BASIS_CONFIDENCE = {
     "rss_description": 0.84,
@@ -104,6 +105,7 @@ RUN_REPORT = {
     },
     "ai": {
         "summary_candidates": 0,
+        "limited_summary_candidates": 0,
         "summary_updates": 0,
         "response_chars": 0,
         "parsed_summaries": 0,
@@ -829,7 +831,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             continue
         if not context_text:
             continue
-        if context_confidence < MIN_AI_CONTEXT_CONFIDENCE:
+        if context_confidence < MIN_LIMITED_AI_CONTEXT_CONFIDENCE:
             RUN_REPORT["item_quality"]["summary_rejections"].append({
                 "id": item.get("id", ""),
                 "reason": "low_source_confidence",
@@ -838,6 +840,8 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             })
             continue
         context_by_id[item["id"]] = context_text
+        if context_confidence < MIN_AI_CONTEXT_CONFIDENCE:
+            RUN_REPORT["ai"]["limited_summary_candidates"] += 1
         payload.append({
             "id": item["id"],
             "title_zh": item["title_zh"],
@@ -1459,7 +1463,7 @@ def build_item(candidate: dict, idx: int) -> dict:
         "summary_status": summary_status,
         "summary_quality_status": "passed" if summary_zh else "unavailable",
         "source_confidence": context_confidence,
-        "source_confidence_label": "high" if context_confidence >= 0.88 else "medium" if context_confidence >= MIN_AI_CONTEXT_CONFIDENCE else "low",
+        "source_confidence_label": "high" if context_confidence >= 0.88 else "medium" if context_confidence >= MIN_DIRECT_CONTEXT_CONFIDENCE else "low",
         "key_facts": key_facts[:4],
         "market_impact": "",
         "reporter_angle": "",

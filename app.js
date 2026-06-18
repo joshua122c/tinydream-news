@@ -47,7 +47,10 @@ const headlineHtml = (value = "") =>
 
 const asList = (value) => (Array.isArray(value) ? value : []);
 const linkFor = (path) => path;
-const dataPath = (path) => `/${path}`;
+const dataPath = (path) => {
+  const separator = path.includes("?") ? "&" : "?";
+  return `/${path}${separator}v=${Date.now()}`;
+};
 
 function hasCjk(value = "") {
   return /[\u3400-\u9fff]/.test(String(value));
@@ -227,7 +230,7 @@ function heatClass(label = "") {
 }
 
 async function readJson(path) {
-  const response = await fetch(path);
+  const response = await fetch(path, { cache: "no-store" });
   if (!response.ok) throw new Error(`${path} returned ${response.status}`);
   return response.json();
 }
@@ -1091,18 +1094,14 @@ function readProgress(brief) {
 
 function homePage(brief) {
   workspaceState(brief);
-  return `<section class="morning-workbench" data-workspace>
+  return `<section class="morning-workbench minimal-brief" data-workspace>
     ${workbenchHero(brief)}
-    ${mobileWorkspaceBar(brief)}
-    <div class="workbench-grid">
-      ${readingSidebar(brief)}
-      <main class="reading-main">
-        ${workspaceToolbar(brief)}
-        ${articleWorkspace(brief)}
-        ${sourceOnlySection(brief)}
-        ${trustMethodologyPanel(brief)}
-      </main>
-    </div>
+    <main class="reading-main">
+      ${workspaceToolbar(brief)}
+      ${articleWorkspace(brief)}
+      ${sourceOnlySection(brief)}
+      ${trustMethodologyPanel(brief)}
+    </main>
     <button class="back-top" type="button" data-back-top>回到頂部</button>
   </section>`;
 }
@@ -1114,25 +1113,35 @@ function workbenchHero(brief) {
   return `<section class="brief-hero">
     <div class="brief-hero-top">
       <p class="section-kicker">Editorial Morning Brief</p>
-      <span>${escapeHtml(updateTime)}</span>
+      <span>${escapeHtml(formatBriefDate(brief.date))} · ${escapeHtml(updateTime)} · ${escapeHtml(asList(brief.items).length)} 篇</span>
     </div>
     <div class="brief-hero-grid">
-      <article class="brief-lead-card" id="item-${escapeHtml(lead?.id || "lead")}">
+      <article class="brief-lead-card summary-collapsed" id="item-${escapeHtml(lead?.id || "lead")}">
         <div class="workspace-meta">${lead ? storyMeta(lead, brief) : ""}<span>${escapeHtml(itemSummaryTier(lead || {}).label)}</span></div>
         <p class="lead-overline">Today’s Lead / 今日焦點</p>
         <h1>${headlineHtml(leadHeadline.headline)}</h1>
         ${leadHeadline.dek ? `<p class="lead-dek">${escapeHtml(leadHeadline.dek)}</p>` : ""}
-        <p class="lead-conclusion">${escapeHtml(oneLineConclusion(lead))}</p>
-        ${displaySummary(lead) ? `<p class="lead-summary">${escapeHtml(displaySummary(lead))}</p>` : `<p class="lead-summary muted">今日焦點未有足夠可信摘要文字，請由原文入口核對。</p>`}
-        ${lead?.url ? `<a class="action primary-action" href="${escapeHtml(lead.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>` : ""}
+        ${leadSummaryBlock(lead)}
+        <div class="lead-actions">
+          ${displaySummary(lead) ? `<button class="summary-toggle" type="button" data-toggle-summary>展開完整摘要</button>` : ""}
+          ${lead?.url ? `<a class="action primary-action" href="${escapeHtml(lead.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>` : ""}
+        </div>
       </article>
       <aside class="morning-five">
         <p class="section-kicker">Morning Brief / 開市前 5 件事</p>
         <ol>${morningFive(brief).map((point) => `<li>${headlineHtml(point)}</li>`).join("")}</ol>
       </aside>
     </div>
-    ${marketPulse(brief)}
   </section>`;
+}
+
+function leadSummaryBlock(item) {
+  const summary = displaySummary(item);
+  if (!summary) return `<p class="lead-summary muted">今日焦點未有足夠可信摘要文字，請由原文入口核對。</p>`;
+  return `<p class="lead-conclusion">${escapeHtml(oneLineConclusion(item))}</p>
+    <div class="lead-summary article-summary summary-collapsed" data-summary-body>
+      ${summaryParagraphs(summary, itemSummaryTier(item).grade).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+    </div>`;
 }
 
 function morningFive(brief) {
@@ -1230,7 +1239,7 @@ function workspaceToolbar(brief) {
   const counts = workspaceCounts(brief);
   return `<section class="workspace-toolbar">
     <div class="toolbar-head">
-      <div><p class="section-kicker">Reading Workspace</p><h2>今日文章</h2></div>
+      <div><p class="section-kicker">Today’s Stories</p><h2>今日文章</h2><p class="section-note">每篇先顯示約 100 字摘要；需要更多背景時再展開詳情。</p></div>
       <label class="workspace-search"><span>Search</span><input data-workspace-search type="search" value="${escapeHtml(ws.query)}" placeholder="搜尋公司、題材、來源" /></label>
     </div>
     <div class="workspace-controls">
@@ -1265,37 +1274,43 @@ function renderWorkbenchArticle(item, brief, index) {
   const read = workspaceState(brief).readIds.has(item.id);
   const points = articleKeyPoints(item);
   const title = editorialHeadlineParts(item);
-  return `<article class="workbench-article ${tier.grade === "A" ? "full" : "limited"} ${read ? "is-read" : ""}" id="item-${escapeHtml(item.id)}" data-article-id="${escapeHtml(item.id)}" data-grade="${escapeHtml(tier.grade)}">
+  const paragraphs = summaryParagraphs(summary, tier.grade);
+  const preview = summaryPreview(summary || oneLineConclusion(item));
+  return `<article class="workbench-article ${tier.grade === "A" ? "full" : "limited"} summary-collapsed ${read ? "is-read" : ""}" id="item-${escapeHtml(item.id)}" data-article-id="${escapeHtml(item.id)}" data-grade="${escapeHtml(tier.grade)}">
     <div class="article-main">
       <div class="article-meta-row">
         <span>${escapeHtml(storyTime(item, brief))}</span>
         <span>${escapeHtml(item.source || "Source")}</span>
         <span>${escapeHtml(primaryTopic(item))}</span>
         <span class="summary-grade grade-${escapeHtml(tier.grade.toLowerCase())}">${escapeHtml(tier.label)}</span>
-        <span>${Math.max(1, Math.ceil(summary.length / 180))} 分鐘</span>
+        <span>${Math.max(1, Math.ceil((summary.length || 90) / 180))} 分鐘</span>
       </div>
       <h2>${headlineHtml(title.headline)}</h2>
       ${title.dek ? `<p class="article-dek">${escapeHtml(title.dek)}</p>` : ""}
-      <p class="one-line">${escapeHtml(oneLineConclusion(item))}</p>
+      <p class="summary-preview">${escapeHtml(preview)}</p>
       <div class="article-summary" data-summary-body>
-        ${summaryParagraphs(summary, tier.grade).map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+        ${paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join("")}
+        ${points.length ? `<div class="article-points-inline"><strong>Editor’s Notes</strong><ul>${points.slice(0, 4).map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ul></div>` : ""}
       </div>
-      <button class="summary-toggle" type="button" data-toggle-summary>展開 / 收起詳細摘要</button>
-      ${contextMap(item)}
       <div class="article-footer">
         <div class="tag-row">${asList(item.themes).slice(0, 4).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
         <div class="article-actions">
+          ${paragraphs.length ? `<button type="button" data-toggle-summary>展開摘要</button>` : ""}
           <button type="button" data-mark-read="${escapeHtml(item.id)}">${read ? "已讀" : "標記已讀"}</button>
           <a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>
         </div>
       </div>
       ${tier.grade === "B" ? `<p class="source-note">根據來源描述生成，請以原文作最後核對。</p>` : ""}
     </div>
-    <aside class="article-points">
-      <strong>Editor’s Notes</strong>
-      <ul>${points.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ul>
-    </aside>
   </article>`;
+}
+
+function summaryPreview(value = "") {
+  const text = String(value || "").replace(/\s+/g, "").trim();
+  if (!text) return "這篇新聞暫未有足夠可信摘要文字，請由原文入口核對。";
+  const chars = Array.from(text);
+  if (chars.length <= 115) return text;
+  return `${chars.slice(0, 108).join("")}…`;
 }
 
 function oneLineConclusion(item) {
@@ -1386,21 +1401,10 @@ function trustMethodologyPanel(brief) {
   const candidates = collection.raw_candidates || collection.candidate_count || collection.accepted_candidates || asList(brief.items).length;
   const sourcesTotal = collection.sources_total || asList(brief.sources).length;
   const sourcesAccessible = collection.sources_accessible || sourcesTotal;
-  return `<section class="trust-panel">
-    <div class="trust-head">
-      <p class="section-kicker">Trust & Methodology</p>
-      <h2>今日核查</h2>
-    </div>
-    <p class="trust-readable">${escapeHtml(candidates)} 條候選新聞中，${escapeHtml(readable.length)} 條通過摘要品質檢查；所有已摘要新聞均保留原文入口；${escapeHtml(sourceOnly.length)} 條因來源文字不足而只列原文。</p>
-    <dl class="reader-metrics">
-      <div><dt>候選新聞</dt><dd>${escapeHtml(candidates)}</dd></div>
-      <div><dt>可摘要新聞</dt><dd>${escapeHtml(readable.length)}</dd></div>
-      <div><dt>原文入口</dt><dd>${sourceLinks}/${readable.length}</dd></div>
-      <div><dt>只列原文</dt><dd>${escapeHtml(sourceOnly.length)}</dd></div>
-      <div><dt>來源狀態</dt><dd>${escapeHtml(sourcesAccessible)}/${escapeHtml(sourcesTotal)}</dd></div>
-    </dl>
+  return `<section class="trust-panel compact-trust">
     <details class="method-details">
-      <summary>查看詳細處理數據</summary>
+      <summary>今日核查：${escapeHtml(candidates)} 條候選，${escapeHtml(readable.length)} 條可摘要，原文入口 ${sourceLinks}/${readable.length}</summary>
+      <p class="trust-readable">${escapeHtml(candidates)} 條候選新聞中，${escapeHtml(readable.length)} 條通過摘要品質檢查；${escapeHtml(sourceOnly.length)} 條因來源文字不足而只列原文；來源狀態 ${escapeHtml(sourcesAccessible)}/${escapeHtml(sourcesTotal)}。</p>
       <pre>${escapeHtml(JSON.stringify({ collection, ai, context_confidence: quality.context_confidence, rejected: asList(quality.summary_rejections).slice(0, 8) }, null, 2))}</pre>
     </details>
   </section>`;
@@ -1444,7 +1448,11 @@ function bindWorkspaceControls(brief) {
     });
   });
   root.querySelectorAll("[data-toggle-summary]").forEach((button) => {
-    button.addEventListener("click", () => button.closest(".workbench-article")?.classList.toggle("summary-collapsed"));
+    button.addEventListener("click", () => {
+      const article = button.closest(".workbench-article, .brief-lead-card");
+      article?.classList.toggle("summary-collapsed");
+      button.textContent = article?.classList.contains("summary-collapsed") ? "展開摘要" : "收起摘要";
+    });
   });
   root.querySelector("[data-back-top]")?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
   observeReadingProgress(root, brief);

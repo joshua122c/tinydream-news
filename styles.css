@@ -47,6 +47,499 @@
   --section-heading-rule: var(--rule-strong);
 }
 
+/* Minimal editorial brief polish */
+.minimal-brief {
+  width: min(1120px, calc(100% - 32px));
+  padding-top: var(--space-6);
+}
+
+.minimal-brief .brief-hero {
+  padding-bottom: var(--space-7);
+}
+
+.minimal-brief .brief-hero-grid {
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.72fr);
+  gap: var(--space-7);
+}
+
+.minimal-brief .brief-lead-card h1 {
+  max-width: 760px;
+  font-size: clamp(32px, 3.6vw, 48px);
+  line-height: 1.1;
+}
+
+.minimal-brief .lead-dek {
+  max-width: 680px;
+  font-size: 20px;
+}
+
+.minimal-brief .lead-conclusion,
+.minimal-brief .summary-preview {
+  max-width: 720px;
+  color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.minimal-brief .lead-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  margin-top: var(--space-4);
+}
+
+.minimal-brief .morning-five {
+  background: transparent;
+}
+
+.minimal-brief .morning-five li {
+  font-size: 18px;
+}
+
+.minimal-brief .reading-main {
+  display: block;
+}
+
+.minimal-brief .workspace-toolbar {
+  display: grid;
+  gap: var(--space-4);
+  border-top: var(--rule-strong);
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+}
+
+.minimal-brief .toolbar-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  align-items: end;
+}
+
+.minimal-brief .workspace-toolbar h2 {
+  font-size: 34px;
+}
+
+.minimal-brief .workspace-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: 0;
+}
+
+.minimal-brief .chip,
+.minimal-brief .summary-filter-toggle {
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  padding: 4px 0;
+}
+
+.minimal-brief .chip.active,
+.minimal-brief .chip:hover,
+.minimal-brief .summary-filter-toggle.active,
+.minimal-brief .summary-filter-toggle:hover {
+  border-color: var(--accent);
+  background: transparent;
+  color: var(--accent);
+}
+
+.minimal-brief .article-workspace {
+  gap: 0;
+}
+
+.minimal-brief .workbench-article {
+  display: block;
+  border-top: var(--rule);
+  background: transparent;
+  padding: var(--space-5) 0;
+}
+
+.minimal-brief .workbench-article h2 {
+  max-width: 780px;
+  margin-top: var(--space-2);
+  font-size: 28px;
+}
+
+.minimal-brief .article-dek {
+  max-width: 760px;
+  margin-bottom: var(--space-2);
+}
+
+.minimal-brief .summary-preview {
+  margin: var(--space-3) 0;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.minimal-brief .article-summary {
+  max-width: 760px;
+  border-top: var(--rule);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+.minimal-brief .summary-collapsed .article-summary {
+  display: none;
+}
+
+.minimal-brief .summary-toggle,
+.minimal-brief .article-actions button {
+  border: 0;
+  border-bottom: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  padding: 0;
+}
+
+.minimal-brief .article-footer {
+  max-width: 860px;
+  margin-top: var(--space-3);
+}
+
+.minimal-brief .article-actions a {
+  border-color: var(--ink);
+}
+
+.minimal-brief .article-points-inline {
+  border-top: var(--rule);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+.minimal-brief .article-points-inline strong {
+  color: var(--accent);
+  font-size: var(--step-meta);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.minimal-brief .article-points-inline ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding-left: 18px;
+  color: var(--ink-soft);
+}
+
+.compact-trust {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+}
+
+.compact-trust .method-details summary {
+  font-family: var(--font-sans);
+  font-size: var(--step-small);
+  color: var(--muted);
+}
+
+@media (max-width: 980px) {
+  .minimal-brief .brief-hero-grid,
+  .minimal-brief .toolbar-head {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+}
+
+@media (max-width: 640px) {
+  .minimal-brief {
+    width: min(100% - 24px, 680px);
+    max-width: calc(100vw - 24px);
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: var(--space-4);
+  }
+
+  .minimal-brief .brief-lead-card h1 {
+    max-width: calc(100vw - 88px);
+    font-size: 24px;
+    line-break: auto;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .minimal-brief .lead-dek,
+  .minimal-brief .lead-conclusion,
+  .minimal-brief .lead-summary,
+  .minimal-brief .summary-preview,
+  .minimal-brief .morning-five li {
+    max-width: min(270px, calc(100vw - 112px));
+    font-size: 16px;
+    line-break: auto;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .minimal-brief .workspace-search {
+    min-width: 0;
+  }
+
+  .minimal-brief .filter-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: var(--space-2);
+  }
+
+  .minimal-brief .workbench-article h2 {
+    font-size: 22px;
+  }
+}
+
+/* Professional editorial pass - visible V3 direction */
+body {
+  background:
+    linear-gradient(90deg, rgba(18, 20, 23, 0.035) 0 1px, transparent 1px) 50% 0 / 1180px 100% no-repeat,
+    #f4f2ed;
+}
+
+.site-header {
+  position: static;
+  background: #fffdfa;
+  border-bottom: 3px solid var(--ink);
+  backdrop-filter: none;
+}
+
+.masthead-top {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 8px 0;
+  border-bottom: 1px solid #d7d2c8;
+}
+
+.masthead-main {
+  width: min(1180px, calc(100% - 32px));
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  padding: 18px 0 14px;
+}
+
+.brand-mark {
+  width: 52px;
+  height: 52px;
+}
+
+.brand strong {
+  font-size: clamp(34px, 3.6vw, 46px);
+  letter-spacing: -0.01em;
+}
+
+.nav {
+  width: min(1180px, calc(100% - 32px));
+  justify-content: flex-start;
+  gap: 28px;
+  padding: 10px 0;
+  border-top: 1px solid #d7d2c8;
+}
+
+.nav a {
+  font-size: 13px;
+  letter-spacing: 0.03em;
+}
+
+.global-search input {
+  background: #f8f6f1;
+}
+
+.minimal-brief {
+  width: min(1180px, calc(100% - 32px));
+  padding-top: 34px;
+}
+
+.minimal-brief .brief-hero {
+  background: #fffdfa;
+  border: 1px solid #d7d2c8;
+  border-top: 5px solid var(--ink);
+  padding: 28px 32px 34px;
+}
+
+.minimal-brief .brief-hero-top {
+  border-bottom: 1px solid #d7d2c8;
+  padding-bottom: 12px;
+}
+
+.minimal-brief .brief-hero-grid {
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.72fr);
+  gap: 44px;
+  padding-top: 28px;
+}
+
+.minimal-brief .brief-lead-card h1 {
+  max-width: 700px;
+  margin-top: 10px;
+  font-size: clamp(34px, 3.7vw, 52px);
+  line-height: 1.08;
+}
+
+.minimal-brief .lead-overline,
+.minimal-brief .section-kicker {
+  letter-spacing: 0.08em;
+}
+
+.minimal-brief .lead-dek {
+  color: #3b3c3c;
+  font-size: 20px;
+}
+
+.minimal-brief .lead-summary,
+.minimal-brief .lead-conclusion {
+  max-width: 660px;
+}
+
+.minimal-brief .morning-five {
+  border-top: 3px solid var(--ink);
+  padding: 16px 0 0;
+}
+
+.minimal-brief .morning-five ol {
+  margin-top: 16px;
+}
+
+.minimal-brief .morning-five li {
+  padding-bottom: 13px;
+  font-size: 18px;
+}
+
+.minimal-brief .reading-main {
+  margin-top: 30px;
+  background: #fffdfa;
+  border: 1px solid #d7d2c8;
+  border-top: 5px solid var(--ink);
+  padding: 0 32px 28px;
+}
+
+.minimal-brief .workspace-toolbar {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 28px;
+}
+
+.minimal-brief .workspace-toolbar h2 {
+  font-size: 42px;
+}
+
+.minimal-brief .section-note {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.minimal-brief .workspace-controls {
+  border-top: 1px solid #d7d2c8;
+  border-bottom: 2px solid var(--ink);
+  padding: 12px 0;
+}
+
+.minimal-brief .workbench-article {
+  padding: 28px 0;
+}
+
+.minimal-brief .workbench-article h2 {
+  font-size: 30px;
+}
+
+.minimal-brief .summary-preview {
+  max-width: 760px;
+  color: #30343a;
+  font-size: 18px;
+}
+
+.minimal-brief .empty-workspace {
+  border-top: 0;
+  background: #f7f4ee;
+  padding: 26px 28px;
+}
+
+.minimal-brief .source-only-section,
+.minimal-brief .compact-trust {
+  border-top: 3px solid var(--ink);
+}
+
+.minimal-brief .source-only-list a {
+  grid-template-columns: minmax(0, 1fr);
+  padding: 14px 0;
+}
+
+.minimal-brief .source-only-list strong {
+  font-size: 19px;
+}
+
+.back-top {
+  right: 24px;
+  bottom: 24px;
+}
+
+@media (max-width: 760px) {
+  body {
+    background: #f4f2ed;
+  }
+
+  .masthead-top {
+    display: none;
+  }
+
+  .masthead-main {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: min(100% - 28px, 680px);
+  }
+
+  .brand strong {
+    font-size: 28px;
+  }
+
+  .nav {
+    width: min(100% - 28px, 680px);
+    gap: 18px;
+  }
+
+  .minimal-brief {
+    width: min(100% - 22px, 680px);
+    padding-top: 18px;
+  }
+
+  .minimal-brief .brief-hero,
+  .minimal-brief .reading-main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .minimal-brief .brief-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .minimal-brief .brief-lead-card h1 {
+    max-width: 100%;
+    font-size: 27px;
+    line-break: auto;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .minimal-brief .lead-dek,
+  .minimal-brief .lead-summary,
+  .minimal-brief .lead-conclusion,
+  .minimal-brief .summary-preview,
+  .minimal-brief .morning-five li {
+    max-width: 100%;
+    font-size: 16px;
+    line-break: auto;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .minimal-brief .workspace-toolbar h2 {
+    font-size: 31px;
+  }
+
+  .minimal-brief .toolbar-head {
+    grid-template-columns: 1fr;
+  }
+
+  .minimal-brief .workbench-article h2 {
+    font-size: 23px;
+  }
+}
+
 /* Morning brief reading workbench */
 .morning-workbench {
   width: min(var(--container), calc(100% - 32px));
@@ -2491,5 +2984,244 @@ span { overflow-wrap: anywhere; }
   .lead-summary,
   .lead-conclusion {
     font-size: 16px;
+  }
+}
+
+/* Minimal editorial brief polish - final overrides */
+.minimal-brief {
+  width: min(1120px, calc(100% - 32px));
+  padding-top: var(--space-6);
+}
+
+.minimal-brief .brief-hero {
+  padding-bottom: var(--space-7);
+}
+
+.minimal-brief .brief-hero-grid {
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.72fr);
+  gap: var(--space-7);
+}
+
+.minimal-brief .brief-lead-card h1 {
+  max-width: 760px;
+  font-size: clamp(32px, 3.6vw, 48px);
+  line-height: 1.1;
+}
+
+.minimal-brief .lead-dek {
+  max-width: 680px;
+  font-size: 20px;
+}
+
+.minimal-brief .lead-conclusion,
+.minimal-brief .summary-preview {
+  max-width: 720px;
+  color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.minimal-brief .lead-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  margin-top: var(--space-4);
+}
+
+.minimal-brief .morning-five {
+  background: transparent;
+}
+
+.minimal-brief .morning-five li {
+  font-size: 18px;
+}
+
+.minimal-brief .reading-main {
+  display: block;
+}
+
+.minimal-brief .workspace-toolbar {
+  display: grid;
+  gap: var(--space-4);
+  border-top: var(--rule-strong);
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+}
+
+.minimal-brief .toolbar-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  align-items: end;
+}
+
+.minimal-brief .workspace-toolbar h2 {
+  font-size: 34px;
+}
+
+.minimal-brief .workspace-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: 0;
+}
+
+.minimal-brief .chip,
+.minimal-brief .summary-filter-toggle {
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  padding: 4px 0;
+}
+
+.minimal-brief .chip.active,
+.minimal-brief .chip:hover,
+.minimal-brief .summary-filter-toggle.active,
+.minimal-brief .summary-filter-toggle:hover {
+  border-color: var(--accent);
+  background: transparent;
+  color: var(--accent);
+}
+
+.minimal-brief .article-workspace {
+  gap: 0;
+}
+
+.minimal-brief .workbench-article {
+  display: block;
+  border-top: var(--rule);
+  background: transparent;
+  padding: var(--space-5) 0;
+}
+
+.minimal-brief .workbench-article h2 {
+  max-width: 780px;
+  margin-top: var(--space-2);
+  font-size: 28px;
+}
+
+.minimal-brief .article-dek {
+  max-width: 760px;
+  margin-bottom: var(--space-2);
+}
+
+.minimal-brief .summary-preview {
+  margin: var(--space-3) 0;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.minimal-brief .article-summary {
+  max-width: 760px;
+  border-top: var(--rule);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+.minimal-brief .summary-collapsed .article-summary {
+  display: none;
+}
+
+.minimal-brief .summary-toggle,
+.minimal-brief .article-actions button {
+  border: 0;
+  border-bottom: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  padding: 0;
+}
+
+.minimal-brief .article-footer {
+  max-width: 860px;
+  margin-top: var(--space-3);
+}
+
+.minimal-brief .article-actions a {
+  border-color: var(--ink);
+}
+
+.minimal-brief .article-points-inline {
+  border-top: var(--rule);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+.minimal-brief .article-points-inline strong {
+  color: var(--accent);
+  font-size: var(--step-meta);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.minimal-brief .article-points-inline ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding-left: 18px;
+  color: var(--ink-soft);
+}
+
+.compact-trust {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+}
+
+.compact-trust .method-details summary {
+  font-family: var(--font-sans);
+  font-size: var(--step-small);
+  color: var(--muted);
+}
+
+@media (max-width: 980px) {
+  .minimal-brief .brief-hero-grid,
+  .minimal-brief .toolbar-head {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+}
+
+@media (max-width: 640px) {
+  .minimal-brief {
+    width: min(100% - 24px, 680px);
+    max-width: calc(100vw - 24px);
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: var(--space-4);
+  }
+
+  .minimal-brief .brief-lead-card h1 {
+    max-width: calc(100vw - 88px);
+    font-size: 24px;
+    line-break: auto;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .minimal-brief .lead-dek,
+  .minimal-brief .lead-conclusion,
+  .minimal-brief .lead-summary,
+  .minimal-brief .summary-preview,
+  .minimal-brief .morning-five li {
+    max-width: min(270px, calc(100vw - 112px));
+    font-size: 16px;
+    line-break: auto;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .minimal-brief .workspace-search {
+    min-width: 0;
+  }
+
+  .minimal-brief .filter-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: var(--space-2);
+  }
+
+  .minimal-brief .workbench-article h2 {
+    font-size: 22px;
   }
 }
