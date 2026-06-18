@@ -571,6 +571,8 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
         return "machine_translation_artifact"
     if re.search(r"\b(Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放)\b|\$[0-9]", summary):
         return "machine_translation_artifact"
+    if unsupported_summary_claims(summary, context_text, title):
+        return "unsupported_claims"
     if len(summary) < 35:
         return "too_short"
     if len(summary) > 160:
@@ -601,6 +603,47 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
     unsupported_tokens = [token for token in re.findall(r"\b[A-Za-z][A-Za-z0-9&.-]{2,}\b", summary_lower) if token not in context_lower and token not in title_tokens]
     if len([token for token in unsupported_tokens if not token.isdigit()]) > 4:
         return "unsupported_entities"
+    return ""
+
+
+def unsupported_summary_claims(summary: str, context_text: str, title: str) -> str:
+    support = f"{context_text} {title}".lower()
+    normalized_summary = re.sub(r"\s+", "", summary or "")
+    if "美聯儲股價" in normalized_summary or "聯儲股價" in normalized_summary:
+        return "impossible_fed_stock_phrase"
+
+    entity_support = [
+        (r"美聯儲|聯儲局|鮑威爾", r"\bfed\b|federal reserve|fomc|powell|warsh"),
+        (r"Apple|蘋果", r"\bapple\b"),
+        (r"Intel|英特爾", r"\bintel\b"),
+        (r"Nvidia|輝達|英偉達", r"\bnvidia\b"),
+        (r"AMD", r"\bamd\b"),
+        (r"SpaceX", r"\bspacex\b"),
+        (r"OpenAI", r"\bopenai\b"),
+        (r"伊朗", r"\biran\b|tehran"),
+        (r"特朗普|川普", r"\btrump\b"),
+        (r"日本央行", r"bank of japan|\bboj\b"),
+    ]
+    for summary_pattern, support_pattern in entity_support:
+        if re.search(summary_pattern, summary or "", re.I) and not re.search(support_pattern, support, re.I):
+            return f"unsupported_entity:{summary_pattern}"
+
+    summary_numbers = set(re.findall(r"\b\d+(?:[.,]\d+)?%?\b", summary or ""))
+    support_numbers = set(re.findall(r"\b\d+(?:[.,]\d+)?%?\b", support))
+    unsupported_numbers = [number for number in summary_numbers if number not in support_numbers]
+    if len(unsupported_numbers) >= 2:
+        return "unsupported_numbers"
+
+    clauses = [
+        re.sub(r"\s+", "", clause)
+        for clause in re.split(r"[，,；;。]", summary or "")
+        if len(re.sub(r"\s+", "", clause)) >= 6
+    ]
+    if len(clauses) != len(set(clauses)):
+        return "repeated_clause"
+    for idx, clause in enumerate(clauses):
+        if any(clause and (clause in other or other in clause) for other in clauses[idx + 1:]):
+            return "repeated_clause"
     return ""
 
 
