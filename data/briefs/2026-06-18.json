@@ -1,0 +1,832 @@
+{
+  "date": "2026-06-18",
+  "update_id": "2026-06-18-0815",
+  "update_file": "data/briefs/2026-06-18-0815.json",
+  "title": "每日國際財經與科技新聞摘要",
+  "deck": "整理全球市場、科技產業和主要企業消息，協助快速掌握今日值得追蹤的新聞主線。",
+  "daily_summary_zh": "今日國際財經與科技新聞以全球市場與宏觀、半導體與供應鏈、科技、AI與平台、能源、外匯與商品為主線。頭版焦點包括利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價、半導體供應鏈成為 AI 交易核心，晶片需求與資本開支持續牽動估值、AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視。本期共有 3 個主題整合同題材來源，重點不只在單一標題，而是觀察新聞是否正在形成可持續的市場敘事；讀者可先讀焦點主題，再按分類核對原文和後續變化。",
+  "market_focus": [
+    "全球市場與宏觀",
+    "半導體與供應鏈",
+    "科技、AI與平台",
+    "能源、外匯與商品"
+  ],
+  "hot_topics": [
+    {
+      "rank": 1,
+      "topic": "利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價",
+      "heat_score": 99,
+      "heat_label": "High",
+      "source_count": 4,
+      "main_sources": [
+        "CNBC",
+        "CNBC Markets",
+        "MarketWatch",
+        "The Guardian"
+      ],
+      "item_ids": [
+        "2026-06-18-headline-001",
+        "2026-06-18-headline-004"
+      ],
+      "one_line_reason": "2 條相關新聞集中在同一題材，反映它是今日主要新聞熱點之一；宏觀數據和利率預期會同時影響股債匯商品，是今日市場定價的核心變數。",
+      "reporter_angle": "",
+      "related_story_count": 2,
+      "supporting_titles": [
+        "利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價",
+        "利率與通脹預期牽動美債和股市走向"
+      ]
+    },
+    {
+      "rank": 2,
+      "topic": "半導體供應鏈成為 AI 交易核心，晶片需求與資本開支持續牽動估值",
+      "heat_score": 99,
+      "heat_label": "High",
+      "source_count": 2,
+      "main_sources": [
+        "CNBC Technology",
+        "MarketWatch"
+      ],
+      "item_ids": [
+        "2026-06-18-headline-002",
+        "2026-06-18-headline-006"
+      ],
+      "one_line_reason": "2 條相關新聞集中在同一題材，反映它是今日主要新聞熱點之一；半導體供應鏈是 AI 基建的核心，相關消息容易牽動硬件股和設備商估值。",
+      "reporter_angle": "",
+      "related_story_count": 2,
+      "supporting_titles": [
+        "半導體供應鏈成為 AI 交易核心，晶片需求與資本開支持續牽動估值",
+        "Nvidia 帶動投資熱潮延續，估值與供應鏈受關注"
+      ]
+    },
+    {
+      "rank": 3,
+      "topic": "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視",
+      "heat_score": 96,
+      "heat_label": "High",
+      "source_count": 2,
+      "main_sources": [
+        "MarketWatch",
+        "晚點"
+      ],
+      "item_ids": [
+        "2026-06-18-headline-003"
+      ],
+      "one_line_reason": "AI 應用與雲端平台消息可能改變市場對大型科技股增長和資本開支的判斷。",
+      "reporter_angle": "",
+      "related_story_count": 1,
+      "supporting_titles": [
+        "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視"
+      ]
+    },
+    {
+      "rank": 4,
+      "topic": "金價受壓，避險與通脹交易出現重新定價",
+      "heat_score": 94,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "MarketWatch"
+      ],
+      "item_ids": [
+        "2026-06-18-headline-005"
+      ],
+      "one_line_reason": "宏觀數據和利率預期會同時影響股債匯商品，是今日市場定價的核心變數。",
+      "reporter_angle": "",
+      "related_story_count": 1,
+      "supporting_titles": [
+        "金價受壓，避險與通脹交易出現重新定價"
+      ]
+    },
+    {
+      "rank": 5,
+      "topic": "伊朗和平協議時間表仍存變數，能源與地緣風險重新定價",
+      "heat_score": 88,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "CNBC"
+      ],
+      "item_ids": [
+        "2026-06-18-headline-007"
+      ],
+      "one_line_reason": "商品和外匯價格會影響通脹預期、企業成本和避險資金流向。",
+      "reporter_angle": "",
+      "related_story_count": 1,
+      "supporting_titles": [
+        "伊朗和平協議時間表仍存變數，能源與地緣風險重新定價"
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "name": "全球市場與宏觀",
+      "slug": "global-markets-macro",
+      "item_ids": [
+        "2026-06-18-headline-001",
+        "2026-06-18-headline-004",
+        "2026-06-18-headline-005"
+      ]
+    },
+    {
+      "name": "科技、AI與平台",
+      "slug": "technology-ai-platforms",
+      "item_ids": [
+        "2026-06-18-headline-003"
+      ]
+    },
+    {
+      "name": "半導體與供應鏈",
+      "slug": "semiconductors-supply-chain",
+      "item_ids": [
+        "2026-06-18-headline-002",
+        "2026-06-18-headline-006"
+      ]
+    },
+    {
+      "name": "能源、外匯與商品",
+      "slug": "energy-fx-commodities",
+      "item_ids": [
+        "2026-06-18-headline-007"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "2026-06-18-headline-001",
+      "date": "2026-06-18",
+      "title_original": "2-year Treasury yield rockets higher as many Fed officials signal possible hike this year",
+      "title_zh": "利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/17/treasury-yields-investors-await-warsh-fed-decision.html",
+      "published_at": "Wed, 17 Jun 2026 20:02:51 GMT",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "利率與通脹"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "jsonld_article",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.88,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：4",
+        "同題材來源：CNBC、CNBC Markets、MarketWatch、The Guardian",
+        "代表性原始標題：2-year Treasury yield rockets higher as many Fed officials signal possible hike this year；Here are the five big takeaways from Kevin Warsh's first meeting as Fed chairman"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 4,
+      "sources_reporting_same_topic": [
+        "CNBC",
+        "CNBC Markets",
+        "MarketWatch",
+        "The Guardian"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "rates-inflation"
+    },
+    {
+      "id": "2026-06-18-headline-002",
+      "date": "2026-06-18",
+      "title_original": "Jim Cramer says this chipmaker is still a buy after soaring more than 200% this year",
+      "title_zh": "半導體供應鏈成為 AI 交易核心，晶片需求與資本開支持續牽動估值",
+      "source": "CNBC Technology",
+      "url": "https://www.cnbc.com/2026/06/17/jim-cramer-intel.html",
+      "published_at": "2026-06-18T08:15:15+08:00",
+      "category": "半導體與供應鏈",
+      "themes": [
+        "半導體與供應鏈",
+        "半導體供應鏈"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "jsonld_article",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.88,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：CNBC Technology",
+        "同題材來源數：2",
+        "同題材來源：CNBC Technology、MarketWatch",
+        "代表性原始標題：Jim Cramer says this chipmaker is still a buy after soaring more than 200% this year；Rumble gets 22,000 Nvidia chips, but the video company’s CEO insists this isn’t a fad-like pivot"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 2,
+      "sources_reporting_same_topic": [
+        "CNBC Technology",
+        "MarketWatch"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "semiconductors"
+    },
+    {
+      "id": "2026-06-18-headline-003",
+      "date": "2026-06-18",
+      "title_original": "It’s ‘unavoidable’: Apple says it will be forced to raise prices due to the AI boom",
+      "title_zh": "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視",
+      "source": "MarketWatch",
+      "url": "https://www.marketwatch.com/story/its-unavoidable-apple-says-it-will-be-forced-to-raise-prices-due-to-the-ai-boom-e3d1e4c4?mod=mw_rss_topstories",
+      "published_at": "Wed, 17 Jun 2026 23:19:00 GMT",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "AI投資熱潮"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "rss_description",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.84,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：MarketWatch",
+        "同題材來源數：2",
+        "同題材來源：MarketWatch、晚點",
+        "代表性原始標題：It’s ‘unavoidable’: Apple says it will be forced to raise prices due to the AI boom；解密 AI 版支付宝，20 年来最大改版即将发布"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 2,
+      "sources_reporting_same_topic": [
+        "MarketWatch",
+        "晚點"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "ai-platforms"
+    },
+    {
+      "id": "2026-06-18-headline-004",
+      "date": "2026-06-18",
+      "title_original": "Here are the five big takeaways from Kevin Warsh's first meeting as Fed chairman",
+      "title_zh": "利率與通脹預期牽動美債和股市走向",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/17/here-are-the-five-big-takeaways-from-kevin-warshs-first-meeting-as-fed-chairman.html",
+      "published_at": "Wed, 17 Jun 2026 23:51:33 GMT",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "利率與通脹"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "jsonld_article",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.8,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：1",
+        "同題材來源：CNBC",
+        "代表性原始標題：Here are the five big takeaways from Kevin Warsh's first meeting as Fed chairman"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 9,
+      "heat_score": 94,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "rates-inflation"
+    },
+    {
+      "id": "2026-06-18-headline-005",
+      "date": "2026-06-18",
+      "title_original": "The Fed just threw investors a curveball. Here’s how stocks, bonds, gold and the dollar reacted.",
+      "title_zh": "金價受壓，避險與通脹交易出現重新定價",
+      "source": "MarketWatch",
+      "url": "https://www.marketwatch.com/story/the-fed-threw-investors-a-curve-ball-on-wednesday-heres-how-stocks-bonds-gold-and-the-dollar-reacted-d0e1e3c0?mod=mw_rss_topstories",
+      "published_at": "Wed, 17 Jun 2026 21:38:00 GMT",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "利率與通脹",
+        "商品與外匯",
+        "企業與資本市場"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "rss_description",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.84,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：MarketWatch",
+        "同題材來源數：1",
+        "同題材來源：MarketWatch",
+        "代表性原始標題：The Fed just threw investors a curveball. Here’s how stocks, bonds, gold and the dollar reacted."
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 9,
+      "heat_score": 94,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "MarketWatch"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "gold"
+    },
+    {
+      "id": "2026-06-18-headline-006",
+      "date": "2026-06-18",
+      "title_original": "Rumble gets 22,000 Nvidia chips, but the video company’s CEO insists this isn’t a fad-like pivot",
+      "title_zh": "Nvidia 帶動投資熱潮延續，估值與供應鏈受關注",
+      "source": "MarketWatch",
+      "url": "https://www.marketwatch.com/story/rumble-gets-22-000-nvidia-chips-but-the-video-companys-ceo-insists-this-isnt-a-fad-like-pivot-b52b2036?mod=mw_rss_topstories",
+      "published_at": "Thu, 18 Jun 2026 00:13:00 GMT",
+      "category": "半導體與供應鏈",
+      "themes": [
+        "半導體與供應鏈",
+        "AI投資熱潮",
+        "半導體供應鏈"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "",
+      "summary_status": "no_verifiable_source_text",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.0,
+      "source_confidence_label": "low",
+      "key_facts": [
+        "主要來源：MarketWatch",
+        "同題材來源數：1",
+        "同題材來源：MarketWatch",
+        "代表性原始標題：Rumble gets 22,000 Nvidia chips, but the video company’s CEO insists this isn’t a fad-like pivot"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 8,
+      "heat_score": 93,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "MarketWatch"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "semiconductors"
+    },
+    {
+      "id": "2026-06-18-headline-007",
+      "date": "2026-06-18",
+      "title_original": "Trump says he likes idea of blaming Vance if Iran deal doesn't work out",
+      "title_zh": "伊朗和平協議時間表仍存變數，能源與地緣風險重新定價",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/17/trump-vance-iran-deal-nuclear-g7.html",
+      "published_at": "Wed, 17 Jun 2026 19:54:13 GMT",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "企業與資本市場"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "jsonld_article",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.88,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：1",
+        "同題材來源：CNBC",
+        "代表性原始標題：Trump says he likes idea of blaming Vance if Iran deal doesn't work out"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 8,
+      "heat_score": 88,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "CNBC"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "iran-oil"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Reuters Markets",
+      "url": "https://www.reuters.com/markets/",
+      "access": "Blocked",
+      "tier": 1
+    },
+    {
+      "name": "Reuters Technology",
+      "url": "https://www.reuters.com/technology/",
+      "access": "Blocked",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Top News",
+      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Markets",
+      "url": "https://www.cnbc.com/markets/",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Technology",
+      "url": "https://www.cnbc.com/technology/",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "WSJ Markets",
+      "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "WSJ Technology",
+      "url": "https://feeds.a.dj.com/rss/RSSWSJD.xml",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/news/rssindex",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "MarketWatch Top Stories",
+      "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "The Guardian Business",
+      "url": "https://www.theguardian.com/business/rss",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "Nikkei Asia Business",
+      "url": "https://asia.nikkei.com/Business",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "TechCrunch AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "TechCrunch Startups",
+      "url": "https://techcrunch.com/category/startups/",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "Wallstreetcn",
+      "url": "https://wallstreetcn.com/",
+      "access": "Full",
+      "tier": 3
+    },
+    {
+      "name": "Caixin",
+      "url": "https://www.caixin.com/",
+      "access": "Full",
+      "tier": 3
+    },
+    {
+      "name": "LatePost",
+      "url": "https://www.latepost.com/",
+      "access": "Full",
+      "tier": 3
+    }
+  ],
+  "generation_report": {
+    "collection": {
+      "sources_total": 16,
+      "sources_accessible": 14,
+      "raw_candidates": 349,
+      "accepted_candidates": 41,
+      "skipped_by_rule": 42,
+      "skipped_stale": 16,
+      "keyword_candidates": 22,
+      "unique_candidates": 21,
+      "grouped_candidates": 12
+    },
+    "source_stats": [
+      {
+        "name": "Reuters Markets",
+        "tier": 1,
+        "access": "Blocked",
+        "status_code": 0,
+        "extracted_count": 0,
+        "accepted_count": 0,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Reuters Technology",
+        "tier": 1,
+        "access": "Blocked",
+        "status_code": 0,
+        "extracted_count": 0,
+        "accepted_count": 0,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "CNBC Top News",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 10,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "CNBC Markets",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 1,
+        "skipped_by_rule": 7,
+        "skipped_stale": 0
+      },
+      {
+        "name": "CNBC Technology",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 2,
+        "skipped_by_rule": 6,
+        "skipped_stale": 0
+      },
+      {
+        "name": "WSJ Markets",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 20,
+        "accepted_count": 0,
+        "skipped_by_rule": 1,
+        "skipped_stale": 11
+      },
+      {
+        "name": "WSJ Technology",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 20,
+        "accepted_count": 0,
+        "skipped_by_rule": 3,
+        "skipped_stale": 5
+      },
+      {
+        "name": "Yahoo Finance",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 5,
+        "skipped_by_rule": 3,
+        "skipped_stale": 0
+      },
+      {
+        "name": "MarketWatch Top Stories",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 10,
+        "accepted_count": 8,
+        "skipped_by_rule": 2,
+        "skipped_stale": 0
+      },
+      {
+        "name": "The Guardian Business",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 20,
+        "accepted_count": 8,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Nikkei Asia Business",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 0,
+        "skipped_by_rule": 5,
+        "skipped_stale": 0
+      },
+      {
+        "name": "TechCrunch AI",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 2,
+        "skipped_by_rule": 6,
+        "skipped_stale": 0
+      },
+      {
+        "name": "TechCrunch Startups",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 0,
+        "skipped_by_rule": 5,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Wallstreetcn",
+        "tier": 3,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 29,
+        "accepted_count": 2,
+        "skipped_by_rule": 1,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Caixin",
+        "tier": 3,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 1,
+        "skipped_by_rule": 2,
+        "skipped_stale": 0
+      },
+      {
+        "name": "LatePost",
+        "tier": 3,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 10,
+        "accepted_count": 2,
+        "skipped_by_rule": 1,
+        "skipped_stale": 0
+      }
+    ],
+    "item_quality": {
+      "built_items": 12,
+      "publishable_items": 7,
+      "skipped_items": [
+        {
+          "id": "2026-06-18-headline-008",
+          "reason": "generic_title",
+          "source": "MarketWatch",
+          "title_original": "Stock-market pessimists have one less reason to worry as shares of banks and retailers perk up",
+          "title_zh": "圍繞 Stock-market 的企業消息牽動投資者對盈利與估值的判斷"
+        },
+        {
+          "id": "2026-06-18-headline-009",
+          "reason": "generic_title",
+          "source": "The Guardian",
+          "title_original": "Trump’s Department of Labor claims without data that states defrauded government",
+          "title_zh": "重要財經與科技消息值得今日追蹤"
+        },
+        {
+          "id": "2026-06-18-headline-010",
+          "reason": "generic_title",
+          "source": "The Guardian",
+          "title_original": "SpaceX overtakes Amazon to become world’s fifth most valuable company",
+          "title_zh": "圍繞 SpaceX 的市場消息牽動投資者風險判斷"
+        },
+        {
+          "id": "2026-06-18-headline-011",
+          "reason": "generic_title",
+          "source": "The Guardian",
+          "title_original": "Struggling Pizza Hut restaurant chain to be sold in two deals worth $2.7bn",
+          "title_zh": "圍繞 Struggling Pizza Hut 的企業消息牽動投資者對盈利與估值的判斷"
+        },
+        {
+          "id": "2026-06-18-headline-012",
+          "reason": "duplicate_title",
+          "source": "The Guardian",
+          "title_original": "Bank of Japan raises interest rates to 31-year high … of 1%",
+          "title_zh": "利率與通脹預期牽動美債和股市走向"
+        }
+      ],
+      "summaries_removed": 0,
+      "summary_rejections": [
+        {
+          "id": "2026-06-18-headline-001",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.88
+        },
+        {
+          "id": "2026-06-18-headline-002",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.88
+        },
+        {
+          "id": "2026-06-18-headline-003",
+          "reason": "low_source_confidence",
+          "basis": "rss_description",
+          "confidence": 0.84
+        },
+        {
+          "id": "2026-06-18-headline-004",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.8
+        },
+        {
+          "id": "2026-06-18-headline-005",
+          "reason": "low_source_confidence",
+          "basis": "rss_description",
+          "confidence": 0.84
+        },
+        {
+          "id": "2026-06-18-headline-007",
+          "reason": "low_source_confidence",
+          "basis": "jsonld_article",
+          "confidence": 0.88
+        },
+        {
+          "id": "2026-06-18-headline-009",
+          "reason": "low_source_confidence",
+          "basis": "rss_description",
+          "confidence": 0.84
+        },
+        {
+          "id": "2026-06-18-headline-010",
+          "reason": "low_source_confidence",
+          "basis": "rss_description",
+          "confidence": 0.84
+        },
+        {
+          "id": "2026-06-18-headline-011",
+          "reason": "low_source_confidence",
+          "basis": "rss_description",
+          "confidence": 0.84
+        },
+        {
+          "id": "2026-06-18-headline-012",
+          "reason": "low_source_confidence",
+          "basis": "rss_description",
+          "confidence": 0.84
+        }
+      ],
+      "context_confidence": {
+        "jsonld_article:0.88": 3,
+        "rss_description:0.84": 6,
+        "jsonld_article:0.80": 1
+      },
+      "minimum_publishable_items": 5,
+      "degraded_publishable_count": true,
+      "degraded_reason": "Only 7 publishable items remained after quality isolation; publishing a smaller verified brief instead of blocking the daily update."
+    },
+    "ai": {
+      "summary_candidates": 0,
+      "summary_updates": 0,
+      "response_chars": 0,
+      "parsed_summaries": 0,
+      "rejected_summaries": 0,
+      "response_samples": [],
+      "last_status": "not_called"
+    }
+  },
+  "generated_at": "2026-06-18T08:15:15+08:00",
+  "email_body_zh": "今日國際財經與科技新聞以全球市場與宏觀、半導體與供應鏈、科技、AI與平台、能源、外匯與商品為主線。頭版焦點包括利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價、半導體供應鏈成為 AI 交易核心，晶片需求與資本開支持續牽動估值、AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視。本期共有 3 個主題整合同題材來源，重點不只在單一標題，而是觀察新聞是否正在形成可持續的市場敘事；讀者可先讀焦點主題，再按分類核對原文和後續變化。\n\n網站：https://news.tinydreamlab.com/"
+}
