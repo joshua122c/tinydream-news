@@ -571,6 +571,13 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
         return "machine_translation_artifact"
     if re.search(r"\b(Spacex|美Fed|fraud conviction|raised \$|tanker將|Straits of Hormuz開放)\b|\$[0-9]", summary):
         return "machine_translation_artifact"
+    if re.search(
+        r"\u7968\u50f9|\u65e5\u672c\u7f8e\u806f\u5132|yet traffic|\u4e2deast|\u652f\u6301\u7e8c|"
+        r"\u7f8e\u806f\u513210\u5e74|US \u91ab\u7642\u82af\u7247|\u7f8e\u7e3d\u7d71\u7279\u6717\u666e\u53cd\u61c9\u5f37\u70c8",
+        summary,
+        re.I,
+    ):
+        return "machine_translation_artifact"
     if unsupported_summary_claims(summary, context_text, title):
         return "unsupported_claims"
     if len(summary) < 35:
