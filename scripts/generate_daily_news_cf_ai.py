@@ -681,6 +681,8 @@ def summary_supported_by_text(summary: str, context_text: str, title: str, sourc
 def clean_ai_summary_output(value: object) -> str:
     text = to_traditional_zh(clean_text(value))
     text = re.sub(r"\bseeking\b", "尋求", text, flags=re.I)
+    text = re.sub(r"\bdeals\b", "交易", text, flags=re.I)
+    text = re.sub(r"\bcurrency\b", "貨幣", text, flags=re.I)
     text = re.sub(r'["”」』\']?\s*[:：]\s*["“「『\']?\s*\}+\s*$', "", text)
     text = re.sub(r'["”」』\']?\s*\}+[,]?\s*$', "", text)
     text = text.strip(" \"'，,;；")
@@ -930,6 +932,29 @@ def build_retry_summary_prompt(row: dict) -> str:
     )
 
 
+def fallback_editor_notes(summary: str, title: str = "", category: str = "") -> list[str]:
+    notes = []
+    for sentence in re.split(r"(?<=[。！？])\s*", summary or ""):
+        text = clean_ai_summary_output(sentence)
+        if 12 <= len(text) <= 90 and text not in notes:
+            notes.append(text)
+        if len(notes) >= 3:
+            break
+    haystack = f"{title} {category} {summary}"
+    impact = ""
+    if re.search(r"AI|半導體|晶片|科技|估值", haystack, re.I):
+        impact = "影響層面：科技股估值與AI投資情緒"
+    elif re.search(r"油|能源|OPEC|伊朗|霍爾木茲", haystack, re.I):
+        impact = "影響層面：能源價格與通脹預期"
+    elif re.search(r"利率|聯儲|美債|通脹|日圓|美元", haystack, re.I):
+        impact = "影響層面：利率預期、外匯與風險資產"
+    elif re.search(r"收購|併購|交易|股價|業績", haystack, re.I):
+        impact = "影響層面：企業估值、併購風險與個股情緒"
+    if impact and impact not in notes:
+        notes.append(impact)
+    return notes[:4]
+
+
 def apply_batch_ai_summaries(items: list[dict]) -> None:
     payload = []
     context_by_id = {}
@@ -1006,8 +1031,9 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
                 item["summary"] = item["summary_zh"]
                 if takeaway and not contains_common_simplified_zh(takeaway):
                     item["editorial_takeaway"] = takeaway[:180]
-                if key_points and not any(contains_common_simplified_zh(point) for point in key_points):
-                    item["editor_notes"] = key_points[:4]
+                notes = key_points if key_points else fallback_editor_notes(summary, item.get("title_zh", ""), item.get("category", ""))
+                if notes and not any(contains_common_simplified_zh(point) for point in notes):
+                    item["editor_notes"] = notes[:4]
                 item["summary_status"] = "verified_from_source_text"
                 item["summary_quality_status"] = "passed"
                 RUN_REPORT["ai"]["summary_updates"] += 1
@@ -1048,6 +1074,9 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
                     item["summary"] = item["summary_zh"]
                     if takeaway and not contains_common_simplified_zh(takeaway):
                         item["editorial_takeaway"] = takeaway[:180]
+                    notes = fallback_editor_notes(summary, item.get("title_zh", ""), item.get("category", ""))
+                    if notes and not any(contains_common_simplified_zh(point) for point in notes):
+                        item["editor_notes"] = notes[:4]
                     item["summary_status"] = "verified_from_source_text"
                     item["summary_quality_status"] = "passed"
                     RUN_REPORT["ai"]["summary_updates"] += 1
