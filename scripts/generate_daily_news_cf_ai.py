@@ -963,6 +963,10 @@ def fallback_editor_notes(summary: str, title: str = "", category: str = "") -> 
     return notes[:4]
 
 
+def can_publish_limited_summary(summary: str, rejection_reason: str) -> bool:
+    return rejection_reason == "too_short" and len(summary or "") >= 60
+
+
 def apply_batch_ai_summaries(items: list[dict]) -> None:
     payload = []
     context_by_id = {}
@@ -1034,7 +1038,8 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
                 confidence,
                 item.get("_summary_context_basis", ""),
             )
-            if not rejection_reason and not contains_common_simplified_zh(summary):
+            limited_summary = can_publish_limited_summary(summary, rejection_reason)
+            if (not rejection_reason or limited_summary) and not contains_common_simplified_zh(summary):
                 item["summary_zh"] = summary[:420]
                 item["summary"] = item["summary_zh"]
                 if takeaway and not contains_common_simplified_zh(takeaway):
@@ -1043,7 +1048,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
                 if notes and not any(contains_common_simplified_zh(point) for point in notes):
                     item["editor_notes"] = notes[:4]
                 item["summary_status"] = "verified_from_source_text"
-                item["summary_quality_status"] = "passed"
+                item["summary_quality_status"] = "limited_length" if limited_summary else "passed"
                 RUN_REPORT["ai"]["summary_updates"] += 1
                 accepted_any = True
             elif summary:
@@ -1077,7 +1082,8 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
                     confidence,
                     item.get("_summary_context_basis", ""),
                 )
-                if not rejection_reason and not contains_common_simplified_zh(summary):
+                limited_summary = can_publish_limited_summary(summary, rejection_reason)
+                if (not rejection_reason or limited_summary) and not contains_common_simplified_zh(summary):
                     item["summary_zh"] = summary[:420]
                     item["summary"] = item["summary_zh"]
                     if takeaway and not contains_common_simplified_zh(takeaway):
@@ -1086,7 +1092,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
                     if notes and not any(contains_common_simplified_zh(point) for point in notes):
                         item["editor_notes"] = notes[:4]
                     item["summary_status"] = "verified_from_source_text"
-                    item["summary_quality_status"] = "passed"
+                    item["summary_quality_status"] = "limited_length" if limited_summary else "passed"
                     RUN_REPORT["ai"]["summary_updates"] += 1
                     RUN_REPORT["ai"]["retry_updates"] += 1
                     accepted_any = True
@@ -1779,12 +1785,13 @@ def sanitize_items_for_publication(items: list[dict]) -> list[dict]:
             float(item.get("source_confidence") or 0),
             item.get("summary_basis", ""),
         ) if summary else ""
+        limited_summary_ok = can_publish_limited_summary(summary, summary_rejection) and item.get("summary_quality_status") == "limited_length"
         if summary and (
             any(phrase in summary for phrase in BAD_READER_PHRASES)
             or contains_common_simplified_zh(summary)
             or not item.get("summary_basis")
             or item.get("summary_status") != "verified_from_source_text"
-            or summary_rejection
+            or (summary_rejection and not limited_summary_ok)
         ):
             item["summary"] = ""
             item["summary_zh"] = ""
