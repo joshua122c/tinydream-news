@@ -967,6 +967,13 @@ def can_publish_limited_summary(summary: str, rejection_reason: str) -> bool:
     return rejection_reason == "too_short" and len(summary or "") >= 60
 
 
+def normalize_publishable_summary(summary: str) -> str:
+    text = clean_ai_summary_output(summary)
+    if text and not re.search(r"[。！？!?]$", text):
+        text += "。"
+    return text
+
+
 def apply_batch_ai_summaries(items: list[dict]) -> None:
     payload = []
     context_by_id = {}
@@ -1040,6 +1047,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             )
             limited_summary = can_publish_limited_summary(summary, rejection_reason)
             if (not rejection_reason or limited_summary) and not contains_common_simplified_zh(summary):
+                summary = normalize_publishable_summary(summary)
                 item["summary_zh"] = summary[:420]
                 item["summary"] = item["summary_zh"]
                 if takeaway and not contains_common_simplified_zh(takeaway):
@@ -1084,6 +1092,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
                 )
                 limited_summary = can_publish_limited_summary(summary, rejection_reason)
                 if (not rejection_reason or limited_summary) and not contains_common_simplified_zh(summary):
+                    summary = normalize_publishable_summary(summary)
                     item["summary_zh"] = summary[:420]
                     item["summary"] = item["summary_zh"]
                     if takeaway and not contains_common_simplified_zh(takeaway):
