@@ -599,7 +599,8 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
     if unsupported_summary_claims(summary, context_text, title):
         return "unsupported_claims"
     limited_basis = summary_basis in {"rss_description", "meta_description"}
-    min_summary_chars = 55 if limited_basis else 45
+    macro_sensitive = re.search(r"聯儲|聯準會|Fed|利率|美債|通脹|央行", summary or "", re.I)
+    min_summary_chars = 55 if limited_basis and macro_sensitive else 45
     if len(summary) < min_summary_chars:
         return "too_short"
     if len(summary) > 360:
