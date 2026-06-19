@@ -1,0 +1,858 @@
+{
+  "date": "2026-06-19",
+  "update_id": "2026-06-19-0815",
+  "update_file": "data/briefs/2026-06-19-0815.json",
+  "title": "每日國際財經與科技新聞摘要",
+  "deck": "整理全球市場、科技產業和主要企業消息，協助快速掌握今日值得追蹤的新聞主線。",
+  "daily_summary_zh": "今日國際財經與科技新聞以科技、AI與平台、企業、財報與交易、全球市場與宏觀、能源、外匯與商品為主線。頭版焦點包括AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視、SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應、利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價。本期共有 4 個主題整合同題材來源，重點不只在單一標題，而是觀察新聞是否正在形成可持續的市場敘事；讀者可先讀焦點主題，再按分類核對原文和後續變化。",
+  "market_focus": [
+    "科技、AI與平台",
+    "企業、財報與交易",
+    "全球市場與宏觀",
+    "能源、外匯與商品"
+  ],
+  "hot_topics": [
+    {
+      "rank": 1,
+      "topic": "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視",
+      "heat_score": 99,
+      "heat_label": "High",
+      "source_count": 4,
+      "main_sources": [
+        "CNBC",
+        "MarketWatch",
+        "TechCrunch AI",
+        "晚點"
+      ],
+      "item_ids": [
+        "2026-06-19-headline-001",
+        "2026-06-19-headline-010"
+      ],
+      "one_line_reason": "2 條相關新聞集中在同一題材，反映它是今日主要新聞熱點之一；AI 應用與雲端平台消息可能改變市場對大型科技股增長和資本開支的判斷。",
+      "reporter_angle": "",
+      "related_story_count": 2,
+      "supporting_titles": [
+        "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視",
+        "AI 與半導體投資熱潮延續，估值與供應鏈受關注"
+      ]
+    },
+    {
+      "rank": 2,
+      "topic": "SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應",
+      "heat_score": 99,
+      "heat_label": "High",
+      "source_count": 3,
+      "main_sources": [
+        "CNBC",
+        "Yahoo Finance",
+        "The Guardian"
+      ],
+      "item_ids": [
+        "2026-06-19-headline-002",
+        "2026-06-19-headline-009"
+      ],
+      "one_line_reason": "2 條相關新聞集中在同一題材，反映它是今日主要新聞熱點之一；企業融資、財報或交易消息會直接影響個股估值，並可能擴散至同業。",
+      "reporter_angle": "",
+      "related_story_count": 2,
+      "supporting_titles": [
+        "SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應",
+        "伊朗和平協議時間表仍存變數，能源與地緣風險重新定價"
+      ]
+    },
+    {
+      "rank": 3,
+      "topic": "半導體供應鏈成為 AI 交易核心，晶片需求與資本開支持續牽動估值",
+      "heat_score": 97,
+      "heat_label": "High",
+      "source_count": 1,
+      "main_sources": [
+        "MarketWatch"
+      ],
+      "item_ids": [
+        "2026-06-19-headline-005",
+        "2026-06-19-headline-006"
+      ],
+      "one_line_reason": "2 條相關新聞集中在同一題材，反映它是今日主要新聞熱點之一；半導體供應鏈是 AI 基建的核心，相關消息容易牽動硬件股和設備商估值。",
+      "reporter_angle": "",
+      "related_story_count": 2,
+      "supporting_titles": [
+        "半導體供應鏈成為 AI 交易核心，晶片需求與資本開支持續牽動估值",
+        "Apple 帶動投資熱潮延續，估值與供應鏈受關注"
+      ]
+    },
+    {
+      "rank": 4,
+      "topic": "利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價",
+      "heat_score": 96,
+      "heat_label": "High",
+      "source_count": 2,
+      "main_sources": [
+        "CNBC",
+        "The Guardian"
+      ],
+      "item_ids": [
+        "2026-06-19-headline-003"
+      ],
+      "one_line_reason": "宏觀數據和利率預期會同時影響股債匯商品，是今日市場定價的核心變數。",
+      "reporter_angle": "",
+      "related_story_count": 1,
+      "supporting_titles": [
+        "利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價"
+      ]
+    },
+    {
+      "rank": 5,
+      "topic": "中東與原油供應風險再受關注，能源價格牽動通脹與避險定價",
+      "heat_score": 96,
+      "heat_label": "High",
+      "source_count": 2,
+      "main_sources": [
+        "CNBC",
+        "MarketWatch"
+      ],
+      "item_ids": [
+        "2026-06-19-headline-004"
+      ],
+      "one_line_reason": "商品和外匯價格會影響通脹預期、企業成本和避險資金流向。",
+      "reporter_angle": "",
+      "related_story_count": 1,
+      "supporting_titles": [
+        "中東與原油供應風險再受關注，能源價格牽動通脹與避險定價"
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "name": "全球市場與宏觀",
+      "slug": "global-markets-macro",
+      "item_ids": [
+        "2026-06-19-headline-003"
+      ]
+    },
+    {
+      "name": "科技、AI與平台",
+      "slug": "technology-ai-platforms",
+      "item_ids": [
+        "2026-06-19-headline-001",
+        "2026-06-19-headline-010"
+      ]
+    },
+    {
+      "name": "半導體與供應鏈",
+      "slug": "semiconductors-supply-chain",
+      "item_ids": [
+        "2026-06-19-headline-005",
+        "2026-06-19-headline-006"
+      ]
+    },
+    {
+      "name": "企業、財報與交易",
+      "slug": "companies-earnings-deals",
+      "item_ids": [
+        "2026-06-19-headline-002"
+      ]
+    },
+    {
+      "name": "能源、外匯與商品",
+      "slug": "energy-fx-commodities",
+      "item_ids": [
+        "2026-06-19-headline-004",
+        "2026-06-19-headline-009",
+        "2026-06-19-headline-012"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "2026-06-19-headline-001",
+      "date": "2026-06-19",
+      "title_original": "Amazon investigating engineers who criticized AI data center expansion",
+      "title_zh": "AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/18/amazon-engineers-ai-data-center-opposition.html",
+      "published_at": "Thu, 18 Jun 2026 19:47:59 GMT",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "AI投資熱潮"
+      ],
+      "summary": "五名亞馬遜員工於西雅圖市議會作證，討論數據中心建設暫停一年的影響。此舉可能影響其AI與雲端業務擴張，牽動科技股估值與市場風險情緒。",
+      "summary_zh": "五名亞馬遜員工於西雅圖市議會作證，討論數據中心建設暫停一年的影響。此舉可能影響其AI與雲端業務擴張，牽動科技股估值與市場風險情緒。",
+      "summary_basis": "jsonld_article",
+      "summary_status": "verified_from_source_text",
+      "summary_quality_status": "passed",
+      "source_confidence": 0.88,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：4",
+        "同題材來源：CNBC、MarketWatch、TechCrunch AI、晚點",
+        "代表性原始標題：Amazon investigating engineers who criticized AI data center expansion；This AI company wants to replace MRIs with a 60-second dip in the spa. Can that really work?"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 4,
+      "sources_reporting_same_topic": [
+        "CNBC",
+        "MarketWatch",
+        "TechCrunch AI",
+        "晚點"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "ai-platforms"
+    },
+    {
+      "id": "2026-06-19-headline-002",
+      "date": "2026-06-19",
+      "title_original": "The average SpaceX buyer post-IPO is almost under water after two-day slide",
+      "title_zh": "SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/18/the-average-spacex-buyer-post-ipo-is-almost-under-water-after-two-day-slide.html",
+      "published_at": "Thu, 18 Jun 2026 20:10:47 GMT",
+      "category": "企業、財報與交易",
+      "themes": [
+        "企業、財報與交易",
+        "企業與資本市場"
+      ],
+      "summary": "SpaceX股價週四下跌7%至178美元，接近其成交量加權平均價約180美元，市場關注其上市後估值與投資者信心。",
+      "summary_zh": "SpaceX股價週四下跌7%至178美元，接近其成交量加權平均價約180美元，市場關注其上市後估值與投資者信心。",
+      "summary_basis": "jsonld_article",
+      "summary_status": "verified_from_source_text",
+      "summary_quality_status": "passed",
+      "source_confidence": 0.88,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：3",
+        "同題材來源：CNBC、Yahoo Finance、The Guardian",
+        "代表性原始標題：The average SpaceX buyer post-IPO is almost under water after two-day slide；Dow Jones Futures: Techs Rebound, SpaceX Rises Despite Trump's Iran Threat; Warsh's Fed Debut Due"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 3,
+      "sources_reporting_same_topic": [
+        "CNBC",
+        "Yahoo Finance",
+        "The Guardian"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "spacex"
+    },
+    {
+      "id": "2026-06-19-headline-003",
+      "date": "2026-06-19",
+      "title_original": "Japan core inflation holds steady in May, matching expectations despite energy price concerns",
+      "title_zh": "利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/19/japan-core-inflation-holds-steady-in-may-matching-expectations-despite-energy-price-concerns.html",
+      "published_at": "Fri, 19 Jun 2026 00:02:03 GMT",
+      "category": "全球市場與宏觀",
+      "themes": [
+        "全球市場與宏觀",
+        "利率與通脹"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "jsonld_article",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.8,
+      "source_confidence_label": "medium",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：2",
+        "同題材來源：CNBC、The Guardian",
+        "代表性原始標題：Japan core inflation holds steady in May, matching expectations despite energy price concerns；Markets are set for a much more hawkish Warsh Fed than expected"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 10,
+      "heat_score": 94,
+      "source_count": 2,
+      "sources_reporting_same_topic": [
+        "CNBC",
+        "The Guardian"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "rates-inflation"
+    },
+    {
+      "id": "2026-06-19-headline-004",
+      "date": "2026-06-19",
+      "title_original": "Vance says U.S. isn’t giving Iran ‘a cent’ as he defends Trump peace deal",
+      "title_zh": "中東與原油供應風險再受關注，能源價格牽動通脹與避險定價",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/06/18/vance-iran-war-memo-oil-gas.html",
+      "published_at": "Thu, 18 Jun 2026 20:14:38 GMT",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "企業與資本市場"
+      ],
+      "summary": "美國副總統Vance指伊朗若不完全履行協議將無法獲取資源，引發市場對中東局勢及能源供應風險的關注。",
+      "summary_zh": "美國副總統Vance指伊朗若不完全履行協議將無法獲取資源，引發市場對中東局勢及能源供應風險的關注。",
+      "summary_basis": "jsonld_article",
+      "summary_status": "verified_from_source_text",
+      "summary_quality_status": "passed",
+      "source_confidence": 0.88,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：CNBC",
+        "同題材來源數：2",
+        "同題材來源：CNBC、MarketWatch",
+        "代表性原始標題：Vance says U.S. isn’t giving Iran ‘a cent’ as he defends Trump peace deal；Trump’s Iran agreement is a massive buy signal for stocks"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 9,
+      "heat_score": 94,
+      "source_count": 2,
+      "sources_reporting_same_topic": [
+        "CNBC",
+        "MarketWatch"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "iran-oil"
+    },
+    {
+      "id": "2026-06-19-headline-005",
+      "date": "2026-06-19",
+      "title_original": "Intel’s stock jumps 11% — even as analysts say new Apple chip deal might start small",
+      "title_zh": "半導體供應鏈成為 AI 交易核心，晶片需求與資本開支持續牽動估值",
+      "source": "MarketWatch",
+      "url": "https://www.marketwatch.com/story/intel-shares-rally-as-trump-says-company-will-build-chips-for-apple-in-the-u-s-c72d8c88?mod=mw_rss_topstories",
+      "published_at": "Thu, 18 Jun 2026 22:00:00 GMT",
+      "category": "半導體與供應鏈",
+      "themes": [
+        "半導體與供應鏈",
+        "半導體供應鏈",
+        "企業與資本市場"
+      ],
+      "summary": "英特爾擴建國內製造能力，將戰略優勢轉化為具體代工成果，可能影響半導體產業估值與AI相關科技股表現。",
+      "summary_zh": "英特爾擴建國內製造能力，將戰略優勢轉化為具體代工成果，可能影響半導體產業估值與AI相關科技股表現。",
+      "summary_basis": "rss_description",
+      "summary_status": "verified_from_source_text",
+      "summary_quality_status": "passed",
+      "source_confidence": 0.84,
+      "source_confidence_label": "medium",
+      "key_facts": [
+        "主要來源：MarketWatch",
+        "同題材來源數：1",
+        "同題材來源：MarketWatch",
+        "代表性原始標題：Intel’s stock jumps 11% — even as analysts say new Apple chip deal might start small；Micron’s stock is on the rise. Even Apple isn’t safe from ballooning memory-chip costs."
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 9,
+      "heat_score": 94,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "MarketWatch"
+      ],
+      "position_signal": "merged_topic",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "semiconductors"
+    },
+    {
+      "id": "2026-06-19-headline-006",
+      "date": "2026-06-19",
+      "title_original": "Micron’s stock is on the rise. Even Apple isn’t safe from ballooning memory-chip costs.",
+      "title_zh": "Apple 帶動投資熱潮延續，估值與供應鏈受關注",
+      "source": "MarketWatch",
+      "url": "https://www.marketwatch.com/story/microns-stock-is-on-the-rise-even-apple-isnt-safe-from-ballooning-memory-chip-costs-ddd04d74?mod=mw_rss_topstories",
+      "published_at": "Thu, 18 Jun 2026 21:56:00 GMT",
+      "category": "半導體與供應鏈",
+      "themes": [
+        "半導體與供應鏈",
+        "半導體供應鏈",
+        "企業與資本市場"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "rss_description",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.84,
+      "source_confidence_label": "medium",
+      "key_facts": [
+        "主要來源：MarketWatch",
+        "同題材來源數：1",
+        "同題材來源：MarketWatch",
+        "代表性原始標題：Micron’s stock is on the rise. Even Apple isn’t safe from ballooning memory-chip costs."
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 8,
+      "heat_score": 93,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "MarketWatch"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "semiconductors"
+    },
+    {
+      "id": "2026-06-19-headline-009",
+      "date": "2026-06-19",
+      "title_original": "Dow Jones Futures: Techs Rebound, SpaceX Rises Despite Trump's Iran Threat; Warsh's Fed Debut Due",
+      "title_zh": "伊朗和平協議時間表仍存變數，能源與地緣風險重新定價",
+      "source": "Yahoo Finance",
+      "url": "https://www.investors.com/market-trend/stock-market-today/dow-jones-futures-spacex-ai-stocks-warsh-fed-debut/?src=A00220&yptr=yahoo",
+      "published_at": "2026-06-17T12:18:32Z",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品",
+        "利率與通脹"
+      ],
+      "summary": "科技股在道瓊期貨中小幅上升，儘管特朗普威脅重啟對伊朗空襲，市場關注聯儲主席沃什的言論對貨幣政策及風險情緒的影響。",
+      "summary_zh": "科技股在道瓊期貨中小幅上升，儘管特朗普威脅重啟對伊朗空襲，市場關注聯儲主席沃什的言論對貨幣政策及風險情緒的影響。",
+      "summary_basis": "jsonld_article",
+      "summary_status": "verified_from_source_text",
+      "summary_quality_status": "passed",
+      "source_confidence": 0.88,
+      "source_confidence_label": "high",
+      "key_facts": [
+        "主要來源：Yahoo Finance",
+        "同題材來源數：1",
+        "同題材來源：Yahoo Finance",
+        "代表性原始標題：Dow Jones Futures: Techs Rebound, SpaceX Rises Despite Trump's Iran Threat; Warsh's Fed Debut Due"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 7,
+      "heat_score": 83,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "Yahoo Finance"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "spacex"
+    },
+    {
+      "id": "2026-06-19-headline-010",
+      "date": "2026-06-19",
+      "title_original": "This AI company wants to replace MRIs with a 60-second dip in the spa. Can that really work?",
+      "title_zh": "AI 與半導體投資熱潮延續，估值與供應鏈受關注",
+      "source": "MarketWatch",
+      "url": "https://www.marketwatch.com/story/this-ai-company-wants-to-replace-mris-with-a-60-second-dip-in-the-spa-can-that-really-work-3bce6681?mod=mw_rss_topstories",
+      "published_at": "Thu, 18 Jun 2026 23:22:00 GMT",
+      "category": "科技、AI與平台",
+      "themes": [
+        "科技、AI與平台",
+        "AI投資熱潮"
+      ],
+      "summary": "Midjourney推出醫療體掃描產品，致力提升醫療成像可及性。此舉可能推動AI醫療科技股受關注。",
+      "summary_zh": "Midjourney推出醫療體掃描產品，致力提升醫療成像可及性。此舉可能推動AI醫療科技股受關注。",
+      "summary_basis": "rss_description",
+      "summary_status": "verified_from_source_text",
+      "summary_quality_status": "passed",
+      "source_confidence": 0.84,
+      "source_confidence_label": "medium",
+      "key_facts": [
+        "主要來源：MarketWatch",
+        "同題材來源數：1",
+        "同題材來源：MarketWatch",
+        "代表性原始標題：This AI company wants to replace MRIs with a 60-second dip in the spa. Can that really work?"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 6,
+      "heat_score": 82,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "MarketWatch"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "ai-platforms"
+    },
+    {
+      "id": "2026-06-19-headline-012",
+      "date": "2026-06-19",
+      "title_original": "霍尔木兹海峡重开提振股债，半导体指数收创新高，原油走V，美元两连涨，黄金承压",
+      "title_zh": "霍爾木茲海峽重開提振股債，半導體指數收創新高，原油走V，美元兩連漲，黃金承壓",
+      "source": "華爾街見聞",
+      "url": "https://wallstreetcn.com/articles/3774963",
+      "published_at": "2026-06-19T08:15:17+08:00",
+      "category": "能源、外匯與商品",
+      "themes": [
+        "能源、外匯與商品"
+      ],
+      "summary": "",
+      "summary_zh": "",
+      "summary_basis": "meta_description",
+      "summary_status": "summary_unavailable_after_source_check",
+      "summary_quality_status": "unavailable",
+      "source_confidence": 0.76,
+      "source_confidence_label": "medium",
+      "key_facts": [
+        "主要來源：華爾街見聞",
+        "同題材來源數：1",
+        "同題材來源：華爾街見聞",
+        "代表性原始標題：霍尔木兹海峡重开提振股债，半导体指数收创新高，原油走V，美元两连涨，黄金承压"
+      ],
+      "market_impact": "",
+      "reporter_angle": "",
+      "importance_score": 5,
+      "heat_score": 70,
+      "source_count": 1,
+      "sources_reporting_same_topic": [
+        "華爾街見聞"
+      ],
+      "position_signal": "ranked_headline",
+      "time_horizon": "short_term",
+      "tracking_value": "",
+      "topic_key": "霍尔木兹海峡重开提振股债半导体指数收创新高原油走"
+    }
+  ],
+  "sources": [
+    {
+      "name": "Reuters Markets",
+      "url": "https://www.reuters.com/markets/",
+      "access": "Blocked",
+      "tier": 1
+    },
+    {
+      "name": "Reuters Technology",
+      "url": "https://www.reuters.com/technology/",
+      "access": "Blocked",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Top News",
+      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Markets",
+      "url": "https://www.cnbc.com/markets/",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "CNBC Technology",
+      "url": "https://www.cnbc.com/technology/",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "WSJ Markets",
+      "url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "WSJ Technology",
+      "url": "https://feeds.a.dj.com/rss/RSSWSJD.xml",
+      "access": "Full",
+      "tier": 1
+    },
+    {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/news/rssindex",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "MarketWatch Top Stories",
+      "url": "https://feeds.content.dowjones.io/public/rss/mw_topstories",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "The Guardian Business",
+      "url": "https://www.theguardian.com/business/rss",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "Nikkei Asia Business",
+      "url": "https://asia.nikkei.com/Business",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "TechCrunch AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "TechCrunch Startups",
+      "url": "https://techcrunch.com/category/startups/",
+      "access": "Full",
+      "tier": 2
+    },
+    {
+      "name": "Wallstreetcn",
+      "url": "https://wallstreetcn.com/",
+      "access": "Full",
+      "tier": 3
+    },
+    {
+      "name": "Caixin",
+      "url": "https://www.caixin.com/",
+      "access": "Full",
+      "tier": 3
+    },
+    {
+      "name": "LatePost",
+      "url": "https://www.latepost.com/",
+      "access": "Full",
+      "tier": 3
+    }
+  ],
+  "generation_report": {
+    "collection": {
+      "sources_total": 16,
+      "sources_accessible": 14,
+      "raw_candidates": 349,
+      "accepted_candidates": 37,
+      "skipped_by_rule": 46,
+      "skipped_stale": 16,
+      "keyword_candidates": 20,
+      "unique_candidates": 20,
+      "grouped_candidates": 12
+    },
+    "source_stats": [
+      {
+        "name": "Reuters Markets",
+        "tier": 1,
+        "access": "Blocked",
+        "status_code": 0,
+        "extracted_count": 0,
+        "accepted_count": 0,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Reuters Technology",
+        "tier": 1,
+        "access": "Blocked",
+        "status_code": 0,
+        "extracted_count": 0,
+        "accepted_count": 0,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "CNBC Top News",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 10,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "CNBC Markets",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 0,
+        "skipped_by_rule": 8,
+        "skipped_stale": 0
+      },
+      {
+        "name": "CNBC Technology",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 2,
+        "skipped_by_rule": 6,
+        "skipped_stale": 0
+      },
+      {
+        "name": "WSJ Markets",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 20,
+        "accepted_count": 0,
+        "skipped_by_rule": 1,
+        "skipped_stale": 11
+      },
+      {
+        "name": "WSJ Technology",
+        "tier": 1,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 20,
+        "accepted_count": 0,
+        "skipped_by_rule": 3,
+        "skipped_stale": 5
+      },
+      {
+        "name": "Yahoo Finance",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 4,
+        "skipped_by_rule": 4,
+        "skipped_stale": 0
+      },
+      {
+        "name": "MarketWatch Top Stories",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 10,
+        "accepted_count": 8,
+        "skipped_by_rule": 2,
+        "skipped_stale": 0
+      },
+      {
+        "name": "The Guardian Business",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 20,
+        "accepted_count": 7,
+        "skipped_by_rule": 1,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Nikkei Asia Business",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 0,
+        "skipped_by_rule": 5,
+        "skipped_stale": 0
+      },
+      {
+        "name": "TechCrunch AI",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 1,
+        "skipped_by_rule": 7,
+        "skipped_stale": 0
+      },
+      {
+        "name": "TechCrunch Startups",
+        "tier": 2,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 0,
+        "skipped_by_rule": 5,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Wallstreetcn",
+        "tier": 3,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 3,
+        "skipped_by_rule": 0,
+        "skipped_stale": 0
+      },
+      {
+        "name": "Caixin",
+        "tier": 3,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 30,
+        "accepted_count": 0,
+        "skipped_by_rule": 3,
+        "skipped_stale": 0
+      },
+      {
+        "name": "LatePost",
+        "tier": 3,
+        "access": "Full",
+        "status_code": 200,
+        "extracted_count": 9,
+        "accepted_count": 2,
+        "skipped_by_rule": 1,
+        "skipped_stale": 0
+      }
+    ],
+    "item_quality": {
+      "built_items": 12,
+      "publishable_items": 9,
+      "skipped_items": [
+        {
+          "id": "2026-06-19-headline-007",
+          "reason": "generic_title",
+          "source": "MarketWatch",
+          "title_original": "Two big reasons Accenture’s stock is sliding in the wake of earnings",
+          "title_zh": "圍繞 Two 的企業消息牽動投資者對盈利與估值的判斷"
+        },
+        {
+          "id": "2026-06-19-headline-008",
+          "reason": "generic_title",
+          "source": "The Guardian",
+          "title_original": "Trump’s Department of Labor claims without data that states defrauded government",
+          "title_zh": "重要財經與科技消息值得今日追蹤"
+        },
+        {
+          "id": "2026-06-19-headline-011",
+          "reason": "generic_title",
+          "source": "The Guardian",
+          "title_original": "Paramount rejected ad criticizing its owners and Warner Bros acquisition",
+          "title_zh": "圍繞 Warner 的企業消息牽動投資者對盈利與估值的判斷"
+        }
+      ],
+      "summaries_removed": 0,
+      "summary_rejections": [
+        {
+          "id": "2026-06-19-headline-012",
+          "reason": "unsupported_claims",
+          "basis": "meta_description",
+          "confidence": 0.76,
+          "preview": "霍爾木茲海峽重開提振市場，納指升2%創高，英偉達、英特爾股價雙雙走高，但美元走強壓抑黃金與原油表現。科技股與風險情緒受提振，美債收益率攀升反映市場對利率走勢的關注。"
+        }
+      ],
+      "context_confidence": {
+        "jsonld_article:0.88": 4,
+        "jsonld_article:0.80": 1,
+        "rss_description:0.84": 6,
+        "meta_description:0.76": 1
+      },
+      "minimum_publishable_items": 5
+    },
+    "ai": {
+      "summary_candidates": 12,
+      "limited_summary_candidates": 1,
+      "summary_updates": 8,
+      "response_chars": 968,
+      "parsed_summaries": 9,
+      "rejected_summaries": 1,
+      "response_samples": [
+        "{\"summaries\": {\"2026-06-19-headline-001\": \"五名亞馬遜員工於西雅圖市議會作證，討論數據中心建設暫停一年的影響。此舉可能影響其AI與雲端業務擴張，牽動科技股估值與市場風險情緒。\"}}",
+        "{\"summaries\": {\"2026-06-19-headline-002\": \"SpaceX股價週四下跌7%至178美元，接近其成交量加權平均價約180美元，市場關注其上市後估值與投資者信心。\"}}"
+      ],
+      "last_status": "ok"
+    }
+  },
+  "generated_at": "2026-06-19T08:15:17+08:00",
+  "email_body_zh": "今日國際財經與科技新聞以科技、AI與平台、企業、財報與交易、全球市場與宏觀、能源、外匯與商品為主線。頭版焦點包括AI 平台與算力投資熱度延續，估值、需求與競爭壓力同步受檢視、SpaceX 上市與估值話題升溫，市場同時關注配售、監管與財富效應、利率與通脹訊號交錯，市場重新評估美債收益率與風險資產定價。本期共有 4 個主題整合同題材來源，重點不只在單一標題，而是觀察新聞是否正在形成可持續的市場敘事；讀者可先讀焦點主題，再按分類核對原文和後續變化。\n\n網站：https://news.tinydreamlab.com/"
+}
