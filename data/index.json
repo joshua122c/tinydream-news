@@ -1,12 +1,12 @@
 {
   "latest_date": "2026-06-19",
-  "latest_update_id": "2026-06-19-1257",
+  "latest_update_id": "2026-06-19-1304",
   "latest_file": "data/briefs/2026-06-19.json",
   "briefs": [
     {
       "date": "2026-06-19",
-      "update_id": "2026-06-19-1257",
-      "file": "data/briefs/2026-06-19-1257.json",
+      "update_id": "2026-06-19-1304",
+      "file": "data/briefs/2026-06-19-1304.json",
       "latest_file": "data/briefs/2026-06-19.json",
       "title": "每日國際財經與科技新聞摘要",
       "summary": "整理全球市場、科技產業和主要企業消息，協助快速掌握今日值得追蹤的新聞主線。",
@@ -20,8 +20,16 @@
       ],
       "hot_topic_count": 5,
       "item_count": 11,
-      "generated_at": "2026-06-19T12:57:56+08:00",
+      "generated_at": "2026-06-19T13:04:20+08:00",
       "updates": [
+        {
+          "update_id": "2026-06-19-1304",
+          "file": "data/briefs/2026-06-19-1304.json",
+          "generated_at": "2026-06-19T13:04:20+08:00",
+          "item_count": 11,
+          "hot_topic_count": 5,
+          "title": "每日國際財經與科技新聞摘要"
+        },
         {
           "update_id": "2026-06-19-1257",
           "file": "data/briefs/2026-06-19-1257.json",
