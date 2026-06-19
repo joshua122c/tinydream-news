@@ -1457,6 +1457,8 @@ def title_from_original_fallback(original_title: str, current_title: str) -> str
         return "Paramount 拒刊批評廣告，併購爭議延燒"
     if "department of labor" in lower and "defrauded" in lower:
         return "美國勞工部指州政府申領失當，數據爭議升溫"
+    if "leveraged" in lower and ("loan" in lower or "credit" in lower):
+        return "槓桿貸款展期創一年新高，信貸風險受關注"
     return current_title
 
 
