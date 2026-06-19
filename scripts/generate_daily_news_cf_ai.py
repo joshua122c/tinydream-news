@@ -107,6 +107,8 @@ RUN_REPORT = {
         "summary_candidates": 0,
         "limited_summary_candidates": 0,
         "summary_updates": 0,
+        "retry_attempts": 0,
+        "retry_updates": 0,
         "response_chars": 0,
         "parsed_summaries": 0,
         "rejected_summaries": 0,
@@ -875,6 +877,9 @@ def normalize_ai_editorial_packets(data: dict, response_text: str = "", known_id
         if summary or takeaway or key_points:
             rows[item_id] = {"summary": summary, "takeaway": takeaway, "key_points": key_points}
 
+    if known_ids and len(known_ids) == 1 and any(key in data for key in ["summary", "summary_zh", "takeaway", "key_points"]):
+        add_packet(known_ids[0], data)
+
     for container_key in ["items", "stories", "summaries"]:
         value = data.get(container_key)
         if isinstance(value, dict):
@@ -910,6 +915,17 @@ def build_clean_summary_prompt(batch: list[dict]) -> str:
         "Keep company names in English where normal, such as Nvidia, Apple, SpaceX, OpenAI. Use Traditional Chinese terms such as 聯儲 and 半導體.\n"
         "Return JSON only, exactly in this shape: {\"items\":{\"item id\":{\"takeaway\":\"one sentence\",\"summary\":\"summary text\",\"key_points\":[\"point 1\",\"point 2\"]}}}.\n\n"
         + json.dumps(batch, ensure_ascii=False)
+    )
+
+
+def build_retry_summary_prompt(row: dict) -> str:
+    return (
+        "You are a Hong Kong Traditional Chinese financial news editor.\n"
+        "Use ONLY source_text. If a fact, number, company, person, policy, or market move is not in source_text, do not write it.\n"
+        "Write one useful summary of 70 to 150 Chinese characters and one takeaway sentence. Do not repeat the headline.\n"
+        "The summary must say what happened and why it matters for markets, rates, technology shares, commodities, valuation, or risk sentiment.\n"
+        "Return compact JSON only: {\"summary\":\"...\",\"takeaway\":\"...\"}.\n\n"
+        + json.dumps(row, ensure_ascii=False)
     )
 
 
@@ -966,8 +982,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
         known_ids = [row["id"] for row in batch]
         packets = normalize_ai_editorial_packets(data, response, known_ids)
         RUN_REPORT["ai"]["parsed_summaries"] += len(packets)
-        if not packets:
-            continue
+        accepted_any = False
         parsed_any = True
         for item_id, packet in packets.items():
             item = item_by_id.get(item_id)
@@ -995,6 +1010,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
                 item["summary_status"] = "verified_from_source_text"
                 item["summary_quality_status"] = "passed"
                 RUN_REPORT["ai"]["summary_updates"] += 1
+                accepted_any = True
             elif summary:
                 RUN_REPORT["ai"]["rejected_summaries"] += 1
                 RUN_REPORT["item_quality"]["summary_rejections"].append({
@@ -1004,6 +1020,46 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
                     "confidence": confidence,
                     "preview": summary[:120],
                 })
+        if not accepted_any and len(batch) == 1:
+            RUN_REPORT["ai"]["retry_attempts"] += 1
+            retry_response = call_cloudflare_ai(build_retry_summary_prompt(batch[0]))
+            RUN_REPORT["ai"]["response_chars"] += len(retry_response or "")
+            retry_data = parse_ai_json_object(retry_response)
+            retry_packets = normalize_ai_editorial_packets(retry_data, retry_response, known_ids)
+            RUN_REPORT["ai"]["parsed_summaries"] += len(retry_packets)
+            for item_id, packet in retry_packets.items():
+                item = item_by_id.get(item_id)
+                if not item:
+                    continue
+                summary = clean_ai_summary_output(packet.get("summary"))
+                takeaway = clean_ai_summary_output(packet.get("takeaway"))
+                context_text = context_by_id.get(item_id, "")
+                confidence = float(item.get("_summary_context_confidence") or 0)
+                rejection_reason = summary_rejection_reason(
+                    summary,
+                    context_text,
+                    item.get("title_original", ""),
+                    confidence,
+                    item.get("_summary_context_basis", ""),
+                )
+                if not rejection_reason and not contains_common_simplified_zh(summary):
+                    item["summary_zh"] = summary[:420]
+                    item["summary"] = item["summary_zh"]
+                    if takeaway and not contains_common_simplified_zh(takeaway):
+                        item["editorial_takeaway"] = takeaway[:180]
+                    item["summary_status"] = "verified_from_source_text"
+                    item["summary_quality_status"] = "passed"
+                    RUN_REPORT["ai"]["summary_updates"] += 1
+                    RUN_REPORT["ai"]["retry_updates"] += 1
+                    accepted_any = True
+                elif summary:
+                    RUN_REPORT["item_quality"]["summary_rejections"].append({
+                        "id": item.get("id", ""),
+                        "reason": rejection_reason or "simplified_chinese_retry",
+                        "basis": item.get("_summary_context_basis", ""),
+                        "confidence": confidence,
+                        "preview": summary[:120],
+                    })
     RUN_REPORT["ai"]["last_status"] = "ok" if parsed_any else "empty_or_unparseable_response"
 
 
