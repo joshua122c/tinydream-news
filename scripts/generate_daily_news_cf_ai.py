@@ -891,7 +891,9 @@ def normalize_ai_editorial_packets(data: dict, response_text: str = "", known_id
         return rows
 
     summaries = normalize_ai_summaries(data, response_text, known_ids)
-    return {item_id: {"summary": summary, "takeaway": "", "key_points": []} for item_id, summary in summaries.items()}
+    for item_id, summary in summaries.items():
+        add_packet(item_id, summary)
+    return rows
 
 
 def build_clean_summary_prompt(batch: list[dict]) -> str:
@@ -1535,6 +1537,8 @@ def title_from_original_fallback(original_title: str, current_title: str) -> str
         return "美國勞工部指州政府申領失當，數據爭議升溫"
     if "leveraged" in lower and ("loan" in lower or "credit" in lower):
         return "槓桿貸款展期創一年新高，信貸風險受關注"
+    if "crude oil" in lower or "oil prices" in lower or "wti" in lower:
+        return "原油價格反彈，商品與通脹交易受關注"
     return current_title
 
 
@@ -1545,7 +1549,7 @@ def build_item(candidate: dict, idx: int) -> dict:
     related = as_list(candidate.get("related_candidates")) or [candidate]
     cluster = candidate.get("cluster_key") or cluster_key(original_title)
     title_zh = topic_title_from_cluster(cluster, primary_title_zh, related, category)
-    if looks_like_generic_editorial_title(title_zh) or re.search(r"圍繞\s+\w+|重要財經|相關價格變化", title_zh):
+    if looks_like_generic_editorial_title(title_zh) or re.search(r"圍繞\s+\w+|重要財經|相關價格變化|Crude Oil Prices", title_zh):
         title_zh = title_from_original_fallback(original_title, title_zh)
     source = source_label(candidate.get("source", ""))
     same_topic_sources = as_list(candidate.get("sources_reporting_same_topic")) or [source]
