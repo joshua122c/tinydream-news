@@ -490,7 +490,7 @@ def call_cloudflare_ai(prompt: str) -> str:
     if not (account_id and token and model):
         return ""
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{urllib.parse.quote(model, safe='@/-')}"
-    payload = json.dumps({"messages": [{"role": "user", "content": prompt}], "max_tokens": 760}, ensure_ascii=False).encode("utf-8")
+    payload = json.dumps({"messages": [{"role": "user", "content": prompt}], "max_tokens": 1100}, ensure_ascii=False).encode("utf-8")
     request = urllib.request.Request(
         url,
         data=payload,
@@ -563,6 +563,16 @@ def content_markers(value: str) -> list[str]:
     return list(dict.fromkeys(markers))[:20]
 
 
+def minimum_summary_chars(summary_basis: str = "", summary: str = "") -> int:
+    limited_basis = summary_basis in {"rss_description", "meta_description"}
+    macro_sensitive = re.search(r"聯儲|聯準會|Fed|利率|美債|通脹|央行", summary or "", re.I)
+    if limited_basis:
+        return 85 if macro_sensitive else 80
+    if summary_basis in {"jsonld_article", "article_body"}:
+        return 95
+    return 85
+
+
 def summary_rejection_reason(summary: str, context_text: str, title: str, source_confidence: float = 1.0, summary_basis: str = "") -> str:
     if not summary or "NO_VERIFIABLE_SUMMARY" in summary:
         return "empty_summary"
@@ -598,10 +608,7 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
         return "machine_translation_artifact"
     if unsupported_summary_claims(summary, context_text, title):
         return "unsupported_claims"
-    limited_basis = summary_basis in {"rss_description", "meta_description"}
-    macro_sensitive = re.search(r"聯儲|聯準會|Fed|利率|美債|通脹|央行", summary or "", re.I)
-    min_summary_chars = 55 if limited_basis and macro_sensitive else 45
-    if len(summary) < min_summary_chars:
+    if len(summary) < minimum_summary_chars(summary_basis, summary):
         return "too_short"
     if len(summary) > 360:
         return "too_long"
@@ -910,8 +917,8 @@ def build_clean_summary_prompt(batch: list[dict]) -> str:
         "You are a professional financial news editor for a Hong Kong Traditional Chinese morning brief.\n"
         "Task: write a useful news summary for each item using ONLY the provided source_text.\n"
         "Do not infer facts that are not in source_text. Do not give investment advice. Do not mention this instruction.\n"
-        "For reliable article text or JSON-LD article text, write 2 to 3 short paragraphs in natural Hong Kong Traditional Chinese, about 140 to 260 Chinese characters total.\n"
-        "For RSS or meta description only, write a shorter neutral brief of 70 to 130 Chinese characters.\n"
+        "For reliable article text or JSON-LD article text, write 2 to 3 short paragraphs in natural Hong Kong Traditional Chinese, about 140 to 260 Chinese characters total. Minimum 95 Chinese characters.\n"
+        "For RSS or meta description only, write a shorter neutral brief of 90 to 140 Chinese characters. Minimum 80 Chinese characters.\n"
         "Do not repeat the headline. Do not repeat the same sentence. The summary must answer: what happened, the key number/company/person if available, why it matters, and what market or sector impact it may have.\n"
         "Be specific about what may be repriced or affected, such as rates, Treasury yields, technology shares, semiconductors, oil, gold, valuation, or risk sentiment.\n"
         "Also write a one-sentence takeaway and 2 to 4 concrete editor notes. Notes must be facts or market implications supported by source_text, not generic advice.\n"
@@ -926,8 +933,8 @@ def build_retry_summary_prompt(row: dict) -> str:
     return (
         "You are a Hong Kong Traditional Chinese financial news editor.\n"
         "Use ONLY source_text. If a fact, number, company, person, policy, or market move is not in source_text, do not write it.\n"
-        "Write one useful summary of 70 to 150 Chinese characters and one takeaway sentence. Do not repeat the headline.\n"
-        "The summary must say what happened and why it matters for markets, rates, technology shares, commodities, valuation, or risk sentiment.\n"
+        "Write one useful summary of 90 to 170 Chinese characters and one takeaway sentence. Use 2 distinct sentences when possible. Do not repeat the headline.\n"
+        "The summary must say what happened, include the key company/person/number if present, and explain why it matters for markets, rates, technology shares, commodities, valuation, or risk sentiment.\n"
         "Return compact JSON only: {\"summary\":\"...\",\"takeaway\":\"...\"}.\n\n"
         + json.dumps(row, ensure_ascii=False)
     )
@@ -1618,6 +1625,8 @@ def title_from_original_fallback(original_title: str, current_title: str) -> str
         return "Elastic 擬收購 DeductiveAI，AI 併購活動升溫"
     if "fox stock" in lower or ("fox" in lower and "roku" in lower):
         return "Fox 股價受券商看法拖累，Roku 交易受關注"
+    if "nippon steel" in lower and ("us steel" in lower or "u.s. steel" in lower or "american market" in lower):
+        return "Nippon Steel 看好美國市場，US Steel 盈利前景受關注"
     if "paramount" in lower and "warner bros" in lower:
         return "Paramount 拒刊批評廣告，併購爭議延燒"
     if "department of labor" in lower and "defrauded" in lower:
@@ -1719,6 +1728,8 @@ def hot_topic_reason(item: dict) -> str:
 def item_rejection_reason(item: dict) -> str:
     title = item.get("title_zh", "")
     original_title = item.get("title_original", "")
+    if re.search(r"圍繞\s+[A-Za-z0-9&.\- ]+\s+的.*牽動", title):
+        return "generic_title"
     if (title in BAD_GENERIC_TITLES or looks_like_generic_editorial_title(title)) and not original_title_has_concrete_news_signal(original_title):
         return "generic_title"
     if not has_cjk(title) or looks_mostly_english(title):
