@@ -1110,6 +1110,9 @@ function workbenchHero(brief) {
   const lead = leadItem(brief);
   const leadHeadline = editorialHeadlineParts(lead || {}, "lead");
   const updateTime = brief.generated_at ? `${formatTime(brief.generated_at)} HKT` : brief.date;
+  const leadSummary = displaySummary(lead);
+  const leadParagraphs = summaryParagraphs(leadSummary, itemSummaryTier(lead || {}).grade);
+  const leadCanExpand = shouldShowSummaryToggle(leadSummary, leadParagraphs, summaryPreview(leadSummary || oneLineConclusion(lead || {})));
   return `<section class="brief-hero">
     <div class="brief-hero-top">
       <p class="section-kicker">Editorial Morning Brief</p>
@@ -1123,7 +1126,7 @@ function workbenchHero(brief) {
         ${leadHeadline.dek ? `<p class="lead-dek">${escapeHtml(leadHeadline.dek)}</p>` : ""}
         ${leadSummaryBlock(lead)}
         <div class="lead-actions">
-          ${displaySummary(lead) ? `<button class="summary-toggle" type="button" data-toggle-summary>展開完整摘要</button>` : ""}
+          ${leadCanExpand ? `<button class="summary-toggle" type="button" data-toggle-summary>展開摘要</button>` : ""}
           ${lead?.url ? `<a class="action primary-action" href="${escapeHtml(lead.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>` : ""}
         </div>
       </article>
@@ -1289,6 +1292,7 @@ function renderWorkbenchArticle(item, brief, index) {
   const title = editorialHeadlineParts(item);
   const paragraphs = summaryParagraphs(summary, tier.grade);
   const preview = summaryPreview(summary || oneLineConclusion(item));
+  const canExpand = shouldShowSummaryToggle(summary, paragraphs, preview);
   return `<article class="workbench-article ${tier.grade === "A" ? "full" : "limited"} summary-collapsed ${read ? "is-read" : ""}" id="item-${escapeHtml(item.id)}" data-article-id="${escapeHtml(item.id)}" data-grade="${escapeHtml(tier.grade)}">
     <div class="article-main">
       <div class="article-meta-row">
@@ -1308,7 +1312,7 @@ function renderWorkbenchArticle(item, brief, index) {
       <div class="article-footer">
         <div class="tag-row">${asList(item.themes).slice(0, 4).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
         <div class="article-actions">
-          ${paragraphs.length ? `<button type="button" data-toggle-summary>展開摘要</button>` : ""}
+          ${canExpand ? `<button type="button" data-toggle-summary>展開摘要</button>` : ""}
           <button type="button" data-mark-read="${escapeHtml(item.id)}">${read ? "已讀" : "標記已讀"}</button>
           <a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${UI.readSource}</a>
         </div>
@@ -1324,6 +1328,14 @@ function summaryPreview(value = "") {
   const chars = Array.from(text);
   if (chars.length <= 115) return text;
   return `${chars.slice(0, 108).join("")}…`;
+}
+
+function shouldShowSummaryToggle(summary, paragraphs, preview) {
+  const fullText = String(summary || "").replace(/\s+/g, "");
+  const previewText = String(preview || "").replace(/…$/, "").replace(/\s+/g, "");
+  if (!fullText || !paragraphs.length) return false;
+  if (fullText.length <= previewText.length + 18) return false;
+  return true;
 }
 
 function oneLineConclusion(item) {
@@ -1356,7 +1368,10 @@ function isVagueSummarySentence(value = "") {
 }
 
 function articleKeyPoints(item) {
-  const facts = asList(item.key_facts).filter((fact) => !String(fact).includes("摘要依據")).slice(0, 3);
+  const facts = asList(item.key_facts).filter((fact) => {
+    const text = String(fact || "");
+    return text && !/摘要|主要來源|同題材來源|代表性原始標題/.test(text);
+  }).slice(0, 2);
   const points = [...facts];
   const summary = displaySummary(item);
   summary.split(/[。；;]/).map((part) => part.trim()).filter((part) => part.length >= 12).slice(0, 3).forEach((part) => {

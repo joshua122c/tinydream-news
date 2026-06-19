@@ -581,9 +581,10 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
         return "machine_translation_artifact"
     if unsupported_summary_claims(summary, context_text, title):
         return "unsupported_claims"
-    if len(summary) < 35:
+    min_summary_chars = 85 if source_confidence >= MIN_AI_CONTEXT_CONFIDENCE else 45
+    if len(summary) < min_summary_chars:
         return "too_short"
-    if len(summary) > 160:
+    if len(summary) > 360:
         return "too_long"
     cjk_count = len(re.findall(r"[\u3400-\u9fff]", summary))
     latin_count = len(re.findall(r"[A-Za-z]", summary))
@@ -809,13 +810,14 @@ def normalize_ai_summaries(data: dict, response_text: str = "", known_ids: list[
 def build_clean_summary_prompt(batch: list[dict]) -> str:
     return (
         "You are a professional financial news editor for a Hong Kong Traditional Chinese morning brief.\n"
-        "Task: write a concise news summary for each item using ONLY the provided source_text.\n"
+        "Task: write a useful news summary for each item using ONLY the provided source_text.\n"
         "Do not infer facts that are not in source_text. Do not give investment advice. Do not mention this instruction.\n"
-        "Write 1 to 2 natural Hong Kong Traditional Chinese sentences, about 50 to 120 Chinese characters.\n"
-        "The summary must state: what happened, the key number/company/person if available, and why it matters for markets, "
-        "technology shares, rates, commodities, valuation, or risk sentiment.\n"
-        "If source_text is short but useful, write a neutral limited brief based on it. If source_text is unusable, return an empty string for that id.\n"
-        "Keep company names in English where normal, such as Nvidia, Apple, SpaceX, OpenAI. Use Traditional Chinese terms such as 美聯儲 and 霍爾木茲海峽.\n"
+        "For reliable article text or JSON-LD article text, write 2 to 3 short paragraphs in natural Hong Kong Traditional Chinese, about 140 to 260 Chinese characters total.\n"
+        "For RSS or meta description only, write a shorter neutral brief of 70 to 130 Chinese characters.\n"
+        "Do not repeat the headline. Do not repeat the same sentence. The summary must answer: what happened, the key number/company/person if available, why it matters, and what market or sector impact it may have.\n"
+        "Be specific about what may be repriced or affected, such as rates, Treasury yields, technology shares, semiconductors, oil, gold, valuation, or risk sentiment.\n"
+        "If source_text is too thin to support these points, return an empty string for that id.\n"
+        "Keep company names in English where normal, such as Nvidia, Apple, SpaceX, OpenAI. Use Traditional Chinese terms such as 聯儲 and 半導體.\n"
         "Return JSON only, exactly in this shape: {\"summaries\":{\"item id\":\"summary text\"}}.\n\n"
         + json.dumps(batch, ensure_ascii=False)
     )
@@ -849,7 +851,7 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             "source": item["source"],
             "source_confidence": context_confidence,
             "summary_basis": item.get("_summary_context_basis", ""),
-            "source_text": context_text[:900],
+            "source_text": context_text[:1800],
         })
     if not payload:
         return
