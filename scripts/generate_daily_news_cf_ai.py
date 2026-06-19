@@ -680,6 +680,7 @@ def summary_supported_by_text(summary: str, context_text: str, title: str, sourc
 
 def clean_ai_summary_output(value: object) -> str:
     text = to_traditional_zh(clean_text(value))
+    text = re.sub(r"\bseeking\b", "尋求", text, flags=re.I)
     text = re.sub(r'["”」』\']?\s*[:：]\s*["“「『\']?\s*\}+\s*$', "", text)
     text = re.sub(r'["”」』\']?\s*\}+[,]?\s*$', "", text)
     text = text.strip(" \"'，,;；")
@@ -1595,6 +1596,8 @@ def title_from_original_fallback(original_title: str, current_title: str) -> str
         return "槓桿貸款展期創一年新高，信貸風險受關注"
     if "crude oil" in lower or "oil prices" in lower or "wti" in lower:
         return "原油價格反彈，商品與通脹交易受關注"
+    if ("saudis" in lower or "saudi" in lower) and "ea" in lower and ("deal" in lower or "approval" in lower):
+        return "沙特基金 550 億美元收購 EA，等待歐盟審批"
     return current_title
 
 
@@ -1605,7 +1608,7 @@ def build_item(candidate: dict, idx: int) -> dict:
     related = as_list(candidate.get("related_candidates")) or [candidate]
     cluster = candidate.get("cluster_key") or cluster_key(original_title)
     title_zh = topic_title_from_cluster(cluster, primary_title_zh, related, category)
-    if looks_like_generic_editorial_title(title_zh) or re.search(r"圍繞\s+\w+|重要財經|相關價格變化|Crude Oil Prices", title_zh):
+    if looks_like_generic_editorial_title(title_zh) or re.search(r"圍繞\s+\w+|重要財經|相關價格變化|Crude Oil Prices|Saudis", title_zh):
         title_zh = title_from_original_fallback(original_title, title_zh)
     source = source_label(candidate.get("source", ""))
     same_topic_sources = as_list(candidate.get("sources_reporting_same_topic")) or [source]
