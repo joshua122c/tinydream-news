@@ -599,7 +599,7 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
     if unsupported_summary_claims(summary, context_text, title):
         return "unsupported_claims"
     limited_basis = summary_basis in {"rss_description", "meta_description"}
-    min_summary_chars = 55 if limited_basis else 60 if source_confidence >= MIN_AI_CONTEXT_CONFIDENCE else 45
+    min_summary_chars = 55 if limited_basis else 45
     if len(summary) < min_summary_chars:
         return "too_short"
     if len(summary) > 360:
