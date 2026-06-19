@@ -597,7 +597,7 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
     if unsupported_summary_claims(summary, context_text, title):
         return "unsupported_claims"
     limited_basis = summary_basis in {"rss_description", "meta_description"}
-    min_summary_chars = 65 if limited_basis else 80 if source_confidence >= MIN_AI_CONTEXT_CONFIDENCE else 45
+    min_summary_chars = 55 if limited_basis else 60 if source_confidence >= MIN_AI_CONTEXT_CONFIDENCE else 45
     if len(summary) < min_summary_chars:
         return "too_short"
     if len(summary) > 360:
@@ -850,6 +850,19 @@ def normalize_ai_editorial_packets(data: dict, response_text: str = "", known_id
         if not item_id:
             return
         if isinstance(value, str):
+            nested = parse_ai_json_object(value)
+            if nested:
+                add_packet(item_id, nested)
+                return
+            summary_match = re.search(r'"summary"\s*:\s*"([^"]+)', value, re.S)
+            takeaway_match = re.search(r'"takeaway"\s*:\s*"([^"]+)', value, re.S)
+            if summary_match:
+                rows[item_id] = {
+                    "summary": clean_ai_summary_output(summary_match.group(1)),
+                    "takeaway": clean_ai_summary_output(takeaway_match.group(1)) if takeaway_match else "",
+                    "key_points": [],
+                }
+                return
             summary = clean_ai_summary_output(value)
             if summary:
                 rows[item_id] = {"summary": summary, "takeaway": "", "key_points": []}
