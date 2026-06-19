@@ -823,6 +823,64 @@ def normalize_ai_summaries(data: dict, response_text: str = "", known_ids: list[
     return rows
 
 
+def clean_ai_list(value: object, limit: int = 4) -> list[str]:
+    if isinstance(value, str):
+        parts = re.split(r"[；;。]\s*|\n+", value)
+    elif isinstance(value, list):
+        parts = value
+    else:
+        parts = []
+    rows = []
+    for part in parts:
+        text = clean_ai_summary_output(part)
+        if text and len(text) >= 8 and text not in rows:
+            rows.append(text[:90])
+        if len(rows) >= limit:
+            break
+    return rows
+
+
+def normalize_ai_editorial_packets(data: dict, response_text: str = "", known_ids: list[str] | None = None) -> dict[str, dict]:
+    rows: dict[str, dict] = {}
+    if not isinstance(data, dict):
+        data = {}
+
+    def add_packet(item_id: str, value: object) -> None:
+        item_id = clean_text(item_id)
+        if not item_id:
+            return
+        if isinstance(value, str):
+            summary = clean_ai_summary_output(value)
+            if summary:
+                rows[item_id] = {"summary": summary, "takeaway": "", "key_points": []}
+            return
+        if not isinstance(value, dict):
+            return
+        summary = clean_ai_summary_output(value.get("summary") or value.get("summary_zh") or value.get("text") or value.get("brief"))
+        takeaway = clean_ai_summary_output(value.get("takeaway") or value.get("conclusion") or value.get("one_line"))
+        key_points = clean_ai_list(value.get("key_points") or value.get("points") or value.get("editor_notes"))
+        if summary or takeaway or key_points:
+            rows[item_id] = {"summary": summary, "takeaway": takeaway, "key_points": key_points}
+
+    for container_key in ["items", "stories", "summaries"]:
+        value = data.get(container_key)
+        if isinstance(value, dict):
+            for key, row in value.items():
+                add_packet(str(key), row)
+        elif isinstance(value, list):
+            for row in value:
+                if isinstance(row, dict):
+                    add_packet(row.get("id") or row.get("item_id") or row.get("story_id"), row)
+
+    if rows:
+        if known_ids and len(known_ids) == 1 and known_ids[0] not in rows and len(rows) == 1:
+            return {known_ids[0]: next(iter(rows.values()))}
+        return rows
+
+    summaries = normalize_ai_summaries(data, response_text, known_ids)
+    return {item_id: {"summary": summary, "takeaway": "", "key_points": []} for item_id, summary in summaries.items()}
+
+
 def build_clean_summary_prompt(batch: list[dict]) -> str:
     return (
         "You are a professional financial news editor for a Hong Kong Traditional Chinese morning brief.\n"
@@ -832,9 +890,10 @@ def build_clean_summary_prompt(batch: list[dict]) -> str:
         "For RSS or meta description only, write a shorter neutral brief of 70 to 130 Chinese characters.\n"
         "Do not repeat the headline. Do not repeat the same sentence. The summary must answer: what happened, the key number/company/person if available, why it matters, and what market or sector impact it may have.\n"
         "Be specific about what may be repriced or affected, such as rates, Treasury yields, technology shares, semiconductors, oil, gold, valuation, or risk sentiment.\n"
-        "If source_text is too thin to support these points, return an empty string for that id.\n"
+        "Also write a one-sentence takeaway and 2 to 4 concrete editor notes. Notes must be facts or market implications supported by source_text, not generic advice.\n"
+        "If source_text is too thin to support these points, return an empty summary and empty notes for that id.\n"
         "Keep company names in English where normal, such as Nvidia, Apple, SpaceX, OpenAI. Use Traditional Chinese terms such as 聯儲 and 半導體.\n"
-        "Return JSON only, exactly in this shape: {\"summaries\":{\"item id\":\"summary text\"}}.\n\n"
+        "Return JSON only, exactly in this shape: {\"items\":{\"item id\":{\"takeaway\":\"one sentence\",\"summary\":\"summary text\",\"key_points\":[\"point 1\",\"point 2\"]}}}.\n\n"
         + json.dumps(batch, ensure_ascii=False)
     )
 
@@ -845,8 +904,6 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
     for item in items:
         context_text = clean_text(item.get("_summary_context_text", ""))
         context_confidence = float(item.get("_summary_context_confidence") or 0)
-        if item.get("summary_zh") and item.get("summary_status") == "verified_from_source_text":
-            continue
         if not context_text:
             continue
         if context_confidence < MIN_LIMITED_AI_CONTEXT_CONFIDENCE:
@@ -892,16 +949,18 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             RUN_REPORT["ai"]["response_samples"].append(clean_text(response)[:220])
         data = parse_ai_json_object(response)
         known_ids = [row["id"] for row in batch]
-        summaries = normalize_ai_summaries(data, response, known_ids)
-        RUN_REPORT["ai"]["parsed_summaries"] += len(summaries)
-        if not summaries:
+        packets = normalize_ai_editorial_packets(data, response, known_ids)
+        RUN_REPORT["ai"]["parsed_summaries"] += len(packets)
+        if not packets:
             continue
         parsed_any = True
-        for item_id, value in summaries.items():
+        for item_id, packet in packets.items():
             item = item_by_id.get(item_id)
             if not item:
                 continue
-            summary = clean_ai_summary_output(value)
+            summary = clean_ai_summary_output(packet.get("summary"))
+            takeaway = clean_ai_summary_output(packet.get("takeaway"))
+            key_points = clean_ai_list(packet.get("key_points"))
             context_text = context_by_id.get(item_id, "")
             confidence = float(item.get("_summary_context_confidence") or 0)
             rejection_reason = summary_rejection_reason(
@@ -914,6 +973,10 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             if not rejection_reason and not contains_common_simplified_zh(summary):
                 item["summary_zh"] = summary[:420]
                 item["summary"] = item["summary_zh"]
+                if takeaway and not contains_common_simplified_zh(takeaway):
+                    item["editorial_takeaway"] = takeaway[:180]
+                if key_points and not any(contains_common_simplified_zh(point) for point in key_points):
+                    item["editor_notes"] = key_points[:4]
                 item["summary_status"] = "verified_from_source_text"
                 item["summary_quality_status"] = "passed"
                 RUN_REPORT["ai"]["summary_updates"] += 1
@@ -1506,6 +1569,8 @@ def build_item(candidate: dict, idx: int) -> dict:
         "themes": themes_for(category, original_title),
         "summary": summary_zh,
         "summary_zh": summary_zh,
+        "editorial_takeaway": "",
+        "editor_notes": [],
         "summary_basis": summary_basis,
         "summary_status": summary_status,
         "summary_quality_status": "passed" if summary_zh else "unavailable",

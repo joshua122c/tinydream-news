@@ -1339,6 +1339,8 @@ function shouldShowSummaryToggle(summary, paragraphs, preview) {
 }
 
 function oneLineConclusion(item) {
+  const takeaway = editorialTakeaway(item);
+  if (takeaway) return compactEditorialText(takeaway, "brief");
   const summary = displaySummary(item);
   if (summary) {
     const sentence = summary.split(/[。；;]/).map((part) => part.trim()).find((part) => part.length >= 8) || summary;
@@ -1368,6 +1370,10 @@ function isVagueSummarySentence(value = "") {
 }
 
 function articleKeyPoints(item) {
+  const editorialNotes = asList(item?.editor_notes)
+    .map((point) => String(point || "").trim())
+    .filter((point) => point.length >= 8 && !isWeakSummary(point));
+  if (editorialNotes.length) return editorialNotes.slice(0, 4);
   const facts = asList(item.key_facts).filter((fact) => {
     const text = String(fact || "");
     return text && !/摘要|主要來源|同題材來源|代表性原始標題/.test(text);
