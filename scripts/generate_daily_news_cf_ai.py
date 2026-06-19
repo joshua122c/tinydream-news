@@ -919,8 +919,8 @@ def build_clean_summary_prompt(batch: list[dict]) -> str:
         "Do not infer facts that are not in source_text. Do not give investment advice. Do not mention this instruction.\n"
         "For reliable article text or JSON-LD article text, write 2 to 3 short paragraphs in natural Hong Kong Traditional Chinese, about 140 to 260 Chinese characters total. Minimum 95 Chinese characters.\n"
         "For RSS or meta description only, write a shorter neutral brief of 90 to 140 Chinese characters. Minimum 80 Chinese characters.\n"
-        "Do not repeat the headline. Do not repeat the same sentence. The summary must answer: what happened, the key number/company/person if available, why it matters, and what market or sector impact it may have.\n"
-        "Be specific about what may be repriced or affected, such as rates, Treasury yields, technology shares, semiconductors, oil, gold, valuation, or risk sentiment.\n"
+        "Do not repeat the headline. Do not repeat the same sentence. The summary must answer: what happened, the key number/company/person if available, and the concrete consequence stated or directly supported by source_text.\n"
+        "Never use filler endings such as 市場關注, 投資者關注, 市場擔憂, 此舉可能影響, 可能牽動, 風險偏好, or 估值壓力 unless the source_text gives the exact mechanism. If there is no concrete market consequence in source_text, stop after the verified facts.\n"
         "Also write a one-sentence takeaway and 2 to 4 concrete editor notes. Notes must be facts or market implications supported by source_text, not generic advice.\n"
         "If source_text is too thin to support these points, return an empty summary and empty notes for that id.\n"
         "Keep company names in English where normal, such as Nvidia, Apple, SpaceX, OpenAI. Use Traditional Chinese terms such as 聯儲 and 半導體.\n"
@@ -934,7 +934,7 @@ def build_retry_summary_prompt(row: dict) -> str:
         "You are a Hong Kong Traditional Chinese financial news editor.\n"
         "Use ONLY source_text. If a fact, number, company, person, policy, or market move is not in source_text, do not write it.\n"
         "Write one useful summary of 90 to 170 Chinese characters and one takeaway sentence. Use 2 distinct sentences when possible. Do not repeat the headline.\n"
-        "The summary must say what happened, include the key company/person/number if present, and explain why it matters for markets, rates, technology shares, commodities, valuation, or risk sentiment.\n"
+        "The summary must say what happened and include the key company/person/number if present. Do not add generic market-impact filler. Never write 市場關注, 投資者關注, 此舉可能影響, 可能牽動, 風險偏好, or 估值壓力 unless the exact mechanism is in source_text.\n"
         "Return compact JSON only: {\"summary\":\"...\",\"takeaway\":\"...\"}.\n\n"
         + json.dumps(row, ensure_ascii=False)
     )
@@ -967,8 +967,21 @@ def can_publish_limited_summary(summary: str, rejection_reason: str) -> bool:
     return rejection_reason == "too_short" and len(summary or "") >= 60
 
 
-def normalize_publishable_summary(summary: str) -> str:
+def remove_generic_summary_padding(summary: str) -> str:
     text = clean_ai_summary_output(summary)
+    if not text:
+        return ""
+    text = re.sub(r"[，,]?(市場關注|投資者關注|市場擔憂|市場焦點)[^。！？!?]*(?:[。！？!?]|$)", "。", text)
+    text = re.sub(r"[，,]?(此舉可能|這可能|可能)(影響|牽動|加劇|推升|拖累)[^。！？!?]*(?:[。！？!?]|$)", "。", text)
+    text = re.sub(r"[，,]?對[^。！？!?]{0,18}(科技股|半導體|能源股|風險偏好|投資情緒|估值)[^。！？!?]*(?:[。！？!?]|$)", "。", text)
+    text = re.sub(r"。{2,}", "。", text).strip(" ，,。")
+    if text:
+        text += "。"
+    return clean_text(text)
+
+
+def normalize_publishable_summary(summary: str) -> str:
+    text = remove_generic_summary_padding(summary)
     if text and not re.search(r"[。！？!?]$", text):
         text += "。"
     return text
@@ -1048,6 +1061,15 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             limited_summary = can_publish_limited_summary(summary, rejection_reason)
             if (not rejection_reason or limited_summary) and not contains_common_simplified_zh(summary):
                 summary = normalize_publishable_summary(summary)
+                if len(summary) < 55:
+                    RUN_REPORT["item_quality"]["summary_rejections"].append({
+                        "id": item.get("id", ""),
+                        "reason": "generic_padding_only",
+                        "basis": item.get("_summary_context_basis", ""),
+                        "confidence": confidence,
+                        "preview": summary[:120],
+                    })
+                    continue
                 item["summary_zh"] = summary[:420]
                 item["summary"] = item["summary_zh"]
                 if takeaway and not contains_common_simplified_zh(takeaway):
@@ -1093,6 +1115,15 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
                 limited_summary = can_publish_limited_summary(summary, rejection_reason)
                 if (not rejection_reason or limited_summary) and not contains_common_simplified_zh(summary):
                     summary = normalize_publishable_summary(summary)
+                    if len(summary) < 55:
+                        RUN_REPORT["item_quality"]["summary_rejections"].append({
+                            "id": item.get("id", ""),
+                            "reason": "generic_padding_only_retry",
+                            "basis": item.get("_summary_context_basis", ""),
+                            "confidence": confidence,
+                            "preview": summary[:120],
+                        })
+                        continue
                     item["summary_zh"] = summary[:420]
                     item["summary"] = item["summary_zh"]
                     if takeaway and not contains_common_simplified_zh(takeaway):
@@ -1787,6 +1818,10 @@ def sanitize_items_for_publication(items: list[dict]) -> list[dict]:
             continue
         seen_titles.add(title)
         summary = item.get("summary_zh", "")
+        if summary:
+            summary = normalize_publishable_summary(summary)
+            item["summary"] = summary
+            item["summary_zh"] = summary
         summary_rejection = summary_rejection_reason(
             summary,
             item.get("_summary_context_text", ""),
