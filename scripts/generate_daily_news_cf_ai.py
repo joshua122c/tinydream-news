@@ -195,6 +195,21 @@ def looks_like_generic_editorial_title(value: str) -> bool:
     return False
 
 
+def original_title_has_concrete_news_signal(value: str) -> bool:
+    text = value or ""
+    if re.search(r"\b[A-Z][A-Za-z&.-]{2,}\b", text):
+        return True
+    if re.search(r"\b\d+(?:[.,]\d+)?%?\b|\$[0-9]", text):
+        return True
+    if re.search(
+        r"\b(stock|shares|earnings|IPO|deal|buy|sell|merger|acquisition|tariff|inflation|Fed|dollar|yen|oil|gold|AI|chip|data center)\b",
+        text,
+        re.I,
+    ):
+        return True
+    return False
+
+
 def clean_text(value: object) -> str:
     if value is None:
         return ""
@@ -1509,7 +1524,8 @@ def hot_topic_reason(item: dict) -> str:
 
 def item_rejection_reason(item: dict) -> str:
     title = item.get("title_zh", "")
-    if title in BAD_GENERIC_TITLES or looks_like_generic_editorial_title(title):
+    original_title = item.get("title_original", "")
+    if (title in BAD_GENERIC_TITLES or looks_like_generic_editorial_title(title)) and not original_title_has_concrete_news_signal(original_title):
         return "generic_title"
     if not has_cjk(title) or looks_mostly_english(title):
         return "bad_title_language"
