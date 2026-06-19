@@ -177,7 +177,7 @@ def has_cjk(value: str) -> bool:
 def looks_mostly_english(value: str) -> bool:
     letters = len(re.findall(r"[A-Za-z]", value or ""))
     cjk = len(re.findall(r"[\u3400-\u9fff]", value or ""))
-    return letters > 12 and letters > cjk * 1.3
+    return letters > 24 and letters > cjk * 1.8
 
 
 def looks_like_generic_editorial_title(value: str) -> bool:
@@ -567,10 +567,10 @@ def minimum_summary_chars(summary_basis: str = "", summary: str = "") -> int:
     limited_basis = summary_basis in {"rss_description", "meta_description"}
     macro_sensitive = re.search(r"聯儲|聯準會|Fed|利率|美債|通脹|央行", summary or "", re.I)
     if limited_basis:
-        return 85 if macro_sensitive else 80
+        return 75 if macro_sensitive else 70
     if summary_basis in {"jsonld_article", "article_body"}:
-        return 95
-    return 85
+        return 82
+    return 75
 
 
 def summary_rejection_reason(summary: str, context_text: str, title: str, source_confidence: float = 1.0, summary_basis: str = "") -> str:
@@ -1622,11 +1622,11 @@ def title_from_original_fallback(original_title: str, current_title: str) -> str
     if "accenture" in lower and ("stock" in lower or "earnings" in lower):
         return "Accenture 業績後股價受壓，市場關注需求與估值"
     if "elastic" in lower and "deductiveai" in lower:
-        return "Elastic 擬收購 DeductiveAI，AI 併購活動升溫"
+        return "Elastic 擬收購 AI 新創，企業軟件併購升溫"
     if "fox stock" in lower or ("fox" in lower and "roku" in lower):
         return "Fox 股價受券商看法拖累，Roku 交易受關注"
     if "nippon steel" in lower and ("us steel" in lower or "u.s. steel" in lower or "american market" in lower):
-        return "Nippon Steel 看好美國市場，US Steel 盈利前景受關注"
+        return "Nippon Steel 看好美國需求，鋼鐵盈利前景受關注"
     if "paramount" in lower and "warner bros" in lower:
         return "Paramount 拒刊批評廣告，併購爭議延燒"
     if "department of labor" in lower and "defrauded" in lower:
