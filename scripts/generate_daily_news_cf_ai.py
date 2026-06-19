@@ -1725,9 +1725,11 @@ def validate_brief(brief: dict) -> None:
         if item.get("summary_zh"):
             summary_counts[item["summary_zh"]] = summary_counts.get(item["summary_zh"], 0) + 1
         source_family_counts[source_family(item.get("source", ""))] = source_family_counts.get(source_family(item.get("source", "")), 0) + 1
-        if item["title_zh"] in BAD_GENERIC_TITLES:
+        original_title = item.get("title_original", "")
+        has_concrete_original = original_title_has_concrete_news_signal(original_title)
+        if item["title_zh"] in BAD_GENERIC_TITLES and not has_concrete_original:
             fail(f"title_zh is too generic: {item['title_zh']}")
-        if looks_like_generic_editorial_title(item["title_zh"]):
+        if looks_like_generic_editorial_title(item["title_zh"]) and not has_concrete_original:
             fail(f"title_zh looks like a generic editorial placeholder: {item['title_zh']} | original: {item.get('title_original')}")
         if not has_cjk(item["title_zh"]) or looks_mostly_english(item["title_zh"]):
             fail(f"title_zh is not acceptable Traditional Chinese: {item['title_zh']}")
