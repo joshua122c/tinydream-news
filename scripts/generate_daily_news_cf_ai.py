@@ -546,7 +546,7 @@ def content_markers(value: str) -> list[str]:
     return list(dict.fromkeys(markers))[:20]
 
 
-def summary_rejection_reason(summary: str, context_text: str, title: str, source_confidence: float = 1.0) -> str:
+def summary_rejection_reason(summary: str, context_text: str, title: str, source_confidence: float = 1.0, summary_basis: str = "") -> str:
     if not summary or "NO_VERIFIABLE_SUMMARY" in summary:
         return "empty_summary"
     if not has_cjk(summary):
@@ -581,7 +581,8 @@ def summary_rejection_reason(summary: str, context_text: str, title: str, source
         return "machine_translation_artifact"
     if unsupported_summary_claims(summary, context_text, title):
         return "unsupported_claims"
-    min_summary_chars = 85 if source_confidence >= MIN_AI_CONTEXT_CONFIDENCE else 45
+    limited_basis = summary_basis in {"rss_description", "meta_description"}
+    min_summary_chars = 65 if limited_basis else 80 if source_confidence >= MIN_AI_CONTEXT_CONFIDENCE else 45
     if len(summary) < min_summary_chars:
         return "too_short"
     if len(summary) > 360:
@@ -888,7 +889,13 @@ def apply_batch_ai_summaries(items: list[dict]) -> None:
             summary = clean_ai_summary_output(value)
             context_text = context_by_id.get(item_id, "")
             confidence = float(item.get("_summary_context_confidence") or 0)
-            rejection_reason = summary_rejection_reason(summary, context_text, item.get("title_original", ""), confidence)
+            rejection_reason = summary_rejection_reason(
+                summary,
+                context_text,
+                item.get("title_original", ""),
+                confidence,
+                item.get("_summary_context_basis", ""),
+            )
             if not rejection_reason and not contains_common_simplified_zh(summary):
                 item["summary_zh"] = summary[:420]
                 item["summary"] = item["summary_zh"]
@@ -1549,6 +1556,7 @@ def sanitize_items_for_publication(items: list[dict]) -> list[dict]:
             item.get("_summary_context_text", ""),
             item.get("title_original", ""),
             float(item.get("source_confidence") or 0),
+            item.get("summary_basis", ""),
         ) if summary else ""
         if summary and (
             any(phrase in summary for phrase in BAD_READER_PHRASES)
